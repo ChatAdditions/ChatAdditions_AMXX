@@ -18,7 +18,7 @@ before_script:
     - wget -q "http://www.amxmodx.org/release/amxmodx-$AMXXVERSION-base-linux.tar.gz" -O amxmodx.tar.gz
     - tar -xzf amxmodx.tar.gz
     - cd addons/amxmodx/scripting/
-    - chmod +x amxxpc
+    - chmod +x amxxpc32.so
     - chmod +x compile.sh
 
 script:
