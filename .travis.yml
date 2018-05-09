@@ -22,4 +22,7 @@ before_script:
     - chmod +x compile.sh
 
 script:
-    - ./compile.sh ChatsAdditions_API.sma CA_Gag.sma CA_Mute.sma CA_NeedKills.sma
+    - ./compile.sh ChatsAdditions_API.sma
+    - ./compile.sh CA_Gag.sma
+    - ./compile.sh CA_Mute.sma
+    - ./compile.sh CA_NeedKills.sma
