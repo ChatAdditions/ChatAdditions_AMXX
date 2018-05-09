@@ -1,0 +1,25 @@
+language: c
+
+env:
+    - AMXXVERSION=1.8.3
+    - AMXXVERSION=1.8.2
+
+matrix:
+    fast_finish: true
+    allow_failures:
+    - env: AMXXVERSION=1.8.2
+
+before_install:
+    - sudo apt-get update
+    - sudo apt-get install gcc-multilib
+    - sudo apt-get install lib32stdc++6
+
+before_script:
+    - wget -q "http://www.amxmodx.org/release/amxmodx-$AMXXVERSION-base-linux.tar.gz" -O amxmodx.tar.gz
+    - tar -xzf amxmodx.tar.gz
+    - cd addons\amxmodx\scripting\
+    - chmod +x amxxpc
+    - chmod +x compile.sh
+
+script:
+    - ./compile.sh ChatsAdditions_API.sma CA_Gag.sma CA_Mute.sma CA_NeedKills.sma
