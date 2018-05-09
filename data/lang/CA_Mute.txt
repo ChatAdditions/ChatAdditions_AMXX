@@ -1,0 +1,16 @@
+[ru]
+CA_Mute_TITLE = Заглушить игрока: 
+CA_Mute_MuteALL = Заглушить всех
+CA_Mute_ENABLED = Включено
+CA_Mute_DISABLED = Выключено
+CA_Mute_Next = Следующая
+CA_Mute_Back = Назад
+CA_Mute_Exit = Выход
+
+CA_Mute_PlayerNotAllowed = Игрок[%i] не доступен. (Уже вышел)
+CA_Mute_HasBeenMuted = Игрок %s был %L.
+
+CA_Mute_Muted = заглушен
+CA_Mute_UnMuted = разоткнут
+
+[en]
