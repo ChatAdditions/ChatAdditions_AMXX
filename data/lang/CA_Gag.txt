@@ -1,0 +1,19 @@
+[ru]
+CA_Gag_TITLE = Заткнуть игрока
+CA_Gag_AdditionalModes = Дополнительные режимы
+CA_Gag_Properties = Параметры затычки игрока: [ \r%s\w ]
+MENU_SelectReason = Выберите приину для затычки:
+EnterReason = Ввести причину ->\n
+MENU_SelectTime = Выберите время для затычки:
+SET_CustomTime = Указать время ->
+CA_GAG_YES = \yДа\w
+CA_GAG_NO = \rНет\w
+
+CA_Gag_Say = Чат: [%L]
+CA_Gag_SayTeam = Командный чат: [%L]
+CA_Gag_Voice = Голосовое общение: [%L]
+CA_Gag_Reason = Причина: [\y %s \w]
+CA_Gag_Time = Время: [\y %s \w]
+CA_Gag_Confirm = Подтвердить!
+CA_Gag_NotSet = \dНе задано
+CA_Gag_Perpapent = \r*ПЕРМАМЕНТНО*
