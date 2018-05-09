@@ -17,7 +17,7 @@ before_install:
 before_script:
     - wget -q "http://www.amxmodx.org/release/amxmodx-$AMXXVERSION-base-linux.tar.gz" -O amxmodx.tar.gz
     - tar -xzf amxmodx.tar.gz
-    - cd addons\amxmodx\scripting\
+    - cd addons/amxmodx/scripting/
     - chmod +x amxxpc
     - chmod +x compile.sh
 
