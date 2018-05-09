@@ -1,5 +1,5 @@
 # Chat Additions
-[![Build Status](https://travis-ci.org/wopox1337/ChatsAdditions_AMXX.svg?branch=master)](https://travis-ci.org/wopox1337/ChatsAdditions_AMXX)
+[![Build Status](https://travis-ci.org/wopox1337/ChatsAdditions_AMXX.svg?branch=master)](https://travis-ci.org/wopox1337/ChatsAdditions_AMXX)</br>
 Плагин **Chat Additions** предназначен для управления *голосовым* и *текстовым* чатом игроков. 
 
 ### Состав плагина:
