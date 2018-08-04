@@ -1,13 +1,13 @@
 language: c
 
 env:
-   # - AMXXVERSION=1.8.3
-    - AMXXVERSION=1.8.2
+    - AMXXVERSION=1.8.3-dev-git5175
+   # - AMXXVERSION=1.8.2
 
 matrix:
     fast_finish: true
     allow_failures:
-    - env: AMXXVERSION=1.8.2
+    - env: AMXXVERSION=1.8.3-dev-git5175
 
 before_install:
     - sudo apt-get update
@@ -15,7 +15,7 @@ before_install:
     - sudo apt-get install lib32stdc++6
 
 before_script:
-    - wget -q "http://www.amxmodx.org/release/amxmodx-$AMXXVERSION-base-linux.tar.gz" -O amxmodx.tar.gz
+    - wget -q "https://www.amxmodx.org/amxxdrop/1.8/amxmodx-$AMXXVERSION-base-linux.tar.gz" -O amxmodx.tar.gz
     - tar -xzf amxmodx.tar.gz
     - cd addons/amxmodx/scripting/
     - chmod +x amxxpc32.so
