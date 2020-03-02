@@ -40,14 +40,8 @@ public Init_Storage()
 		set_fail_state("Failed to use '%s' as DB driver. Check modules.ini", SQL_DBTYPE);
 
 	g_hTuple = SQL_MakeDbTuple( "", "", "", SQL_DBNAME);
-
-	// для поддержки utf8 ников требуется AMXX 1.8.3-dev-git3799 или выше
-	// https://github.com/alliedmodders/amxmodx/commit/3d732bbbb6bbb6ca621b99e777ab8d1bc1a4a985
-#if defined SQL_SetCharset
 	SQL_SetCharset(g_hTuple, "utf8");
-#else
-	#pragma AMXX 1.8.2 deprecated Use AMXX 1.8.3 instead!
-#endif
+
 	CreateTable();
 
 	return true;
