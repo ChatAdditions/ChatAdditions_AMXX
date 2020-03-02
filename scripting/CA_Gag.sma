@@ -70,10 +70,12 @@ public plugin_init()
 	Init_Cmds();
 }
 
-public ClCmd_Gag(pPlayer)
+public ClCmd_Gag(pPlayer, level, cid)
 {
-	/* if(!IsUserHaveAccessToUse(pPlayer))
-		return PLUGIN_HANDLED; */
+#if !defined DEBUG
+	if(!cmd_access(pPlayer, level, cid, 1))
+		return PLUGIN_HANDLED;
+#endif
 
 	if(get_playersnum() < 2)
 	{
