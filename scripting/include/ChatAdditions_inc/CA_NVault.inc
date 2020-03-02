@@ -54,7 +54,7 @@ stock save_to_storage(szAuthId[], szIP[], aGagData[gag_s])
 	// nvault_set(g_pNvault_Db, szIP, aGagData);
 
 #if defined DEBUG
-	DEBUG__Dump_GagData(aGagData);
+	DEBUG__Dump_GagData("save_to_storage()", aGagData);
 #endif
 }
 
