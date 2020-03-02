@@ -494,7 +494,7 @@ Init_Cmds()
 						rawPoint
 					);
 						
-					register_clcmd(szCmd, FUNC_NAME);
+					register_clcmd(szCmd, FUNC_NAME, ADMIN_KICK);
 				}
 			}
 			while(ePos != -1);
@@ -502,14 +502,6 @@ Init_Cmds()
 	}
 
 	register_clcmd("enter_GagReason", "ClCmd_EnterGagReason");
-}
-
-stock IsUserHaveAccessToUse(const pPlayer) {
-
-		// Anytime we can add other checks, like cached bool
-
-		return (get_user_flags(pPlayer) & ACCESS_FLAGS);
-
 }
 
 public SrvCmd_AddReason()
