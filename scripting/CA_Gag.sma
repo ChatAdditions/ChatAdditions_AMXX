@@ -565,60 +565,29 @@ public SrvCmd_ShowTemplates()
 	return PLUGIN_HANDLED;
 }
 
-stock flags_to_bit(szFlags[])
-{
-	new gag_flags_s: bits = m_REMOVED;
-	if(containi(szFlags, "a") != -1) bits |= m_Say;
-	if(containi(szFlags, "b") != -1) bits |= m_SayTeam;
-	if(containi(szFlags, "c") != -1) bits |= m_Voice;
-
-	// server_print("flags_to_bit() '%s'=%i",szFlags, bits);
-
-	return bits;
-}
-
-stock bits_to_flags(gag_flags_s: bits)
-{
-	new szFlags[4];
-	if(bits & m_Say) add(szFlags, charsmax(szFlags), "a");
-	if(bits & m_SayTeam) add(szFlags, charsmax(szFlags), "b");
-	if(bits & m_Voice) add(szFlags, charsmax(szFlags), "c");
-
-	// server_print("bits_to_flags()='%s'", szFlags);
-
-	return szFlags;
-}
-
 SaveGag(pPlayer, pOther)
 {
 	// ca_remove_user_gag(pOther);
 
-	get_user_name(pPlayer, g_aGags[pOther][_AdminName], 31);
-	get_user_name(pOther, g_aGags[pOther][_Name], 31);
+	get_user_name(pPlayer, g_aGags[pOther][_AdminName], charsmax(g_aGags[][_AdminName]));
+	get_user_name(pOther, g_aGags[pOther][_Name],  charsmax(g_aGags[][_Name]));
 
 	g_aGags[pOther][_AdminId] = pPlayer;
+	
+#if defined DEBUG
+	//DEBUG__Dump_GagData("SaveGag()", g_aGags[pOther]);
+#endif
 
-// LOG DAT FKIN BUGGY ARRAYS! ;(
-	server_print(" SaveGag() -> \n\
-		g_aGags[_Player] = '%i'\n\
-		g_aGags[_AuthId] = '%s'\n\
-		g_aGags[_IP] = '%s'\n\
-		g_aGags[_Name] = '%s'\n\
-		g_aGags[_AdminId] = '%i'\n\
-		g_aGags[_AdminName] = '%s'\n\
-		g_aGags[_AdminAuthId] = '%s'\n\
-		g_aGags[_AdminIP] = '%s'\n\
-		g_aGags[_Reason] = '%s'\n\
-		g_aGags[_ExpireTime] = '%i'\
-		", g_aGags[pOther][_Player], g_aGags[pOther][_AuthId], g_aGags[pOther][_IP], g_aGags[pOther][_Name],
-		g_aGags[pOther][_AdminId], g_aGags[pOther][_AdminName], g_aGags[pOther][_AdminAuthId],
-		g_aGags[pOther][_AdminIP], g_aGags[pOther][_Reason], g_aGags[pOther][_ExpireTime]
-	);
+	client_print_color(0, print_team_default, "\3 \1Админ %s установил молчанку игроку \4%s\1 на \3%s\1",
+		g_aGags[pOther][_AdminName], g_aGags[pOther][_Name], GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
+
+	if(g_aGags[pOther][_Reason][0])
+		client_print_color(0, print_team_default, "Причина: '%s'", Get_GagStringReason(pPlayer, pOther));
+
+	if(g_aGags[pOther][_ExpireTime] == 0)
+		g_aGags[pOther][_ExpireTime] += 99999999;
 
 	ca_set_user_gag(pOther, g_aGags[pOther]);
-
-	client_print_color(0, print_team_default, "\3 \1Админ %s установил молчанку игроку \4%s\1 на \3%s\1 по причине:\"%s\"",
-		g_aGags[pOther][_AdminName], g_aGags[pOther][_Name], GetStringTime_seconds(g_aGags[pOther][_ExpireTime]), Get_GagStringReason(pPlayer, pOther));
 
 	return PLUGIN_CONTINUE;
 }
