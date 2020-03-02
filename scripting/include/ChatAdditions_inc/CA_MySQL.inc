@@ -32,8 +32,8 @@ enum any: Query_state
 
 enum qeury_data_s
 {
-	_Query_state,
-	_Player
+	qd_Query_state,
+	qd_Player
 }
 
 enum any: Table_s
@@ -106,7 +106,7 @@ CreateTable()
 			);", SQL_TBL_GAGS, SQL_TBL_GAGS
 	);
 
-	g_sqlData[_Query_state] = SQL_INIT;
+	g_sqlData[qd_Query_state] = SQL_INIT;
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
 
@@ -154,8 +154,8 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 #endif	
 
 				// Save on current ingame PlayersArray - gag
-				g_PlayersGags[pPlayer][m_iExpireTime] = SQL_ReadResult(query, col_ExpireTime);
-				g_PlayersGags[pPlayer][m_bitFlags] = any: SQL_ReadResult(query, col_Flags);
+				g_PlayersGags[pPlayer][_ExpireTime] = SQL_ReadResult(query, col_ExpireTime);
+				g_PlayersGags[pPlayer][_bitFlags] = any: SQL_ReadResult(query, col_Flags);
 
 				server_print("\n   - SQL_Handler() FOUND (pPlayer=%i, iExpiredTime=%i)", pPlayer, SQL_ReadResult(query, col_ExpireTime));
 
@@ -173,8 +173,8 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 				static szQuery[QUERY_LENGTH];
 				formatex(szQuery, charsmax(szQuery), "DELETE FROM `%s` WHERE `unban_time` = '0' AND `id` = '%i' LIMIT 1;", SQL_TBL_GAGS, iGagId);
 
-				g_sqlData[_Query_state] = PLAYER_REMOVE;
-				g_sqlData[_Player] = data[_Player];
+				g_sqlData[qd_Query_state] = PLAYER_REMOVE;
+				g_sqlData[qd_Player] = data[_Player];
 
 				SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 
@@ -207,8 +207,8 @@ public load_from_storage(szAuthId[], szIP[], aGagData[gag_s])
 			SQL_TBL_GAGS, szIP, szAuthId
 	);
 
-	g_sqlData[_Query_state] = PLAYER_LOAD;
-	g_sqlData[_Player] = aGagData[m_Player];
+	g_sqlData[qd_Query_state] = PLAYER_LOAD;
+	g_sqlData[qd_Player] = aGagData[_Player];
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 
 #if defined DEBUG
@@ -224,31 +224,31 @@ public save_to_storage(szAuthId[], szIP[], aGagData[gag_s])
 // TODO!
 	new szName[MAX_NAME_LENGTH],
 		iSystime = get_systime(),
-		pPlayer = aGagData[m_Player];
+		pPlayer = aGagData[_Player];
 
 	// User Data
 	get_user_name(pPlayer, szName, charsmax(szName));
-	get_user_ip(pPlayer, aGagData[m_szIP], 31);
-	get_user_authid(pPlayer, aGagData[m_szSteamId], 31);
+	get_user_ip(pPlayer, aGagData[_IP], 31);
+	get_user_authid(pPlayer, aGagData[_AuthId], 31);
 	
 	// Admin Data
-	get_user_name(aGagData[m_AdminId], aGagData[m_szAdminName], 31);
-	get_user_authid(aGagData[m_AdminId], aGagData[m_szAdminAuthId], 31);
-	get_user_ip(aGagData[m_AdminId], aGagData[m_szAdminIP], 31, .without_port = true);
+	get_user_name(aGagData[_AdminId], aGagData[_AdminName], 31);
+	get_user_authid(aGagData[_AdminId], aGagData[_AdminAuthId], 31);
+	get_user_ip(aGagData[_AdminId], aGagData[_AdminIP], 31, .without_port = true);
 
 // TODO!
-	if(aGagData[m_bitFlags] == m_REMOVED)
+	if(aGagData[_bitFlags] == m_REMOVED)
 	{
 		// FORM & sent QUERY to remove player from table.
 	
 		formatex(szQuery, charsmax(szQuery), "\
 			SELECT `id`, `name`, `steamid` FROM `%s`\
 				WHERE (`ip` = '%s' OR `steamid` = '%s') AND `unban_time` = '0' LIMIT 1"
-			, SQL_TBL_GAGS, aGagData[m_szIP], aGagData[m_szSteamId]
+			, SQL_TBL_GAGS, aGagData[_IP], aGagData[_AuthId]
 		);
 
-		g_sqlData[_Query_state] = PLAYER_REMOVE;
-		g_sqlData[_Player] = pPlayer;
+		g_sqlData[qd_Query_state] = PLAYER_REMOVE;
+		g_sqlData[qd_Player] = pPlayer;
 		SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 
 		return;
@@ -258,9 +258,9 @@ public save_to_storage(szAuthId[], szIP[], aGagData[gag_s])
 			(`name`, `steamid`, `ip`, `reason`, `admin_name`, `admin_steamid`, `admin_ip`, `create_time`, `unban_time`, `flags`) \
 		VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i)",
 			SQL_TBL_GAGS,
-				szName, szAuthId, szIP, aGagData[m_szReason],
-				aGagData[m_szAdminName], aGagData[m_szAdminAuthId], aGagData[m_szAdminIP],
-				iSystime, aGagData[m_iExpireTime], aGagData[m_bitFlags]
+				szName, szAuthId, szIP, aGagData[_Reason],
+				aGagData[_AdminName], aGagData[_AdminAuthId], aGagData[_AdminIP],
+				iSystime, aGagData[_ExpireTime], aGagData[_bitFlags]
 		);
 	
 // TODO: 
@@ -269,8 +269,8 @@ public save_to_storage(szAuthId[], szIP[], aGagData[gag_s])
 
 	// server_print("QUERY='%s'", szQuery);
 
-	g_sqlData[_Query_state] = PLAYER_SAVE;
-	g_sqlData[_Player] = pPlayer;
+	g_sqlData[qd_Query_state] = PLAYER_SAVE;
+	g_sqlData[qd_Player] = pPlayer;
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
 
