@@ -189,6 +189,7 @@ public Menu_Handler_PlayersList(pPlayer, iKey)
 
 	if(g_aGags[pOther][_bitFlags]) {
 		ResetOtherData(pOther);
+		ca_remove_user_gag(pOther);
 
 		static szName[MAX_NAME_LENGTH]; get_user_name(pOther, szName, charsmax(szName));
 		client_print(pPlayer, print_chat, "Вы сняли блокировку с игрока '%s'", szName);
@@ -659,7 +660,5 @@ stock ResetAdminData(pPlayer)
 
 stock ResetOtherData(pOther)
 {
-	g_aGags[pOther][_bitFlags] = 0;
-	g_aGags[pOther][_Reason] = 0;
-	g_aGags[pOther][_ExpireTime] = 0;
+	GagData_Reset(g_aGags[pOther]);
 }
