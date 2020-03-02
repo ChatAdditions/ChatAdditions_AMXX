@@ -15,6 +15,7 @@
 	#pragma loadlib Chats_Additions_API
 #endif
 
+#pragma dynamic 524288
 
 enum any: gag_flags_s ( <<=1 )
 {
@@ -44,37 +45,92 @@ enum any: gag_s (+=1)
 	gag_flags_s: _bitFlags
 }
 
+stock flags_to_bit(szFlags[])
+{
+	new gag_flags_s: bits = m_REMOVED;
+	if(containi(szFlags, "a") != -1) bits |= m_Say;
+	if(containi(szFlags, "b") != -1) bits |= m_SayTeam;
+	if(containi(szFlags, "c") != -1) bits |= m_Voice;
+
+	// server_print("flags_to_bit() '%s'=%i",szFlags, bits);
+
+	return bits;
+}
+
+stock bits_to_flags(gag_flags_s: bits)
+{
+	new szFlags[4];
+	if(bits & m_Say) add(szFlags, charsmax(szFlags), "a");
+	if(bits & m_SayTeam) add(szFlags, charsmax(szFlags), "b");
+	if(bits & m_Voice) add(szFlags, charsmax(szFlags), "c");
+
+	// server_print("bits_to_flags()='%s'", szFlags);
+
+	return szFlags;
+}
+
+stock GagData_Reset(aGagData[gag_s])
+{
+	aGagData[_bitFlags] = m_REMOVED;
+	aGagData[_Reason] = EOS;
+	aGagData[_ExpireTime] = 0;
+}
+
 // Debug functions
-stock DEBUG__Dump_GagData(const aGagData[gag_s]) {
-	server_print(" DEBUG__Dump_GagData() -> \n\
-		Player = '%i'\n\
-		AuthId = '%s'\n\
-		IP = '%s'\n\
-		AdminId = '%i'\n\
-		AdminName = '%s'\n\
-		AdminAuthId = '%s'\n\
-		AdminIP = '%s'\n\
-		Reason = '%s'\n\
-		ExpireTime = '%i'\n\
-		", aGagData[_Player], aGagData[_AuthId], aGagData[_IP],
+
+#include <fakemeta>
+#define SERVER_PRINT(%1) engfunc(EngFunc_ServerPrint, %1)
+
+stock Print_Console(szBuffer[])
+{
+	for(new i; i < strlen(szBuffer); i+=255)
+	{
+		SERVER_PRINT(fmt("%-255s", szBuffer[i]));
+	}
+	SERVER_PRINT("\n");
+}
+
+stock DEBUG__Dump_GagData(from[], const aGagData[gag_s]) {
+	new szBuffer[5028];
+	formatex(szBuffer, charsmax(szBuffer), "[call %s] DEBUG__Dump_GagData() -> \n\
+		\t Player = '%i'\n\
+		\t AuthId = '%s'\n\
+		\t IP = '%s'\n\
+		\t AdminId = '%i'\n\
+		\t AdminName = '%s'\n\
+		\t AdminAuthId = '%s'\n\
+		\t AdminIP = '%s'\n\
+		\t Reason = '%s'\n\
+		\t ExpireTime = '%i'\n\
+		\t Flags = '%s'\n\
+		", from, 
+		aGagData[_Player], aGagData[_AuthId], aGagData[_IP],
 		aGagData[_AdminId], aGagData[_AdminName], aGagData[_AdminAuthId],
-		aGagData[_AdminIP], aGagData[_Reason], aGagData[_ExpireTime]
+		aGagData[_AdminIP], aGagData[_Reason], aGagData[_ExpireTime], bits_to_flags(aGagData[_bitFlags])
 	);
+
+	Print_Console(szBuffer);
 }
 
 stock DEBUG__Dump_GagFlags(const aGagData[gag_s]) {
 	if(!aGagData[_bitFlags]) {
-		server_print(" DEBUG_Dump_GagFlags() -> No have any flags.");
+		Print_Console(" DEBUG_Dump_GagFlags() -> No have any flags.");
 		return;
 	}
 
-	server_print("	DEBUG_Dump_GagFlags() -> #FOUND\n\
+	new szBuffer[5028];
+	formatex(szBuffer, charsmax(szBuffer), "	DEBUG_Dump_GagFlags() -> #FOUND\n\
 			\t Flags='%i'\n\
 			\t Reason='%s'\n\
 			\t Time='%i'",
 			aGagData[_bitFlags], aGagData[_Reason], aGagData[_Reason]
 		);
+	
+	Print_Console(szBuffer);
 }
+
+
+// API
 
 /**
  * Called when player say to chat.
@@ -127,7 +183,6 @@ native ca_set_user_gag(index, aGagData[gag_s]);
  * Remove client's gag data..
  *
  * @param index         Client index
- * @param aGagData      Gag data with gag_s
  *
  * @noreturn
  * @error               If the client index is not within the range of 1 to
