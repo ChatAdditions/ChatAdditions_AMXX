@@ -43,6 +43,8 @@ new const MENU_Gag_Properties[]		= "Gag properties on players";
 new any: g_aGags[MAX_PLAYERS + 1][gag_s];
 new Array: g_aReasons, g_iArraySize_Reasons;
 
+new g_pMenu_GagProperties;
+
 public plugin_init()
 {
 	register_plugin("[CA] Gag", "0.01b", "wopox1337");
@@ -68,6 +70,8 @@ public plugin_init()
 	// server_cmd("ca_gag_add_reason \"Reason #5\" \"bc\" \"25\"");
 
 	Init_Cmds();
+	
+	g_pMenu_GagProperties = BuildMenu_GagProperties();
 }
 
 public ClCmd_Gag(pPlayer, level, cid)
@@ -83,81 +87,69 @@ public ClCmd_Gag(pPlayer, level, cid)
 		return PLUGIN_HANDLED;
 	}
 
-	Menu_Show_PlayersList(pPlayer, .iPage = 0);
+	Menu_Show_PlayersList(pPlayer);
 	return PLUGIN_HANDLED;
 }
 
-public Menu_Show_PlayersList(pPlayer, iPage)
+
+// Players menu
+public Menu_Show_PlayersList(pPlayer)
 {
-	if(iPage < 0)
-		return PLUGIN_HANDLED;
+	new pMenu = menu_create("Choose player to gag", "Menu_Handler_PlayersList");
 
-	if(iPage == 0)
-	{
-		// ResetOtherData(g_iSelectedPlayer[pPlayer]);
-		ResetAdminData(pPlayer);
-	}
+	new aPlayers[MAX_PLAYERS], iCount;
+	get_players(aPlayers, iCount, .flags = "ch");
 
-	new aPlayersId[MAX_PLAYERS];
-	static iCount, iPlayer;
-	new szMenu[512], szName[MAX_NAME_LENGTH];
+	new hCallback = menu_makecallback("Callback_PlayersMenu");
 
-#if defined DEBUG
-	get_players(aPlayersId, iCount, .flags = "h");
-#else
-	get_players(aPlayersId, iCount, .flags = "ch");
-#endif
+	for(new i; i < iCount; i++)
+		menu_additem(pMenu, "-", fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
 
-	static i; i = min(iPage * PLAYERS_PER_PAGE, iCount);
-	static iStart; iStart = i - (i % PLAYERS_PER_PAGE);
-	static iEnd; iEnd = min(iStart + PLAYERS_PER_PAGE, iCount);
-
-	iPage = iStart / PLAYERS_PER_PAGE;
-
-	g_apPlayerMenuPlayers[pPlayer] = aPlayersId;
-	g_iPlayerMenuPage[pPlayer] = iPage;
-
-	static iLen;
-	iLen = formatex(szMenu, charsmax(szMenu), "%L\\R%i/%i\n\n", pPlayer, "CA_Gag_TITLE", iPage + 1, ((iCount - 1) / PLAYERS_PER_PAGE) + 1);
-
-	new bitsKeys = MENU_KEY_0, iItem;
-	new bitsFlags;
-
-	for(i = iStart; i < iEnd; i++)
-	{
-		iPlayer = aPlayersId[i];
-		
-		/* if(pPlayer == iPlayer){
-			server_print("SKIPPED %i", iPlayer);
-			continue;
-		} */
-
-		get_user_name(iPlayer, szName, charsmax(szName));
-
-		bitsFlags = get_user_flags(iPlayer);
-		static bHaveImmunity; bHaveImmunity = bitsFlags & FLAGS_IMMUNITY;
-
-		if(pPlayer != iPlayer && !bHaveImmunity)
-			bitsKeys |= (1 << iItem);
-
-		iLen += formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r%i. %s%s%s\n", ++iItem, (bHaveImmunity || (pPlayer == iPlayer)) ? "\\d" : "\\w" ,szName, GetPostfix(iPlayer, bHaveImmunity));
-	}
-
-		// TODO!
-	// bitsKeys |= MENU_KEY_8;
-	// iLen += formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\n\n\\r8. \\w%L\n", pPlayer, "CA_Gag_AdditionalModes");
-
-	if(iEnd < iCount)
-	{
-		bitsKeys |= MENU_KEY_9;
-		formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\n\\r9. \\w%L\n\\r0. \\w%L", pPlayer, "MORE", pPlayer, iPage ? "BACK" : "EXIT");
-	}
-	else
-		formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\n\\r0. \\w%L", pPlayer, iPage ? "BACK" : "EXIT");
-
-	return show_menu(pPlayer, bitsKeys, szMenu, -1, MENU_PlayersList);
+	menu_display(pPlayer, pMenu);
 }
 
+public Callback_PlayersMenu(id, menu, item)
+{
+	new null, sInfo[64], sName[64];
+	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
+
+	new pPlayer = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
+	new bool:bHaveImmunity = !!(get_user_flags(pPlayer) & FLAGS_IMMUNITY);
+
+	menu_item_setname(menu, item, fmt("%n %s", pPlayer, GetPostfix(pPlayer, bHaveImmunity)));
+
+	return (id != pPlayer && !bHaveImmunity) ? ITEM_ENABLED : ITEM_DISABLED;
+}
+
+public Menu_Handler_PlayersList(id, menu, item)
+{
+	if(item == MENU_EXIT || item < 0)
+		return PLUGIN_HANDLED;
+
+	new null, sInfo[64], sName[64];
+	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
+
+	new pOther = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
+
+	if(!is_user_connected(pOther)) {
+		client_print_color(id, print_team_red, "Player not connected!");
+		return PLUGIN_HANDLED;
+	}
+
+	if(g_aGags[pOther][_bitFlags]) {
+		ResetOtherData(pOther);
+		ca_remove_user_gag(pOther);
+
+		client_print(id, print_chat, "Player ungagged '%n'", pOther);
+
+		return menu_display(id, menu);
+	}
+
+	menu_display(id, g_pMenu_GagProperties);
+	g_iSelectedPlayer[id] = pOther;
+
+	return PLUGIN_HANDLED;
+}
 
 	// TODO!
 GetPostfix(pPlayer, bHaveImmunity)
@@ -173,70 +165,96 @@ GetPostfix(pPlayer, bHaveImmunity)
 	return szPostfix;
 }
 
-#define GetPlayerIdByMenuKey(%1,%2) g_apPlayerMenuPlayers[%1][(g_iPlayerMenuPage[%1] * PLAYERS_PER_PAGE) + %2]
-
-public Menu_Handler_PlayersList(pPlayer, iKey)
+// Gag Properties menu
+BuildMenu_GagProperties()
 {
-	switch(iKey)
-	{
-		case 7: return Menu_Show_AdditionalModes(pPlayer);
-		case 8: return Menu_Show_PlayersList(pPlayer, ++g_iPlayerMenuPage[pPlayer]);
-		case 9: return Menu_Show_PlayersList(pPlayer, --g_iPlayerMenuPage[pPlayer]);
-	}
+	new pMenu = menu_create("Gag properties:", "Menu_Handler_GagProperties");
+	new hCallback = menu_makecallback("Callback_GagProperties");
 
-	static pOther; pOther = GetPlayerIdByMenuKey(pPlayer, iKey);
-	// server_print("pPlayer=%i, pOther=%i, iKey=%i", pPlayer, pOther, iKey);
+	menu_additem(pMenu, "Chat:", .callback = hCallback);
+	menu_additem(pMenu, "Team chat:", .callback = hCallback);
+	menu_additem(pMenu, "Voice chat:", .callback = hCallback);
+	menu_addblank(pMenu, false);
+	menu_additem(pMenu, "Reason:", .callback = hCallback);
+	menu_additem(pMenu, "Time:", .callback = hCallback);
+	menu_additem(pMenu, "Confirm!", .callback = hCallback);
 
-	if(g_aGags[pOther][_bitFlags]) {
-		ResetOtherData(pOther);
-		ca_remove_user_gag(pOther);
-
-		static szName[MAX_NAME_LENGTH]; get_user_name(pOther, szName, charsmax(szName));
-		client_print(pPlayer, print_chat, "Вы сняли блокировку с игрока '%s'", szName);
-
-		return Menu_Show_PlayersList(pPlayer, g_iPlayerMenuPage[pPlayer]);
-	}
-
-
-	Menu_Show_OnPlayerSelect(pPlayer, pOther);
-
-	g_iSelectedPlayer[pPlayer] = pOther;
-
-	// Menu_Show_PlayersList(pPlayer, g_iPlayerMenuPage[pPlayer]);
-	return PLUGIN_HANDLED;
+	return pMenu;
 }
 
-Menu_Show_OnPlayerSelect(pPlayer, pOther)
+public Callback_GagProperties(id, menu, item)
 {
-	if(!is_user_connected(pOther))
-		return PLUGIN_HANDLED;
-
-	new szMenu[512],
-		szName[MAX_NAME_LENGTH],
-		bitsKeys = MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_0;
-
-	if(Ready_To_Gag(pOther))
-		bitsKeys |= MENU_KEY_7;
-
-	get_user_name(pOther, szName, charsmax(szName));
-
-	static gag_flags_s: gagFlags; gagFlags = g_aGags[pOther][_bitFlags];
+	enum { menu_Chat, menu_TeamChat, menu_VoiceChat,
+			menu_Reason, menu_Time, menu_Confirm
+		};
 	
-	static iLen;
-	iLen =	formatex(szMenu, charsmax(szMenu), "%L\n", pPlayer, "CA_Gag_Properties", szName);
-	// iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\dФлаги:\\w [\\r%s\\w]\n", szGagFlags));
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r1\\w. %L\n", pPlayer, "CA_Gag_Say", (gagFlags & m_Say) ? " \\r+\\w " : " - ");
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r2\\w. %L\n", pPlayer, "CA_Gag_SayTeam", (gagFlags & m_SayTeam) ? " \\r+\\w " : " - ");
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r3\\w. %L\n\n", pPlayer, "CA_Gag_Voice", (gagFlags & m_Voice) ? " \\r+\\w " : " - ");
+	new pOther = g_iSelectedPlayer[id];
+	new gag_flags_s: gagFlags = g_aGags[pOther][_bitFlags];
 
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r5\\w. %L\n", pPlayer, "CA_Gag_Reason", Get_GagStringReason(pPlayer, pOther));
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r6\\w. %L\n\n", pPlayer, "CA_Gag_Time", GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r7\\w. %s%L\n", Ready_To_Gag(pOther) ? "\\y" : "\\d", pPlayer, "CA_Gag_Confirm");
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r0\\w. \\r%L", pPlayer, "BACK");
+	new null, sInfo[64], sName[64];
+	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
 
-	// log_amx("g_aGags[pOther][_ExpireTime]='%s'", g_aGags[pOther][_ExpireTime]);
+	switch(item) {
+		case menu_Chat:
+			formatex(sName, charsmax(sName), "Chat: [ %s ]", (gagFlags & m_Say) ? " \\r+\\w " : "-");
+		case menu_TeamChat:
+			formatex(sName, charsmax(sName), "Team chat: [ %s ]", (gagFlags & m_SayTeam) ? " \\r+\\w " : "-");
+		case menu_VoiceChat:
+			formatex(sName, charsmax(sName), "Voice chat: [ %s ]", (gagFlags & m_Voice) ? " \\r+\\w " : "-");
+		case menu_Reason:
+			formatex(sName, charsmax(sName), "Reason: [ %s ]", Get_GagStringReason(id, pOther));
+		case menu_Time:
+			formatex(sName, charsmax(sName), "Time: [ %s ]", GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
+	}
 
-	return show_menu(pPlayer, bitsKeys, szMenu, -1, MENU_Gag_Properties);
+	menu_item_setname(menu, item, sName);
+
+	return (item == menu_Confirm && !Ready_To_Gag(pOther)) ? ITEM_DISABLED : ITEM_ENABLED;
+}
+
+public Menu_Handler_GagProperties(id, menu, item)
+{	
+	enum { menu_Chat, menu_TeamChat, menu_VoiceChat,
+			menu_Reason, menu_Time, menu_Confirm
+		};
+
+	new pOther = g_iSelectedPlayer[id];
+
+	if(item == MENU_EXIT || item < 0) {
+		ResetOtherData(pOther);
+		return PLUGIN_HANDLED;
+	}
+
+	if(!is_user_connected(pOther)) {
+		Menu_Show_PlayersList(id);
+		client_print_color(id, print_team_red, "Player not connected!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	switch(item) {
+		case menu_Chat:			Gag_Toggle(pOther, m_Say);
+		case menu_TeamChat: 	Gag_Toggle(pOther, m_SayTeam);
+		case menu_VoiceChat:	Gag_Toggle(pOther, m_Voice);
+		case menu_Reason: {
+			Menu_Show_SelectReason(id, pOther);
+
+			return PLUGIN_HANDLED;
+		}
+		case menu_Time:	{
+			Menu_Show_SelectTime(id, pOther);
+
+			return PLUGIN_HANDLED;
+		}
+		case menu_Confirm: {
+			SaveGag(id ,pOther);
+			return PLUGIN_HANDLED;
+		}
+	}
+
+	menu_display(id, g_pMenu_GagProperties);
+
+	return PLUGIN_HANDLED;
 }
 
 stock bool: Ready_To_Gag(pOther)
@@ -244,27 +262,6 @@ stock bool: Ready_To_Gag(pOther)
 	return (g_aGags[pOther][_bitFlags] != m_REMOVED ) ? true : false;
 }
 
-public Menu_Handler_GagProperties(pPlayer, iKey)
-{
-	static pOther; pOther = g_iSelectedPlayer[pPlayer];
-
-	switch(++iKey)
-	{
-		case 1: Gag_Toggle(pOther, m_Say);
-		case 2: Gag_Toggle(pOther, m_SayTeam);
-		case 3: Gag_Toggle(pOther, m_Voice);
-		case 5: return Menu_Show_SelectReason(pPlayer, pOther);
-		case 6: return Menu_Show_SelectTime(pPlayer, pOther);
-
-		case 7: return SaveGag(pPlayer ,pOther);
-		default: {
-			ResetOtherData(pOther);
-			return Menu_Show_PlayersList(pPlayer, .iPage = g_iPlayerMenuPage[pPlayer]);
-		}
-	}
-
-	return Menu_Show_OnPlayerSelect(pPlayer, pOther);
-}
 
 public Menu_Show_SelectReason(pPlayer, pOther)
 {
@@ -303,8 +300,11 @@ public Menu_Show_SelectReason(pPlayer, pOther)
 public Menu_Handler_SelectReason(pPlayer, pMenu, iItem)
 {
 	new pOther = g_iSelectedPlayer[pPlayer];
-	if(iItem == MENU_EXIT)
-		return Menu_Show_OnPlayerSelect(pPlayer, pOther);
+
+	if(iItem == MENU_EXIT || iItem < 0) {
+		menu_display(pPlayer, g_pMenu_GagProperties);
+		return PLUGIN_HANDLED;
+	}
 
 	static szItemInfo[3], dummy[1];
 	menu_item_getinfo(pMenu, iItem, dummy[0], szItemInfo, charsmax(szItemInfo), dummy[0], charsmax(dummy), dummy[0]);
@@ -330,8 +330,9 @@ public Menu_Handler_SelectReason(pPlayer, pMenu, iItem)
 
 	// log_amx("aReason[_ExpireTime]=%i, aReason[_Reason]=%s", aReason[_ExpireTime], aReason[_Reason]);
 
-	return Menu_Show_OnPlayerSelect(pPlayer, pOther);
+	menu_display(pPlayer, g_pMenu_GagProperties);
 
+	return PLUGIN_HANDLED;
 	// server_print("iItem=%i", iItem);
 	// server_print("Data[%s]", szItemInfo);
 }
@@ -370,9 +371,11 @@ public Menu_Handler_SelectTime(pPlayer, pMenu, iItem)
 {
 	new pOther = g_iSelectedPlayer[pPlayer];
 
-	if(iItem == MENU_EXIT)
-		return Menu_Show_OnPlayerSelect(pPlayer, pOther);
-	
+	if(iItem == MENU_EXIT || iItem < 0) {
+		menu_display(pPlayer, g_pMenu_GagProperties);
+		return PLUGIN_HANDLED;
+	}
+
 	static szItemInfo[16], dummy[1];
 	menu_item_getinfo(pMenu, iItem, dummy[0], szItemInfo, charsmax(szItemInfo), dummy[0], charsmax(dummy), dummy[0]);
 
@@ -394,7 +397,8 @@ public Menu_Handler_SelectTime(pPlayer, pMenu, iItem)
 
 	// server_print("SetGAGTIME: '%i'", g_aGags[pOther][_ExpireTime]);
 
-	return Menu_Show_OnPlayerSelect(pPlayer, pOther);
+	menu_display(pPlayer, g_pMenu_GagProperties);
+	return PLUGIN_HANDLED;
 }
 
 public ClCmd_EnterGagReason(pPlayer)
@@ -416,7 +420,8 @@ public ClCmd_EnterGagReason(pPlayer)
 	copy(g_aGags[pOther][_Reason], MAX_REASON_LEN - 1, szCustomReason);
 
 	client_print(pPlayer, print_chat, "Вы установили причину затычки: '%s'", g_aGags[pOther][_Reason]);
-	return Menu_Show_OnPlayerSelect(pPlayer, pOther);
+	menu_display(pPlayer, g_pMenu_GagProperties);
+	return PLUGIN_HANDLED;
 }
 
 Gag_Toggle(pOther, gag_flags_s: flag)
