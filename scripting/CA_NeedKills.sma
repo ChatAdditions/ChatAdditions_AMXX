@@ -21,28 +21,36 @@ public plugin_init()
 }
 
 public CBasePlayer_Killed(pPlayer, pKiller) {
-	if(!is_user_connected(pKiller)) return;
-	if(--g_iKillsCount[pKiller] < 0) return;
+	if(!is_user_connected(pKiller))
+		return;
+
+	if(--g_iKillsCount[pKiller] < 0)
+		return;
 
 	static szMsg[128];
 	if(g_iKillsCount[pKiller] == 0)
-		formatex(szMsg, charsmax(szMsg), "ВАШ ЧАТ - РАЗБЛОКИРОВАН!");
-	else formatex(szMsg, charsmax(szMsg), "До снятия блокировки: %i убийств.", g_iKillsCount[pKiller]);
+		formatex(szMsg, charsmax(szMsg), "Your chat has been unlocked!");
+	else formatex(szMsg, charsmax(szMsg), "To unlock chat %i kills left.", g_iKillsCount[pKiller]);
 	
 	client_print(pKiller, print_chat, szMsg);
 }
 
-public client_disconnected(pPlayer)
+public client_disconnected(pPlayer) {
 	g_iKillsCount[pPlayer] = KILLS_NEED;
+}
 
-public CA_Client_Say(pPlayer)
+public CA_Client_Say(pPlayer) {
 	return CanCommunicate(pPlayer) ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
+}
 
-public CA_Client_SayTeam(pPlayer)
+public CA_Client_SayTeam(pPlayer) {
 	return CanCommunicate(pPlayer) ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
+}
 
-public CA_Client_Voice(pPlayer, pOther)
+public CA_Client_Voice(pPlayer, pOther) {
 	return CanCommunicate(pPlayer) ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
+}
 
-bool: CanCommunicate(pPlayer)
+bool: CanCommunicate(pPlayer) {
 	return g_iKillsCount[pPlayer] <= 0;
+}
