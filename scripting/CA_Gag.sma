@@ -241,7 +241,7 @@ Menu_Show_OnPlayerSelect(pPlayer, pOther)
 
 stock bool: Ready_To_Gag(pOther)
 {	
-	return (g_aGags[pOther][_ExpireTime] != 0 && g_aGags[pOther][_bitFlags] != m_REMOVED ) ? true : false;
+	return (g_aGags[pOther][_bitFlags] != m_REMOVED ) ? true : false;
 }
 
 public Menu_Handler_GagProperties(pPlayer, iKey)
