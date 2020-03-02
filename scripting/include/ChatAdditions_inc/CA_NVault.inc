@@ -36,15 +36,10 @@ stock load_from_storage(szAuthId[], szIP[], aGagData[gag_s])
 	NVault_GagParse(szGagData, aGagData);
 	
 #if defined DEBUG
-		if(!aGagData[_bitFlags]) return;
-		server_print("	NVault_GetGag('%s', '%s') -> #FOUND\n\
-			\t Flags='%i'\n\
-			\t Reason='%s'\n\
-			\t Time='%i'", szAuthId, szIP,
-			aGagData[_bitFlags], aGagData[_Reason], aGagData[_Reason]
-		);
+		DEBUG__Dump_GagFlags(aGagData);
 #endif
 }
+
 
 stock save_to_storage(szAuthId[], szIP[], aGagData[gag_s])
 {
@@ -59,26 +54,9 @@ stock save_to_storage(szAuthId[], szIP[], aGagData[gag_s])
 	// nvault_set(g_pNvault_Db, szIP, aGagData);
 
 #if defined DEBUG
-	// LOG DAT FKIN BUGGY ARRAYS! ;(
-
-	server_print(" save_to_storage() -> \n\
-		aGagData[_Player] = '%i'\n\
-		aGagData[_AuthId] = '%s'\n\
-		aGagData[_IP] = '%s'\n\
-		aGagData[_AdminId] = '%i'\n\
-		aGagData[_AdminName] = '%s'\n\
-		aGagData[_AdminAuthId] = '%s'\n\
-		aGagData[_AdminIP] = '%s'\n\
-		aGagData[_Reason] = '%s'\n\
-		aGagData[_ExpireTime] = '%i'\n\
-		", aGagData[_Player], aGagData[_AuthId], aGagData[_IP],
-		aGagData[_AdminId], aGagData[_AdminName], aGagData[_AdminAuthId],
-		aGagData[_AdminIP], aGagData[_Reason], aGagData[_ExpireTime]
-	);
-
+	DEBUG__Dump_GagData(aGagData);
 #endif
 }
-
 
 stock NVault_GagParse(szGagData[], aGagData[gag_s])
 {
