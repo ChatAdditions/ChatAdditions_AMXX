@@ -1,10 +1,11 @@
 #include <amxmodx>
 #include <amxmisc>
 
-#include <ChatsAdditions_API>
-
 #pragma semicolon 1
 #pragma ctrlchar '\'
+
+#include <ChatsAdditions_API>
+
 
 #define get_bit(%1,%2)		(%1 & (1 << (%2 & 31)))
 #define set_bit(%1,%2)		(%1 |= (1 << (%2 & 31)))

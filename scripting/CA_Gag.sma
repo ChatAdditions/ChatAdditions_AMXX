@@ -5,12 +5,13 @@
 #include <amxmisc>
 #include <time>
 
+#pragma semicolon 1
+#pragma ctrlchar '\'
+
 #include <ChatsAdditions_API>
 
 #define DEBUG
 
-#pragma semicolon 1
-#pragma ctrlchar '\'
 
 /** Time settings */
 enum any: TIME_CONST_s (+=1) { CUSTOMTIME = -10, FOREVER = 0 };
