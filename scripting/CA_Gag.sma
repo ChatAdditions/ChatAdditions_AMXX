@@ -225,9 +225,9 @@ Menu_Show_OnPlayerSelect(pPlayer, pOther)
 	static iLen;
 	iLen =	formatex(szMenu, charsmax(szMenu), "%L\n", pPlayer, "CA_Gag_Properties", szName);
 	// iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\dФлаги:\\w [\\r%s\\w]\n", szGagFlags));
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r1\\w. %L\n", pPlayer, "CA_Gag_Say", pPlayer, (gagFlags & m_Say) ? "CA_GAG_YES" : "CA_GAG_NO");
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r2\\w. %L\n", pPlayer, "CA_Gag_SayTeam", pPlayer, (gagFlags & m_SayTeam) ? "CA_GAG_YES" : "CA_GAG_NO");
-	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r3\\w. %L\n\n", pPlayer, "CA_Gag_Voice", pPlayer, (gagFlags & m_Voice) ? "CA_GAG_YES" : "CA_GAG_NO");
+	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r1\\w. %L\n", pPlayer, "CA_Gag_Say", (gagFlags & m_Say) ? " \\r+\\w " : " - ");
+	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r2\\w. %L\n", pPlayer, "CA_Gag_SayTeam", (gagFlags & m_SayTeam) ? " \\r+\\w " : " - ");
+	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r3\\w. %L\n\n", pPlayer, "CA_Gag_Voice", (gagFlags & m_Voice) ? " \\r+\\w " : " - ");
 
 	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r5\\w. %L\n", pPlayer, "CA_Gag_Reason", Get_GagStringReason(pPlayer, pOther));
 	iLen +=	formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r6\\w. %L\n\n", pPlayer, "CA_Gag_Time", GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
