@@ -10,14 +10,11 @@
 
 #define _Ca_API_included
 
-#if AMXX_VERSION_NUM >= 175
-	#pragma reqlib Chats_Additions_API
-	#if !defined AMXMODX_NOAUTOLOAD
-		#pragma loadlib Chats_Additions_API
-	#endif
-#else
-	#pragma library Chats_Additions_API
+#pragma reqlib Chats_Additions_API
+#if !defined AMXMODX_NOAUTOLOAD
+	#pragma loadlib Chats_Additions_API
 #endif
+
 
 enum any: gag_flags_s ( <<=1 )
 {
