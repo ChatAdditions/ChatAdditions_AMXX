@@ -105,8 +105,9 @@ public Menu_Handler_PlayersList(pPlayer, iKey)
 }
 
 
-public client_disconnected(pPlayer)
+public client_disconnected(pPlayer) {
 	aMuted[pPlayer] = 0;
+}
 
 Mute_Toggle(pPlayer, pOther)
 {
@@ -124,11 +125,13 @@ Mute_Toggle(pPlayer, pOther)
 	client_print(pPlayer, print_chat, "%L", pPlayer, "CA_Mute_HasBeenMuted", szName, pPlayer, get_bit(aMuted[pPlayer], pOther) ? "CA_Mute_Muted" : "CA_Mute_UnMuted");
 }
 
-MuteALL_Toggle(pPlayer)
+MuteALL_Toggle(pPlayer) {
 	aMuted[pPlayer] = AllMuted(pPlayer) ? 0 : 0xFFFF;
+}
 
-bool: AllMuted(pPlayer)
+bool: AllMuted(pPlayer) {
 	return aMuted[pPlayer] == 0xFFFF;
+}
 
 public CA_Client_Voice(pPlayer, pOther)
 	return get_bit(aMuted[pPlayer], pOther) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;

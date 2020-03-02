@@ -448,12 +448,13 @@ Get_GagStringReason(pPlayer, pOther)
 	return szText;
 }
 
-stock Menu_Show_AdditionalModes(pPlayer)
+stock Menu_Show_AdditionalModes(pPlayer) {
 	return pPlayer;
+}
 
-// public CA_Client_Voice(pPlayer, pOther)
+// public CA_Client_Voice(pPlayer, pOther) {
 	// return get_bit(aMuted[pPlayer], pOther) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
-
+// }
 
 
 const MAX_CMD_LEN = 32;
