@@ -235,7 +235,7 @@ save_user_gag(pPlayer, aGagData[gag_s])
 	// get_user_name(pPlayer, szName, charsmax(szName));
 	aGagData[_Player] = pPlayer;
 	get_user_authid(aGagData[_AdminId], aGagData[_AdminAuthId], 31);
-	get_user_ip(aGagData[_AdminId], aGagData[_AdminIP], 31);
+	get_user_ip(aGagData[_AdminId], aGagData[_AdminIP], 31, .without_port = true);
 
 	Player_GagSet(pPlayer, aGagData);
 
