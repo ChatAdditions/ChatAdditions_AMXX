@@ -15,7 +15,7 @@
 	#pragma loadlib Chats_Additions_API
 #endif
 
-#pragma dynamic 524288
+
 
 enum any: gag_flags_s ( <<=1 )
 {
@@ -106,7 +106,7 @@ stock DEBUG__Dump_GagData(from[], const aGagData[gag_s]) {
 		\t Reason = '%s'\n\
 		\t ExpireTime = '%i'\n\
 		\t Flags = '%s'\n\
-		", from, 
+		", from,
 		aGagData[_Player], aGagData[_AuthId], aGagData[_IP], aGagData[_Name],
 		aGagData[_AdminId], aGagData[_AdminName], aGagData[_AdminAuthId],
 		aGagData[_AdminIP], aGagData[_Reason], aGagData[_ExpireTime], bits_to_flags(aGagData[_bitFlags])

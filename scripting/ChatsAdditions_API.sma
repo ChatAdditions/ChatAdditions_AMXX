@@ -290,9 +290,6 @@ public client_putinserver(pPlayer)
 {
 	// Get player gag from Storage
 	load_user_gag(pPlayer);
-
-	// Check
-	check_user_gag(pPlayer);
 }
 
 	// The client left the server
