@@ -298,7 +298,7 @@ public client_putinserver(pPlayer)
 	// The client left the server
 public client_disconnected(pPlayer)
 {
-	Player_GagReset(pPlayer);
+	GagData_Reset(g_PlayersGags[pPlayer]);
 }
 /** <- On Players Events */
 
@@ -312,6 +312,11 @@ stock Player_GagSet(pPlayer, aGagData[])
 stock Player_GagReset(pPlayer)
 {
 	GagData_Reset(g_PlayersGags[pPlayer]);
+
+	// Remove player gag from Storage
+	get_user_authid(pPlayer, g_PlayersGags[pPlayer][_AuthId], 31);
+	get_user_ip(pPlayer, g_PlayersGags[pPlayer][_IP], 31, .without_port = true);
+	remove_from_storage(g_PlayersGags[pPlayer][_AuthId], g_PlayersGags[pPlayer][_IP], g_PlayersGags[pPlayer]);
 }
 
 stock GetFnLog(Fn[], aGagData[gag_s], szAuthId[])
