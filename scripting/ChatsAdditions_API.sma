@@ -24,11 +24,11 @@
 /**
  *	Database type for storage gags
  *		DB_NVault,
- *		DB_JSON,
+ *		DB_JSON,  // TODO: 
  *		DB_MySQL,
  *		DB_SQLite
  */
-#define DATABASE_TYPE DB_NVault
+#define DATABASE_TYPE DB_SQLite
 
 		/* ----- END OF SETTINGS----- */
 
