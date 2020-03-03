@@ -3,6 +3,7 @@
 
 #pragma semicolon 1
 #pragma ctrlchar '\'
+#pragma dynamic 524288
 
 #include <ChatsAdditions_API>
 
