@@ -65,7 +65,7 @@ static const Float: UPDATER_FREQ = 3.0;
 	#include <ChatAdditions_inc/CA_SQLite>
 #endif
 
-new const VERSION[] = "0.0.22b";
+new const VERSION[] = "1.0.0-alpha";
 
 public plugin_init()
 {
@@ -109,7 +109,7 @@ public plugin_precache()
 	register_plugin(
 		.plugin_name	= "Chats Additions API",
 		.version		= VERSION,
-		.author			= "wopox1337"
+		.author			= "Sergey Shorokhov"
 	);
 
 	// Find in db drivers inc. ( CA_API_NVault | CA_API_SQLx | ... )
