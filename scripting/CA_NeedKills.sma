@@ -43,7 +43,7 @@ public CA_Client_Say(pPlayer) {
 	if(!CanCommunicate(pPlayer)) {
 		client_print_color(pPlayer, print_team_red, "^3Chat not allowed! Need %i kills.", KILLS_NEED);
 		return PLUGIN_HANDLED;
-}
+	}
 
 	return PLUGIN_CONTINUE;
 }
