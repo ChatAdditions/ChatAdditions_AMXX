@@ -49,7 +49,7 @@ new DB_Types: g_iStorageType;
 
 public plugin_init()
 {
-	register_plugin("[CA] Gag", "0.01b", "wopox1337");
+	register_plugin("[CA] Gag", "1.0.0-alpha", "Sergey Shorokhov");
 	register_dictionary("CA_Gag.txt");
 	register_dictionary("common.txt");
 	register_dictionary("time.txt");

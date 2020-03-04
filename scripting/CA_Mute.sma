@@ -20,7 +20,7 @@ const PLAYERS_PER_PAGE = 7;
 
 public plugin_init()
 {
-	register_plugin("[CA] Mute menu", "0.01b", "wopox1337");
+	register_plugin("[CA] Mute menu", "1.0.0-alpha", "Sergey Shorokhov");
 	register_dictionary("CA_Mute.txt");
 	register_menu("Players Mute Menu", 1023, "Menu_Handler_PlayersList", .outside = 1);
 
