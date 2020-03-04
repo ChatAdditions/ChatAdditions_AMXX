@@ -1,10 +1,11 @@
 #include <amxmodx>
 #include <amxmisc>
 
-#include <ChatsAdditions_API>
-
 #pragma semicolon 1
 #pragma ctrlchar '\'
+
+#include <ChatsAdditions_API>
+
 
 #define get_bit(%1,%2)		(%1 & (1 << (%2 & 31)))
 #define set_bit(%1,%2)		(%1 |= (1 << (%2 & 31)))
@@ -19,7 +20,7 @@ const PLAYERS_PER_PAGE = 7;
 
 public plugin_init()
 {
-	register_plugin("[CA] Mute menu", "0.01b", "wopox1337");
+	register_plugin("[CA] Mute menu", "1.0.0-alpha", "Sergey Shorokhov");
 	register_dictionary("CA_Mute.txt");
 	register_menu("Players Mute Menu", 1023, "Menu_Handler_PlayersList", .outside = 1);
 
@@ -29,6 +30,8 @@ public plugin_init()
 public ClCmd_Mute(pPlayer)
 {
 	Menu_Show_PlayersList(pPlayer, .iPage = 0);
+
+	return PLUGIN_HANDLED;
 }
 
 public Menu_Show_PlayersList(pPlayer, iPage)
@@ -105,8 +108,9 @@ public Menu_Handler_PlayersList(pPlayer, iKey)
 }
 
 
-public client_disconnected(pPlayer)
+public client_disconnected(pPlayer) {
 	aMuted[pPlayer] = 0;
+}
 
 Mute_Toggle(pPlayer, pOther)
 {
@@ -124,11 +128,13 @@ Mute_Toggle(pPlayer, pOther)
 	client_print(pPlayer, print_chat, "%L", pPlayer, "CA_Mute_HasBeenMuted", szName, pPlayer, get_bit(aMuted[pPlayer], pOther) ? "CA_Mute_Muted" : "CA_Mute_UnMuted");
 }
 
-MuteALL_Toggle(pPlayer)
+MuteALL_Toggle(pPlayer) {
 	aMuted[pPlayer] = AllMuted(pPlayer) ? 0 : 0xFFFF;
+}
 
-bool: AllMuted(pPlayer)
+bool: AllMuted(pPlayer) {
 	return aMuted[pPlayer] == 0xFFFF;
+}
 
 public CA_Client_Voice(pPlayer, pOther)
 	return get_bit(aMuted[pPlayer], pOther) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;

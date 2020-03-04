@@ -1,10 +1,12 @@
 #include <amxmodx>
 #include <fakemeta>
 
-#include <ChatsAdditions_API>
-
 #pragma semicolon 1
 #pragma ctrlchar '\'
+#pragma dynamic 524288
+
+#include <ChatsAdditions_API>
+
 
 		/* ----- START SETTINGS----- */
 /*	// TODO on Preprocessor logic
@@ -16,17 +18,17 @@
 
 #define DEBUG
 #if defined DEBUG
- #define DBG_BOTS 1 // Bot count for testing
+ #define DBG_BOTS 0 // Bot count for testing
 #endif
 
 /**
  *	Database type for storage gags
  *		DB_NVault,
- *		DB_JSON,
+ *		DB_JSON,  // TODO: 
  *		DB_MySQL,
  *		DB_SQLite
  */
-#define DATABASE_TYPE DB_NVault
+#define DATABASE_TYPE DB_SQLite
 
 		/* ----- END OF SETTINGS----- */
 
@@ -52,9 +54,6 @@ static const Float: UPDATER_FREQ = 3.0;
 	#error Please uncomment DATABASE_TYPE and select!
 #endif
 
-enum DB_Types { DB_NVault, DB_JSON, DB_MySQL, DB_SQLite };
-new const DB_Names[DB_Types][] = { "DB_NVault", "DB_JSON", "DB_MySQL", "DB_SQLite" };
-
 // Select the db driver
 #if DATABASE_TYPE == DB_NVault
 	#include <ChatAdditions_inc/CA_NVault>
@@ -66,7 +65,7 @@ new const DB_Names[DB_Types][] = { "DB_NVault", "DB_JSON", "DB_MySQL", "DB_SQLit
 	#include <ChatAdditions_inc/CA_SQLite>
 #endif
 
-new const VERSION[] = "0.0.22b";
+new const VERSION[] = "1.0.0-alpha";
 
 public plugin_init()
 {
@@ -100,14 +99,17 @@ public plugin_natives()
 {
 	register_library("Chats_Additions_API");
 	register_native("ca_set_user_gag", "native_ca_set_user_gag");
+	register_native("ca_remove_user_gag", "native_ca_remove_user_gag");
+
+	register_native("ca_get_storage_type", "native_ca_get_storage_type");
 }
 
 public plugin_precache()
 {
 	register_plugin(
-		.plugin_name	= "[CA] API",
+		.plugin_name	= "Chats Additions API",
 		.version		= VERSION,
-		.author			= "wopox1337"
+		.author			= "Sergey Shorokhov"
 	);
 
 	// Find in db drivers inc. ( CA_API_NVault | CA_API_SQLx | ... )
@@ -151,17 +153,12 @@ public ClCmd_Hook_Say(const pPlayer)
 	static retVal;
 	ExecuteForward(g_pFwd_Client_Say, retVal, pPlayer);
 
-#if defined DEBUG
-	switch(retVal)
-	{
-		case PLUGIN_HANDLED: server_print("ClCmd_Hook_Say() return = PLUGIN_HANDLED");
-	}
-#endif
+	if(retVal == PLUGIN_HANDLED)
+		return PLUGIN_HANDLED;
 
 	// Get MainAPI sets
 	retVal = g_PlayersGags[pPlayer][_bitFlags] & m_Say;
-
-	return retVal;
+	return retVal ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
 	// Client use "say_team" command
@@ -170,30 +167,25 @@ public ClCmd_Hook_SayTeam(const pPlayer)
 	static retVal;
 	ExecuteForward(g_pFwd_Client_SayTeam, retVal, pPlayer);
 
-#if defined DEBUG
-	switch(retVal)
-	{
-		case PLUGIN_HANDLED: server_print("ClCmd_Hook_SayTeam() return = PLUGIN_HANDLED");
-	}
-#endif
+	if(retVal == PLUGIN_HANDLED)
+		return PLUGIN_HANDLED;
 
 	// Get MainAPI sets
 	retVal = g_PlayersGags[pPlayer][_bitFlags] & m_SayTeam;
-
-
-	return retVal;
+	return retVal ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
 	// Engine Set client VoiceMask
-public pfnVoice_SetClientListening_Pre(const pPlayer, const pOther, bool: bCanHear)
+public pfnVoice_SetClientListening_Pre(iReceiver, iSender, bool:bListen)
 {
-	// server_print("pfnVoice_SetClientListening_Pre: Executed!");
+	if(iReceiver == iSender)
+    	return FMRES_IGNORED;
 
 	static retVal;
-	ExecuteForward(g_pFwd_Client_Voice, retVal, pPlayer, pOther);
+	ExecuteForward(g_pFwd_Client_Voice, retVal, iSender, iReceiver);
 
 	if(retVal == PLUGIN_HANDLED)
-		bCanHear = false;
+		bListen = false;
 
 #if defined DEBUG2
 	switch(retVal)
@@ -204,12 +196,10 @@ public pfnVoice_SetClientListening_Pre(const pPlayer, const pOther, bool: bCanHe
 #endif
 
 	// Get MainAPI sets
-	bCanHear = !(g_PlayersGags[pPlayer][_bitFlags] & m_Voice);
-
-	// server_print("pfnVoice() bCanHear = %s", pPlayer, bCanHear ? "YES" : "   NO!");
+	bListen = !(g_PlayersGags[iSender][_bitFlags] & m_Voice);
 	
-	engfunc(EngFunc_SetClientListening, pPlayer, pOther, bCanHear);
-	return bCanHear ? FMRES_IGNORED : FMRES_SUPERCEDE;
+	engfunc(EngFunc_SetClientListening, iReceiver, iSender, bListen);
+	return bListen ? FMRES_IGNORED : FMRES_SUPERCEDE;
 }
 /** <- HOOKS */
 
@@ -236,13 +226,29 @@ save_user_gag(pPlayer, aGagData[gag_s])
 	// get_user_name(pPlayer, szName, charsmax(szName));
 	aGagData[_Player] = pPlayer;
 	get_user_authid(aGagData[_AdminId], aGagData[_AdminAuthId], 31);
-	get_user_ip(aGagData[_AdminId], aGagData[_AdminIP], 31);
+	get_user_ip(aGagData[_AdminId], aGagData[_AdminIP], 31, .without_port = true);
+
+	Player_GagSet(pPlayer, aGagData);
 
 	// Save player gag on Storage
 	save_to_storage(aGagData[_AuthId], aGagData[_IP], aGagData);
 
 	client_cmd(pPlayer, "-voicerecord");
 }
+
+public native_ca_remove_user_gag(pPlugin, iParams)
+{
+	enum { Player = 1 };
+
+	static pPlayer; pPlayer = get_param(Player);
+	Player_GagReset(pPlayer);
+}
+
+public DB_Types: native_ca_get_storage_type(pPlugin, iParams)
+{
+	return DATABASE_TYPE;
+}
+
 
 load_user_gag(pPlayer)
 {
@@ -281,30 +287,30 @@ public client_putinserver(pPlayer)
 {
 	// Get player gag from Storage
 	load_user_gag(pPlayer);
-
-	// Check
-	check_user_gag(pPlayer);
 }
 
 	// The client left the server
 public client_disconnected(pPlayer)
 {
-	Player_GagReset(pPlayer);
+	GagData_Reset(g_PlayersGags[pPlayer]);
 }
 /** <- On Players Events */
 
 stock Player_GagSet(pPlayer, aGagData[])
 {
 	g_PlayersGags[pPlayer][_bitFlags]		= any: aGagData[_bitFlags];
-	g_PlayersGags[pPlayer][_Reason]		= any: aGagData[_Reason];
-	g_PlayersGags[pPlayer][_ExpireTime]	= any: aGagData[_ExpireTime];
+	g_PlayersGags[pPlayer][_Reason]			= any: aGagData[_Reason];
+	g_PlayersGags[pPlayer][_ExpireTime]		= any: aGagData[_ExpireTime];
 }
 
 stock Player_GagReset(pPlayer)
 {
-	g_PlayersGags[pPlayer][_bitFlags]		= m_REMOVED;
-	g_PlayersGags[pPlayer][_Reason]		= any: '\0';
-	g_PlayersGags[pPlayer][_ExpireTime]	= any: '\0';
+	GagData_Reset(g_PlayersGags[pPlayer]);
+
+	// Remove player gag from Storage
+	get_user_authid(pPlayer, g_PlayersGags[pPlayer][_AuthId], 31);
+	get_user_ip(pPlayer, g_PlayersGags[pPlayer][_IP], 31, .without_port = true);
+	remove_from_storage(g_PlayersGags[pPlayer][_AuthId], g_PlayersGags[pPlayer][_IP], g_PlayersGags[pPlayer]);
 }
 
 stock GetFnLog(Fn[], aGagData[gag_s], szAuthId[])
@@ -358,7 +364,6 @@ public PluginAnnouncement()
 	", DBG_BOTS);
   #endif
  #endif
-
 #endif
 
 // Ending
