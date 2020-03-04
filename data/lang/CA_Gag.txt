@@ -9,11 +9,14 @@ SET_CustomTime = Указать время ->
 CA_GAG_YES = \yДа\w
 CA_GAG_NO = \rНет\w
 
-CA_Gag_Say = Чат: [%s]
-CA_Gag_SayTeam = Командный чат: [%s]
-CA_Gag_Voice = Голосовое общение: [%s]
-CA_Gag_Reason = Причина: [\y %s \w]
-CA_Gag_Time = Время: [\y %s \w]
+CA_Gag_Say = Чат:
+CA_Gag_SayTeam = Командный чат:
+CA_Gag_Voice = Голосовое общение:
+CA_Gag_Reason = Причина:
+CA_Gag_Time = Время:
 CA_Gag_Confirm = Подтвердить!
 CA_Gag_NotSet = Не задано
 CA_Gag_Perpapent = *НАВСЕГДА*
+
+Player_Gagged = ^4^1Админ %n заткнул игрока ^4%n^1 (^3%s^1)
+Player_UnGagged = ^4^1Админ %n снял затычку с игрока ^4%n^1
