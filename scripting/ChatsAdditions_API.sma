@@ -28,7 +28,7 @@
  *		DB_MySQL,
  *		DB_SQLite
  */
-#define DATABASE_TYPE DB_SQLite
+#define DATABASE_TYPE DB_NVault
 
 		/* ----- END OF SETTINGS----- */
 
