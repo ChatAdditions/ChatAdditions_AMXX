@@ -69,12 +69,13 @@ public plugin_init()
 
 
 	g_iStorageType = ca_get_storage_type();
-	// server_cmd("ca_gag_add_reason \"Reason #5\" \"bc\" \"25\"");
 
 	Init_Cmds();
 	
 	g_pMenu_GagProperties = BuildMenu_GagProperties();
 	g_pMenu_ConfirmRemove = BuildMenu_ConfirmRemove();
+
+	server_cmd("exec addons/amxmodx/configs/ChatAdditions/gag_reasons.cfg");
 }
 
 public ClCmd_Gag(pPlayer, level, cid)
@@ -579,10 +580,7 @@ public SrvCmd_AddReason()
 
 	new szArgs[args_s][32];
 	for(new iArg = arg0; iArg < sizeof szArgs; iArg++)
-	{
 		read_argv(iArg, szArgs[iArg], charsmax(szArgs[]));
-		// server_print("\t szArg%i='%s'", iArg, szArgs[iArg]);
-	}
 
 	new iArgsCount = read_argc();
 
