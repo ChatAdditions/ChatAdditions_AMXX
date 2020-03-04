@@ -45,6 +45,8 @@ new Array: g_aReasons, g_iArraySize_Reasons;
 
 new g_pMenu_GagProperties;
 
+new DB_Types: g_iStorageType;
+
 public plugin_init()
 {
 	register_plugin("[CA] Gag", "0.01b", "wopox1337");
@@ -66,7 +68,7 @@ public plugin_init()
 	register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates"); // debug
 
 
-	
+	g_iStorageType = ca_get_storage_type();
 	// server_cmd("ca_gag_add_reason \"Reason #5\" \"bc\" \"25\"");
 
 	Init_Cmds();
@@ -209,7 +211,10 @@ public Callback_GagProperties(id, menu, item)
 
 	menu_item_setname(menu, item, sName);
 
-	return (item == menu_Confirm && !Ready_To_Gag(pOther)) ? ITEM_DISABLED : ITEM_ENABLED;
+	return (
+		item == menu_Confirm && !Ready_To_Gag(pOther)
+		|| g_iStorageType == DB_NVault && item == menu_Reason
+		) ? ITEM_DISABLED : ITEM_ENABLED;
 }
 
 public Menu_Handler_GagProperties(id, menu, item)
