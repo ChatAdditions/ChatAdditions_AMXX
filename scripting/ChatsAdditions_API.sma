@@ -28,7 +28,7 @@
  *		DB_MySQL,
  *		DB_SQLite
  */
-#define DATABASE_TYPE DB_NVault
+#define DATABASE_TYPE DB_SQLite
 
 		/* ----- END OF SETTINGS----- */
 
@@ -153,12 +153,8 @@ public ClCmd_Hook_Say(const pPlayer)
 	static retVal;
 	ExecuteForward(g_pFwd_Client_Say, retVal, pPlayer);
 
-#if defined DEBUG
-	switch(retVal)
-	{
-		case PLUGIN_HANDLED: server_print("ClCmd_Hook_Say() return = PLUGIN_HANDLED");
-	}
-#endif
+	if(retVal == PLUGIN_HANDLED)
+		return PLUGIN_HANDLED;
 
 	// Get MainAPI sets
 	retVal = g_PlayersGags[pPlayer][_bitFlags] & m_Say;
@@ -171,12 +167,8 @@ public ClCmd_Hook_SayTeam(const pPlayer)
 	static retVal;
 	ExecuteForward(g_pFwd_Client_SayTeam, retVal, pPlayer);
 
-#if defined DEBUG
-	switch(retVal)
-	{
-		case PLUGIN_HANDLED: server_print("ClCmd_Hook_SayTeam() return = PLUGIN_HANDLED");
-	}
-#endif
+	if(retVal == PLUGIN_HANDLED)
+		return PLUGIN_HANDLED;
 
 	// Get MainAPI sets
 	retVal = g_PlayersGags[pPlayer][_bitFlags] & m_SayTeam;
