@@ -180,6 +180,7 @@ BuildMenu_GagProperties()
 	menu_addblank(pMenu, false);
 	menu_additem(pMenu, "Reason:", .callback = hCallback);
 	menu_additem(pMenu, "Time:", .callback = hCallback);
+	menu_addblank(pMenu, false);
 	menu_additem(pMenu, "Confirm!", .callback = hCallback);
 
 	return pMenu;
