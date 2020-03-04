@@ -6,10 +6,11 @@
 
 #include <sqlx>
 
-new const SQL_HOSTNAME[]	= "www.db4free.net";
-new const SQL_USERNAME[]	= "wpx_root";
-new const SQL_PASSWORD[]	= "11111111";
-new const SQL_DBNAME[]		= "wpx_1337";
+// Configure your connect to MySQL Server
+new const SQL_HOSTNAME[]	= "127.0.0.1";
+new const SQL_USERNAME[]	= "root";
+new const SQL_PASSWORD[]	= "pw";
+new const SQL_DBNAME[]		= "db";
 new const SQL_TBL_GAGS[]	= "players_gags";
 
 new const SQL_DBTYPE[]		= "mysql";
