@@ -104,9 +104,10 @@ public Menu_Show_PlayersList(pPlayer)
 
 	new hCallback = menu_makecallback("Callback_PlayersMenu");
 
-	for(new i; i < iCount; i++)
+	for(new i; i < iCount; i++) {
+		if(pPlayer != aPlayers[i])
 		menu_additem(pMenu, "-", fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
-
+	}
 	menu_display(pPlayer, pMenu);
 }
 
