@@ -43,7 +43,7 @@ new const MENU_Gag_Properties[]		= "Gag properties on players";
 new any: g_aGags[MAX_PLAYERS + 1][gag_s];
 new Array: g_aReasons, g_iArraySize_Reasons;
 
-new g_pMenu_GagProperties;
+new g_pMenu_GagProperties, g_pMenu_ConfirmRemove;
 
 new DB_Types: g_iStorageType;
 
@@ -74,6 +74,7 @@ public plugin_init()
 	Init_Cmds();
 	
 	g_pMenu_GagProperties = BuildMenu_GagProperties();
+	g_pMenu_ConfirmRemove = BuildMenu_ConfirmRemove();
 }
 
 public ClCmd_Gag(pPlayer, level, cid)
@@ -106,7 +107,7 @@ public Menu_Show_PlayersList(pPlayer)
 
 	for(new i; i < iCount; i++) {
 		if(pPlayer != aPlayers[i])
-		menu_additem(pMenu, "-", fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
+			menu_additem(pMenu, "-", fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
 	}
 	menu_display(pPlayer, pMenu);
 }
@@ -139,16 +140,8 @@ public Menu_Handler_PlayersList(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if(g_aGags[pOther][_bitFlags]) {
-		ResetOtherData(pOther);
-		ca_remove_user_gag(pOther);
+	menu_display(id, (g_aGags[pOther][_bitFlags] != m_REMOVED) ? g_pMenu_ConfirmRemove : g_pMenu_GagProperties);
 
-		client_print(id, print_chat, "Player ungagged '%n'", pOther);
-
-		return menu_display(id, menu);
-	}
-
-	menu_display(id, g_pMenu_GagProperties);
 	g_iSelectedPlayer[id] = pOther;
 
 	return PLUGIN_HANDLED;
@@ -166,6 +159,65 @@ GetPostfix(pPlayer, bHaveImmunity)
 	else szPostfix[0] = '\0';
 
 	return szPostfix;
+}
+
+// Confirm remove gag
+BuildMenu_ConfirmRemove()
+{
+	new pMenu = menu_create("Confirm remove:", "Menu_Handler_ConfirmRemove");
+	new hCallback = menu_makecallback("Callback_ConfirmRemove");
+
+	menu_additem(pMenu, "Yes", .callback = hCallback);
+
+	return pMenu;
+}
+
+public Callback_ConfirmRemove(id, menu, item)
+{
+	enum { menu_Yes };
+	
+	new null, sInfo[64], sName[64];
+	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
+
+	switch(item) {
+		case menu_Yes:
+			formatex(sName, charsmax(sName), "\\yYes");
+	}
+
+	menu_item_setname(menu, item, sName);
+
+	return ITEM_ENABLED;
+}
+
+
+public Menu_Handler_ConfirmRemove(id, menu, item)
+{
+	enum { menu_Yes };
+
+	new pOther = g_iSelectedPlayer[id];
+	if(!is_user_connected(pOther)) {
+		client_print_color(id, print_team_red, "Player not connected!");
+		Menu_Show_PlayersList(id);
+		
+		return PLUGIN_HANDLED;
+	}
+
+	if(item == MENU_EXIT || item < 0) {
+		ResetOtherData(pOther);
+		Menu_Show_PlayersList(id);
+
+		return PLUGIN_HANDLED;
+	}
+	
+	switch(item) {
+		case menu_Yes: {
+			RemoveGag(id, pOther);
+		}
+	}
+
+	Menu_Show_PlayersList(id);
+
+	return PLUGIN_HANDLED;
 }
 
 // Gag Properties menu
@@ -590,7 +642,7 @@ SaveGag(pPlayer, pOther)
 	//DEBUG__Dump_GagData("SaveGag()", g_aGags[pOther]);
 #endif
 
-	client_print_color(0, print_team_default, "\3 \1Админ %s установил молчанку игроку \4%s\1 на \3%s\1",
+	client_print_color(0, print_team_default, "\3\1Admin %s set gag to player \4%s\1 on \3%s\1",
 		g_aGags[pOther][_AdminName], g_aGags[pOther][_Name], GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
 
 	if(g_aGags[pOther][_Reason][0])
@@ -604,7 +656,23 @@ SaveGag(pPlayer, pOther)
 	return PLUGIN_CONTINUE;
 }
 
+RemoveGag(pPlayer, pOther)
+{
+	if(g_aGags[pOther][_bitFlags] != m_REMOVED) {
+		ResetOtherData(pOther);
+		ca_remove_user_gag(pOther);
 
+		client_print_color(0, print_team_default, "\3\1Admin %n remove gag from player \4%n\1",
+			pPlayer, pOther);
+	} else {
+		client_print(pPlayer, print_chat, "Player '%n' gag already removed!", pOther);
+	}
+
+	Menu_Show_PlayersList(pPlayer);
+
+	return PLUGIN_HANDLED;
+
+}
 /* 
 public plugin_cfg()
 {
