@@ -16,6 +16,8 @@
 #endif
 
 
+enum DB_Types { DB_NVault, DB_JSON, DB_MySQL, DB_SQLite };
+new stock const DB_Names[DB_Types][] = { "DB_NVault", "DB_JSON", "DB_MySQL", "DB_SQLite" };
 
 enum any: gag_flags_s ( <<=1 )
 {
@@ -193,3 +195,11 @@ native ca_set_user_gag(index, aGagData[gag_s]);
  *                      will be thrown.
  */
 native ca_remove_user_gag(index);
+
+/**
+ * Get api storage type.
+ *
+ * @return Storage type
+ * 
+ */
+native DB_Types: ca_get_storage_type();

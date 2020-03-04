@@ -54,9 +54,6 @@ static const Float: UPDATER_FREQ = 3.0;
 	#error Please uncomment DATABASE_TYPE and select!
 #endif
 
-enum DB_Types { DB_NVault, DB_JSON, DB_MySQL, DB_SQLite };
-new const DB_Names[DB_Types][] = { "DB_NVault", "DB_JSON", "DB_MySQL", "DB_SQLite" };
-
 // Select the db driver
 #if DATABASE_TYPE == DB_NVault
 	#include <ChatAdditions_inc/CA_NVault>
@@ -103,6 +100,8 @@ public plugin_natives()
 	register_library("Chats_Additions_API");
 	register_native("ca_set_user_gag", "native_ca_set_user_gag");
 	register_native("ca_remove_user_gag", "native_ca_remove_user_gag");
+
+	register_native("ca_get_storage_type", "native_ca_get_storage_type");
 }
 
 public plugin_precache()
@@ -252,6 +251,12 @@ public native_ca_remove_user_gag(pPlugin, iParams)
 	static pPlayer; pPlayer = get_param(Player);
 	Player_GagReset(pPlayer);
 }
+
+public DB_Types: native_ca_get_storage_type(pPlugin, iParams)
+{
+	return DATABASE_TYPE;
+}
+
 
 load_user_gag(pPlayer)
 {
