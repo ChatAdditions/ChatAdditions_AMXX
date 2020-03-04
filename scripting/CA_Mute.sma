@@ -30,6 +30,8 @@ public plugin_init()
 public ClCmd_Mute(pPlayer)
 {
 	Menu_Show_PlayersList(pPlayer, .iPage = 0);
+
+	return PLUGIN_HANDLED;
 }
 
 public Menu_Show_PlayersList(pPlayer, iPage)
