@@ -40,11 +40,21 @@ public client_disconnected(pPlayer) {
 }
 
 public CA_Client_Say(pPlayer) {
-	return CanCommunicate(pPlayer) ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
+	if(!CanCommunicate(pPlayer)) {
+		client_print_color(pPlayer, print_team_red, "^3Chat not allowed! Need %i kills.", KILLS_NEED);
+		return PLUGIN_HANDLED;
+}
+
+	return PLUGIN_CONTINUE;
 }
 
 public CA_Client_SayTeam(pPlayer) {
-	return CanCommunicate(pPlayer) ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
+	if(!CanCommunicate(pPlayer)) {
+		client_print_color(pPlayer, print_team_red, "^3Chat not allowed! Need %i kills.", KILLS_NEED);
+		return PLUGIN_HANDLED;
+	}
+
+	return PLUGIN_CONTINUE;
 }
 
 public CA_Client_Voice(pPlayer, pOther) {
