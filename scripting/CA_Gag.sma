@@ -181,7 +181,7 @@ public Callback_ConfirmRemove(id, menu, item)
 
 	switch(item) {
 		case menu_Yes:
-			formatex(sName, charsmax(sName), "\\yYes");
+			formatex(sName, charsmax(sName), "\\y%L", id, "CA_GAG_YES");
 	}
 
 	menu_item_setname(menu, item, sName);
@@ -252,15 +252,17 @@ public Callback_GagProperties(id, menu, item)
 
 	switch(item) {
 		case menu_Chat:
-			formatex(sName, charsmax(sName), "Chat: [ %s ]", (gagFlags & m_Say) ? " \\r+\\w " : "-");
+			formatex(sName, charsmax(sName), "%L [ %s ]", id, "CA_Gag_Say", (gagFlags & m_Say) ? " \\r+\\w " : "-");
 		case menu_TeamChat:
-			formatex(sName, charsmax(sName), "Team chat: [ %s ]", (gagFlags & m_SayTeam) ? " \\r+\\w " : "-");
+			formatex(sName, charsmax(sName), "%L [ %s ]", id, "CA_Gag_SayTeam", (gagFlags & m_SayTeam) ? " \\r+\\w " : "-");
 		case menu_VoiceChat:
-			formatex(sName, charsmax(sName), "Voice chat: [ %s ]", (gagFlags & m_Voice) ? " \\r+\\w " : "-");
+			formatex(sName, charsmax(sName), "%L [ %s ]", id, "CA_Gag_Voice", (gagFlags & m_Voice) ? " \\r+\\w " : "-");
 		case menu_Reason:
-			formatex(sName, charsmax(sName), "Reason: [ %s ]", Get_GagStringReason(id, pOther));
+			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Reason", Get_GagStringReason(id, pOther));
 		case menu_Time:
-			formatex(sName, charsmax(sName), "Time: [ %s ]", GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
+			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Time", GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
+		case menu_Confirm:
+			formatex(sName, charsmax(sName), "%L", id, "CA_Gag_Confirm");
 	}
 
 	menu_item_setname(menu, item, sName);
@@ -642,8 +644,8 @@ SaveGag(pPlayer, pOther)
 	//DEBUG__Dump_GagData("SaveGag()", g_aGags[pOther]);
 #endif
 
-	client_print_color(0, print_team_default, "\3\1Admin %s set gag to player \4%s\1 on \3%s\1",
-		g_aGags[pOther][_AdminName], g_aGags[pOther][_Name], GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
+	client_print_color(0, print_team_default, "%L",
+		LANG_PLAYER, "Player_Gagged", pPlayer, pOther, GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
 
 	if(g_aGags[pOther][_Reason][0])
 		client_print_color(0, print_team_default, "Причина: '%s'", Get_GagStringReason(pPlayer, pOther));
@@ -662,8 +664,8 @@ RemoveGag(pPlayer, pOther)
 		ResetOtherData(pOther);
 		ca_remove_user_gag(pOther);
 
-		client_print_color(0, print_team_default, "\3\1Admin %n remove gag from player \4%n\1",
-			pPlayer, pOther);
+		client_print_color(0, print_team_default, "%L",
+			LANG_PLAYER, "Player_UnGagged", pPlayer, pOther);
 	} else {
 		client_print(pPlayer, print_chat, "Player '%n' gag already removed!", pOther);
 	}
