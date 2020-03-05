@@ -181,23 +181,16 @@ public pfnVoice_SetClientListening_Pre(iReceiver, iSender, bool:bListen)
 	if(iReceiver == iSender)
     	return FMRES_IGNORED;
 
+	// Get MainAPI sets
+	bListen = !(g_PlayersGags[iSender][_bitFlags] & m_Voice);
+
+	
 	static retVal;
 	ExecuteForward(g_pFwd_Client_Voice, retVal, iSender, iReceiver);
-
+	
 	if(retVal == PLUGIN_HANDLED)
 		bListen = false;
 
-#if defined DEBUG2
-	switch(retVal)
-	{
-		case PLUGIN_HANDLED: server_print("pfnVoice_SetClientListening_Pre() return = PLUGIN_HANDLED");
-		case PLUGIN_CONTINUE: server_print("pfnVoice_SetClientListening_Pre() return = PLUGIN_CONTINUE");
-	}
-#endif
-
-	// Get MainAPI sets
-	bListen = !(g_PlayersGags[iSender][_bitFlags] & m_Voice);
-	
 	engfunc(EngFunc_SetClientListening, iReceiver, iSender, bListen);
 	return bListen ? FMRES_IGNORED : FMRES_SUPERCEDE;
 }
