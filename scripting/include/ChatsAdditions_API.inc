@@ -163,13 +163,13 @@ forward CA_Client_SayTeam(index);
  *
  * @note 
  *
- * @param index   Receiver index.
- * @param pOther   Sender index.
+ * @param listener   Receiver index.
+ * @param sender   	 Sender index.
  *
  * @return      PLUGIN_CONTINUE to allow send voice
  *              PLUGIN_HANDLED or higher to prevent the voice
  */
-forward CA_Client_Voice(index, pOther);
+forward CA_Client_Voice(const listener, const sender);
 
 /**
  * Sets client's gag data.

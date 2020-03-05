@@ -122,6 +122,6 @@ public client_disconnected(id) {
 		g_aMutes[i][id] = false;
 }
 
-public CA_Client_Voice(id, receiver) {
-	return (g_aMutes[receiver][id] == true || g_bGlobalMute[id] || g_bGlobalMute[receiver]) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+public CA_Client_Voice(const listener, const sender) {
+	return (g_aMutes[listener][sender] == true || g_bGlobalMute[listener] || g_bGlobalMute[sender]) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
