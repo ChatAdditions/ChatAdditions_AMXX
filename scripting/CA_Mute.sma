@@ -7,16 +7,8 @@
 #include <ChatsAdditions_API>
 
 
-#define get_bit(%1,%2)		(%1 & (1 << (%2 & 31)))
-#define set_bit(%1,%2)		(%1 |= (1 << (%2 & 31)))
-#define invert_bit(%1,%2)	(%1 ^= (1 << (%2 & 31)))
-#define reset_bit(%1,%2)	(%1 &= ~(1 << (%2 & 31)))
-
-new aMuted[MAX_PLAYERS + 1],
-	g_iPlayerMenuPage[MAX_PLAYERS + 1],
-	g_apPlayerMenuPlayers[MAX_PLAYERS + 1][32];
-
-const PLAYERS_PER_PAGE = 7;
+new bool: g_aMutes[MAX_PLAYERS + 1][MAX_PLAYERS + 1];
+new bool: g_bGlobalMute[MAX_PLAYERS + 1];
 
 public plugin_init()
 {
@@ -27,158 +19,109 @@ public plugin_init()
 	Init_Cmds();
 }
 
-public ClCmd_Mute(pPlayer)
-{
-	Menu_Show_PlayersList(pPlayer, .iPage = 0);
-
-	return PLUGIN_HANDLED;
-}
-
-public Menu_Show_PlayersList(pPlayer, iPage)
-{
-	if(iPage < 0)
-		return PLUGIN_HANDLED;
-	
-	new aPlayersId[MAX_PLAYERS];
-	new iCount, iPlayer;
-	new szMenu[512], szName[MAX_NAME_LENGTH];
-
-	get_players(aPlayersId, iCount);
-
-	static i; i = min(iPage * PLAYERS_PER_PAGE, iCount);
-	static iStart; iStart = i - (i % PLAYERS_PER_PAGE);
-	static iEnd; iEnd = min(iStart + PLAYERS_PER_PAGE, iCount);
-
-	iPage = iStart / PLAYERS_PER_PAGE;
-
-	g_apPlayerMenuPlayers[pPlayer] = aPlayersId;
-	g_iPlayerMenuPage[pPlayer] = iPage;
-
-	static iLen;
-	iLen = formatex(szMenu, charsmax(szMenu), "%L\\R%i/%i\n\n", pPlayer, "CA_Mute_TITLE", iPage + 1, ((iCount - 1) / PLAYERS_PER_PAGE) + 1);
-
-	new bitsKeys = MENU_KEY_0, iItem;
-
-	for(i = iStart; i < iEnd; i++)
-	{
-		iPlayer = aPlayersId[i];
-
-		if(pPlayer == iPlayer)
-			continue;
-
-		bitsKeys |= (1 << iItem);
-
-		get_user_name(iPlayer, szName, charsmax(szName));
-		iLen += formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\\r%i. \\w%s%s\n", ++iItem, szName, get_bit(aMuted[pPlayer], iPlayer) ? " (\\r+\\w)" : "" );
-	}
-
-	bitsKeys |= MENU_KEY_8;
-	iLen += formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\n\n\\r8.\\w %L [\\r%L\\w]\n",
-		pPlayer, "CA_Mute_MuteALL", pPlayer, AllMuted(pPlayer) ? "CA_Mute_ENABLED" : "CA_Mute_DISABLED"
-	);
-
-	if(iEnd < iCount)
-	{
-		bitsKeys |= MENU_KEY_9;
-		formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\n \\r9.\\w%L\n \\r0. \\w%L", pPlayer, "CA_Mute_Next", pPlayer, iPage ? "CA_Mute_Back" : "CA_Mute_Exit");
-	}
-	else
-		formatex(szMenu[iLen], charsmax(szMenu) - iLen, "\n\\r0.\\w%L", pPlayer, iPage ? "CA_Mute_Back" : "CA_Mute_Exit");
-
-	return show_menu(pPlayer, bitsKeys, szMenu, -1, "Players Mute Menu");
-}
-
-public Menu_Handler_PlayersList(pPlayer, iKey)
-{
-	switch (iKey)
-	{
-		case 7: 
-		{
-			MuteALL_Toggle(pPlayer);
-			return Menu_Show_PlayersList(pPlayer, g_iPlayerMenuPage[pPlayer]);
-		}
-		case 8: return Menu_Show_PlayersList(pPlayer, ++g_iPlayerMenuPage[pPlayer]);
-		case 9: return Menu_Show_PlayersList(pPlayer, --g_iPlayerMenuPage[pPlayer]);
-	}
-
-	Mute_Toggle(pPlayer, g_apPlayerMenuPlayers[pPlayer][(g_iPlayerMenuPage[pPlayer] * PLAYERS_PER_PAGE) + iKey]);
-
-	Menu_Show_PlayersList(pPlayer, g_iPlayerMenuPage[pPlayer]);
-	return PLUGIN_HANDLED;
-}
-
-
-public client_disconnected(pPlayer) {
-	aMuted[pPlayer] = 0;
-}
-
-Mute_Toggle(pPlayer, pOther)
-{
-	if(!is_user_connected(pOther))
-	{
-		client_print(pPlayer, print_chat, "%L", pPlayer, "CA_Mute_PlayerNotAllowed", pOther);
-		return;
-	}
-
-	invert_bit(aMuted[pPlayer], pOther);
-	
-	static szName[MAX_NAME_LENGTH];
-	get_user_name(pOther, szName, charsmax(szName));
-
-	client_print(pPlayer, print_chat, "%L", pPlayer, "CA_Mute_HasBeenMuted", szName, pPlayer, get_bit(aMuted[pPlayer], pOther) ? "CA_Mute_Muted" : "CA_Mute_UnMuted");
-}
-
-MuteALL_Toggle(pPlayer) {
-	aMuted[pPlayer] = AllMuted(pPlayer) ? 0 : 0xFFFF;
-}
-
-bool: AllMuted(pPlayer) {
-	return aMuted[pPlayer] == 0xFFFF;
-}
-
-public CA_Client_Voice(pPlayer, pOther)
-	return get_bit(aMuted[pPlayer], pOther) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
-
-
-
-const MAX_CMD_LEN = 32;
-new const g_szCmds[] = "mute";
-new const szPreCmd[][] = {"say ", "say_team "/*, ""*/};
-new const szCtrlChar[][] = {"!", "/", "\\", "." , "?", ""};
-new const FUNC_NAME[] = "ClCmd_Mute";
-
 Init_Cmds()
 {
-	if(!strlen(g_szCmds))
-		return;
+	new const szCmd[] = "mute";
+	new const szPreCmd[][] = {"say ", "say_team "/*, ""*/};
+	new const szCtrlChar[][] = {"!", "/", "\\", "." , "?", ""};
 
-	for(new i; i < sizeof(szPreCmd); i++)
-	{
-		for(new k; k < sizeof(szCtrlChar); k++)
-		{
-			new szCmd[MAX_CMD_LEN], ePos, stPos, rawPoint[32];
-
-			do
-			{
-				ePos = strfind(g_szCmds[stPos],",");
-				formatex(rawPoint, ePos, g_szCmds[stPos]);
-				stPos += ePos + 1;
-
-				trim(rawPoint);
-
-				if(rawPoint[0])
-				{
-					formatex(szCmd, charsmax(szCmd),
-						"%s%s%s",
-						szPreCmd[i],
-						szCtrlChar[k],
-						rawPoint
-					);
-						
-					register_clcmd(szCmd, FUNC_NAME);
-				}
-			}
-			while(ePos != -1);
+	for(new i; i < sizeof(szPreCmd); i++) {
+		for(new k; k < sizeof(szCtrlChar); k++) {
+			register_clcmd(fmt("%s%s%s", szPreCmd[i], szCtrlChar[k], szCmd), "ClCmd_Mute");
 		}
 	}
+}
+
+
+public ClCmd_Mute(id) {
+	Menu_Show_PlayersList(id);
+
+	return PLUGIN_HANDLED;
+}
+
+public Menu_Show_PlayersList(id) {
+	new pMenu = menu_create("Players for mute:", "Menu_Handler_PlayersList");
+	new hCallback = menu_makecallback("Callback_PlayersList");
+
+	new aPlayers[MAX_PLAYERS], iCount;
+	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
+
+	if(iCount < 2) {
+		menu_additem(pMenu, "\\rNot enough players!", "-2", .callback = hCallback);
+	} else {
+		menu_additem(pMenu, fmt("\\r%sute all?", g_bGlobalMute[id] ? "Unm" : "m"), "-1");
+		menu_addblank(pMenu, .slot = false);
+
+		for(new i; i < MaxClients; i++) {
+			if(i != id && is_user_connected(i))
+				menu_additem(pMenu, "Name", fmt("%i", get_user_userid(i)), .callback = hCallback);
+		}
+	}
+
+	menu_display(id, pMenu);
+}
+
+public Callback_PlayersList(id, menu, item) {
+	new null, sInfo[64], sName[64];
+	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
+
+	new iUserID = strtol(sInfo);
+	if(iUserID > 0) {
+		new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
+		menu_item_setname(menu, item, fmt("%n   %s", player, g_aMutes[id][player] ? "[ \\r+\\w ]" : ""));
+	}
+
+	return (
+			(iUserID != -1 && g_bGlobalMute[id])
+			|| iUserID == -2
+		) ? ITEM_DISABLED : ITEM_ENABLED;
+}
+
+public Menu_Handler_PlayersList(id, menu, item) {
+	if(item == MENU_EXIT || item < 0) {
+		menu_destroy(menu);
+		return PLUGIN_HANDLED;
+	}
+	
+	new null, sInfo[64], sName[64];
+	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
+
+	new iUserID = strtol(sInfo);
+	if(iUserID == -1) {
+		g_bGlobalMute[id] ^= true;
+
+		menu_destroy(menu);
+		Menu_Show_PlayersList(id);
+		return PLUGIN_HANDLED;
+	}
+
+	new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
+	if(!is_user_connected(player)) {
+		client_print(id, print_chat, "Player not connected!");
+
+		menu_destroy(menu);
+		Menu_Show_PlayersList(id);
+		return PLUGIN_HANDLED;
+	}
+
+	g_aMutes[id][player] ^= true;
+	client_print_color(id, print_team_default, "^1^4Player %n - %smuted.", player, g_aMutes[id][player] ? "" : "un");
+
+	menu_destroy(menu);
+	Menu_Show_PlayersList(id);
+
+	return PLUGIN_HANDLED;
+}
+
+
+public client_disconnected(id) {
+	arrayset(g_aMutes[id], false, sizeof g_aMutes[]);
+	g_bGlobalMute[id] = false;
+
+	for(new i; i < sizeof g_aMutes[]; i++)
+		g_aMutes[i][id] = false;
+}
+
+public CA_Client_Voice(id, receiver) {
+	return (g_aMutes[receiver][id] == true || g_bGlobalMute[id] || g_bGlobalMute[receiver]) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
