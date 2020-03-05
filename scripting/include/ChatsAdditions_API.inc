@@ -163,8 +163,8 @@ forward CA_Client_SayTeam(index);
  *
  * @note 
  *
- * @param listener   Receiver index.
- * @param sender   	 Sender index.
+ * @param index   Receiver index.
+ * @param pOther   Sender index.
  *
  * @return      PLUGIN_CONTINUE to allow send voice
  *              PLUGIN_HANDLED or higher to prevent the voice
@@ -183,6 +183,19 @@ forward CA_Client_Voice(const listener, const sender);
  *                      will be thrown.
  */
 native ca_set_user_gag(index, aGagData[gag_s]);
+
+/**
+ * Get client's gag data.
+ *
+ * @param index         Client index
+ * @param aGagData      Gag data with gag_s
+ *
+ * @return				True if has Gag.
+ * @error               If the client index is not within the range of 1 to
+ *                      MaxClients, or the client is not connected, an error
+ *                      will be thrown.
+ */
+native bool: ca_get_user_gag(index, aGagData[gag_s]);
 
 /**
  * Remove client's gag data..

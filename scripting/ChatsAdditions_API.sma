@@ -99,6 +99,7 @@ public plugin_natives()
 {
 	register_library("Chats_Additions_API");
 	register_native("ca_set_user_gag", "native_ca_set_user_gag");
+	register_native("ca_get_user_gag", "native_ca_get_user_gag");
 	register_native("ca_remove_user_gag", "native_ca_remove_user_gag");
 
 	register_native("ca_get_storage_type", "native_ca_get_storage_type");
@@ -229,6 +230,19 @@ save_user_gag(pPlayer, aGagData[gag_s])
 	save_to_storage(aGagData[_AuthId], aGagData[_IP], aGagData);
 
 	client_cmd(pPlayer, "-voicerecord");
+}
+
+public native_ca_get_user_gag(pPlugin, iParams) {
+	enum { Player = 1, m_GagData };
+
+	new pPlayer = get_param(Player);
+
+	if(g_PlayersGags[pPlayer][_bitFlags] != m_REMOVED) {
+		set_array(m_GagData, g_PlayersGags[pPlayer], sizeof g_PlayersGags[]);
+		return true;
+	}
+
+	return false;
 }
 
 public native_ca_remove_user_gag(pPlugin, iParams)
