@@ -37,9 +37,6 @@ new g_iPlayerMenuPage[MAX_PLAYERS + 1],
 /* Cvars */
 new ca_gag_flags_default[4];
 
-new const MENU_PlayersList[]		= "Admin Gag Menu";
-new const MENU_Gag_Properties[]		= "Gag properties on players";
-
 new any: g_aGags[MAX_PLAYERS + 1][gag_s];
 new Array: g_aReasons, g_iArraySize_Reasons;
 
@@ -53,9 +50,6 @@ public plugin_init()
 	register_dictionary("CA_Gag.txt");
 	register_dictionary("common.txt");
 	register_dictionary("time.txt");
-
-	register_menu(MENU_PlayersList, 1023, "Menu_Handler_PlayersList", .outside = 1);
-	register_menu(MENU_Gag_Properties, 1023, "Menu_Handler_GagProperties", .outside = 1);
 
 	bind_pcvar_string(
 		create_cvar("ca_gag_flags_default", "abc", .description = "Default flags to set on gagged player."),
@@ -505,10 +499,6 @@ stock GetStringTime_seconds(iSeconds)
 	return szTime;
 }
 
-
-stock Get_GagStringFlags(pOther, flag)
-	return MENU_PlayersList;
-
 Get_GagStringReason(pPlayer, pOther)
 {
 	static szText[MAX_REASON_LEN];
@@ -519,13 +509,26 @@ Get_GagStringReason(pPlayer, pOther)
 	return szText;
 }
 
-stock Menu_Show_AdditionalModes(pPlayer) {
-	return pPlayer;
+
+public client_putinserver(id) {
+	new bool: bHasGag = ca_get_user_gag(id, g_aGags[id]);
+
+	if(bHasGag)
+		client_print_color(0, print_team_red, "\3Player %n has GAG!", id);
 }
 
-// public CA_Client_Voice(pPlayer, pOther) {
-	// return get_bit(aMuted[pPlayer], pOther) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
-// }
+
+public CA_Client_Voice(const listener, const sender) {
+	return (g_aGags[sender][_bitFlags] & m_Voice) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+}
+
+public CA_Client_SayTeam(id) {
+	return (g_aGags[id][_bitFlags] & m_SayTeam) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+}
+
+public CA_Client_Say(id) {
+	return (g_aGags[id][_bitFlags] & m_Say) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+}
 
 
 const MAX_CMD_LEN = 32;
