@@ -1,7 +1,7 @@
 #include <amxmodx>
 #include <hamsandwich>
 
-#include <ChatsAdditions_API>
+#include <ChatsAdditions>
 
 #if !defined MAX_PLAYERS
 	const MAX_PLAYERS = 32;
