@@ -1,5 +1,5 @@
 #include <amxmodx>
-#include <fakemeta>
+#include <reapi>
 
 #pragma semicolon 1
 #pragma ctrlchar '\'
@@ -75,7 +75,7 @@ public plugin_init()
 	register_clcmd("say_team", "ClCmd_Hook_SayTeam");
 
 		// Voice
-	register_forward(FM_Voice_SetClientListening, "pfnVoice_SetClientListening_Pre", ._post = false);
+	RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer, "CSGameRules_CanPlayerHearPlayer", .post = false);
 
 	set_task(UPDATER_FREQ, "Gags_Thinker", .flags = "b");
 
@@ -176,24 +176,26 @@ public ClCmd_Hook_SayTeam(const pPlayer)
 }
 
 	// Engine Set client VoiceMask
-public pfnVoice_SetClientListening_Pre(iReceiver, iSender, bool:bListen)
-{
-	if(iReceiver == iSender)
-    	return FMRES_IGNORED;
-
+public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
+	if(listener == sender)
+		return HC_CONTINUE;
+	
 	// Get MainAPI sets
-	bListen = !(g_PlayersGags[iSender][_bitFlags] & m_Voice);
+	new bool: bCanHear = !(g_PlayersGags[sender][_bitFlags] & m_Voice);
 
-	
-	static retVal;
-	ExecuteForward(g_pFwd_Client_Voice, retVal, iSender, iReceiver);
-	
+	new retVal;
+	ExecuteForward(g_pFwd_Client_Voice, retVal, listener, sender);
 	if(retVal == PLUGIN_HANDLED)
-		bListen = false;
+		bCanHear = false;
+	
+	if(!bCanHear) {
+		SetHookChainReturn(ATYPE_BOOL, bCanHear);
+		return HC_BREAK;
+	}
 
-	engfunc(EngFunc_SetClientListening, iReceiver, iSender, bListen);
-	return bListen ? FMRES_IGNORED : FMRES_SUPERCEDE;
+	return HC_CONTINUE;
 }
+
 /** <- HOOKS */
 
 /** API -> */
