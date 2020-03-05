@@ -154,12 +154,7 @@ public ClCmd_Hook_Say(const pPlayer)
 	static retVal;
 	ExecuteForward(g_pFwd_Client_Say, retVal, pPlayer);
 
-	if(retVal == PLUGIN_HANDLED)
-		return PLUGIN_HANDLED;
-
-	// Get MainAPI sets
-	retVal = g_PlayersGags[pPlayer][_bitFlags] & m_Say;
-	return retVal ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+	return retVal == PLUGIN_HANDLED ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
 	// Client use "say_team" command
@@ -168,21 +163,15 @@ public ClCmd_Hook_SayTeam(const pPlayer)
 	static retVal;
 	ExecuteForward(g_pFwd_Client_SayTeam, retVal, pPlayer);
 
-	if(retVal == PLUGIN_HANDLED)
-		return PLUGIN_HANDLED;
-
-	// Get MainAPI sets
-	retVal = g_PlayersGags[pPlayer][_bitFlags] & m_SayTeam;
-	return retVal ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+	return retVal == PLUGIN_HANDLED ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
 	// Engine Set client VoiceMask
 public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
 	if(listener == sender)
 		return HC_CONTINUE;
-	
-	// Get MainAPI sets
-	new bool: bCanHear = !(g_PlayersGags[sender][_bitFlags] & m_Voice);
+
+	new bool: bCanHear = true;
 
 	new retVal;
 	ExecuteForward(g_pFwd_Client_Voice, retVal, listener, sender);
