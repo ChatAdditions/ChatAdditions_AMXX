@@ -57,8 +57,8 @@ public CA_Client_SayTeam(pPlayer) {
 	return PLUGIN_CONTINUE;
 }
 
-public CA_Client_Voice(pPlayer, pOther) {
-	return CanCommunicate(pPlayer) ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
+public CA_Client_Voice(const listener, const sender) {
+	return CanCommunicate(sender) ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
 }
 
 bool: CanCommunicate(pPlayer) {
