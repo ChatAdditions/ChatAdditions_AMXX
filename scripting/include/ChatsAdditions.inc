@@ -24,6 +24,18 @@ enum
 	CA_SUPERCEDE    // Skip real function, use my return value
 };
 
+#define CHECK_NATIVE_ARGS_NUM(%1,%2,%3) \
+	if (%1 < %2) { \
+		log_error(AMX_ERR_NATIVE, "Invalid num of arguments %d. Expected %d", %1, %2); \
+		return %3; \
+	}
+
+#define CHECK_NATIVE_PLAYER(%1,%2) \
+	if (!is_user_connected(%1)) { \
+		log_error(AMX_ERR_NATIVE, "Invalid player %d", %1); \
+		return %2; \
+	}
+
 /**
  * Called when player say to chat.
  *
