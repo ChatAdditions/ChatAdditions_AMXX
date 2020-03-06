@@ -29,7 +29,7 @@ public plugin_precache()
 }
 
 public plugin_natives() {
-	register_library("Chats_Additions_Core");
+	register_library("ChatAdditions_Core");
 }
 
 public ClCmd_Hook_Say(id) {
