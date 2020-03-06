@@ -1,17 +1,63 @@
-#define FLAGS_ACCESS    ( ADMIN_KICK )
-#define FLAGS_IMMUNITY    ( ADMIN_IMMUNITY )
+/* // CRUD - Create, Read, Update, Delete
+static add_user_gag(const id, const aGagData[gag_s]) {
+    // Готовый набор параметров гага передаём в БД.
+}
+static get_user_gag(const id, aGagData[gag_s]) {
+    // Получаем из БД готовый набор гагов.
+}
+static update_user_gag(const id, aGagData[gag_s]) {
+    // Обновляем на сервере и в БД параметры гага.
+}
+static remove_user_gag(const id, aGagData[gag_s]) {
+    // Удаляем с сервера и БД гаг.
+}
+
+ */
+
+
 
 #include <amxmodx>
 #include <amxmisc>
 #include <time>
 
+#include <ChatsAdditions>
+#include <CA_GAG_API>
+
 #pragma semicolon 1
 #pragma ctrlchar '\'
+#pragma dynamic 524288
 
-#include <ChatsAdditions_API>
 
+		/* ----- START SETTINGS----- */
 #define DEBUG
 
+/**
+ *	Database type for storage gags
+ *		DB_NVault,
+ *		DB_JSON,  // TODO: 
+ *		DB_MySQL,
+ *		DB_SQLite
+ */
+#define DATABASE_TYPE DB_SQLite
+
+#define FLAGS_ACCESS    ( ADMIN_KICK )
+#define FLAGS_IMMUNITY    ( ADMIN_IMMUNITY )
+
+		/* ----- END OF SETTINGS----- */
+
+#if DATABASE_TYPE == DB_NVault
+	#include <ChatAdditions_inc/CA_NVault>
+#elseif DATABASE_TYPE == DB_JSON
+	// #include <ChatAdditions_inc/CA_JSON>
+#elseif DATABASE_TYPE == DB_MySQL
+	#include <ChatAdditions_inc/CA_MySQL>
+#elseif DATABASE_TYPE == DB_SQLite
+	#include <ChatAdditions_inc/CA_SQLite>
+#endif
+
+#if !defined DATABASE_TYPE
+	#error Please uncomment DATABASE_TYPE and select!
+#endif
 
 /** Time settings */
 enum any: TIME_CONST_s (+=1) { CUSTOMTIME = -10, FOREVER = 0 };
@@ -26,54 +72,71 @@ new const g_aTimes[] = {
 	FOREVER
 };
 
+new any: g_aCurrentGags[MAX_PLAYERS + 1][gag_s];
+new g_PlayersGags[MAX_PLAYERS + 1][gag_s];
 
+new g_aAdminGagsEditor[MAX_PLAYERS + 1][gag_s];
 
-const PLAYERS_PER_PAGE = 7;
-
-new g_iPlayerMenuPage[MAX_PLAYERS + 1],
-	g_apPlayerMenuPlayers[MAX_PLAYERS + 1][MAX_PLAYERS],
-	g_iSelectedPlayer[MAX_PLAYERS + 1];
-
-/* Cvars */
-new ca_gag_flags_default[4];
-
-new any: g_aGags[MAX_PLAYERS + 1][gag_s];
 new Array: g_aReasons, g_iArraySize_Reasons;
 
 new g_pMenu_GagProperties, g_pMenu_ConfirmRemove;
 
-new DB_Types: g_iStorageType;
 
-public plugin_init()
-{
+public plugin_precache() {
 	register_plugin("[CA] Gag", "1.0.0-alpha", "Sergey Shorokhov");
+
 	register_dictionary("CA_Gag.txt");
 	register_dictionary("common.txt");
 	register_dictionary("time.txt");
 
-	bind_pcvar_string(
-		create_cvar("ca_gag_flags_default", "abc", .description = "Default flags to set on gagged player."),
-		ca_gag_flags_default, charsmax(ca_gag_flags_default)
-	);
-
-	// create_cvar("ca_gag_times", "1, 5, 30, 60, 1440, 10080, -1", .description = "Default times set."); // concept
-
 	register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason");
 	register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates"); // debug
 
+	new sConfigsDir[PLATFORM_MAX_PATH];
+	get_localinfo("amxx_configsdir", sConfigsDir, charsmax(sConfigsDir));
+    server_cmd("exec %s/gag_reasons.cfg", sConfigsDir);
+    server_exec();
 
-	g_iStorageType = ca_get_storage_type();
-
-	Init_Cmds();
-	
 	g_pMenu_GagProperties = BuildMenu_GagProperties();
 	g_pMenu_ConfirmRemove = BuildMenu_ConfirmRemove();
+	
+	new const szCmd[] = "gag";
+	new const szCtrlChar[][] = {"!", "/", "\\", "." , "?", ""};
+	for(new i; i < sizeof(szCtrlChar); i++) {
+		register_clcmd(fmt("%s%s", szCtrlChar[i], szCmd), "ClCmd_Gag", FLAGS_ACCESS);
+		register_clcmd(fmt("say %s%s", szCtrlChar[i], szCmd), "ClCmd_Gag", FLAGS_ACCESS);
+		register_clcmd(fmt("say_team %s%s", szCtrlChar[i], szCmd), "ClCmd_Gag", FLAGS_ACCESS);
+	}
 
-	server_cmd("exec addons/amxmodx/configs/ChatAdditions/gag_reasons.cfg");
+	register_clcmd("enter_GagReason", "ClCmd_EnterGagReason");
+
+	const Float: UPDATER_FREQ = 3.0;
+	set_task(UPDATER_FREQ, "Gags_Thinker", .flags = "b");
 }
 
-public ClCmd_Gag(pPlayer, level, cid)
+public plugin_natives() {
+	register_library("ChatAdditions_GAG_API");
+
+	// TODO: Need CRUD
+	register_native("ca_set_user_gag", "native_ca_set_user_gag");
+	register_native("ca_get_user_gag", "native_ca_get_user_gag");
+	// register_native("ca_update_user_gag", "native_ca_update_user_gag");
+	register_native("ca_remove_user_gag", "native_ca_remove_user_gag");
+
+	// TODO: Create forwards: gagged, ungagged, loaded from storage, saved to storage
+}
+
+public Gags_Thinker()
 {
+	static aPlayers[MAX_PLAYERS], iCount;
+	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
+
+	for(new i; i < iCount; i++)
+		check_user_gag(aPlayersId[i]);
+}
+
+//
+public ClCmd_Gag(pPlayer, level, cid) {
 #if !defined DEBUG
 	if(!cmd_access(pPlayer, level, cid, 1))
 		return PLUGIN_HANDLED;
@@ -135,7 +198,7 @@ public Menu_Handler_PlayersList(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	menu_display(id, (g_aGags[pOther][_bitFlags] != m_REMOVED) ? g_pMenu_ConfirmRemove : g_pMenu_GagProperties);
+	menu_display(id, (g_aCurrentGags[pOther][_bitFlags] != m_REMOVED) ? g_pMenu_ConfirmRemove : g_pMenu_GagProperties);
 
 	g_iSelectedPlayer[id] = pOther;
 
@@ -149,7 +212,7 @@ GetPostfix(pPlayer, bHaveImmunity)
 
 	if(bHaveImmunity)
 		formatex(szPostfix, charsmax(szPostfix), " [\\r*]");
-	else if(g_aGags[pPlayer][_bitFlags])
+	else if(g_aCurrentGags[pPlayer][_bitFlags])
 		formatex(szPostfix, charsmax(szPostfix), " [\\yGagged\\w]");
 	else szPostfix[0] = '\0';
 
@@ -240,7 +303,7 @@ public Callback_GagProperties(id, menu, item)
 		};
 	
 	new pOther = g_iSelectedPlayer[id];
-	new gag_flags_s: gagFlags = g_aGags[pOther][_bitFlags];
+	new gag_flags_s: gagFlags = g_aCurrentGags[pOther][_bitFlags];
 
 	new null, sInfo[64], sName[64];
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
@@ -255,7 +318,7 @@ public Callback_GagProperties(id, menu, item)
 		case menu_Reason:
 			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Reason", Get_GagStringReason(id, pOther));
 		case menu_Time:
-			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Time", GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
+			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Time", GetStringTime_seconds(g_aCurrentGags[pOther][_ExpireTime]));
 		case menu_Confirm:
 			formatex(sName, charsmax(sName), "%L", id, "CA_Gag_Confirm");
 	}
@@ -264,7 +327,7 @@ public Callback_GagProperties(id, menu, item)
 
 	return (
 		item == menu_Confirm && !Ready_To_Gag(pOther)
-		|| g_iStorageType == DB_NVault && item == menu_Reason
+		|| DATABASE_TYPE == DB_NVault && item == menu_Reason
 		) ? ITEM_DISABLED : ITEM_ENABLED;
 }
 
@@ -315,7 +378,7 @@ public Menu_Handler_GagProperties(id, menu, item)
 
 stock bool: Ready_To_Gag(pOther)
 {	
-	return (g_aGags[pOther][_bitFlags] != m_REMOVED ) ? true : false;
+	return (g_aCurrentGags[pOther][_bitFlags] != m_REMOVED ) ? true : false;
 }
 
 
@@ -379,10 +442,10 @@ public Menu_Handler_SelectReason(pPlayer, pMenu, iItem)
 	new aReason[gag_s];
 	ArrayGetArray(g_aReasons, iReason, aReason);
 
-	copy(g_aGags[pOther][_Reason], MAX_REASON_LEN - 1, aReason[_Reason]);
+	copy(g_aCurrentGags[pOther][_Reason], MAX_REASON_LEN - 1, aReason[_Reason]);
 
 // IF NEED OFC
-	g_aGags[pOther][_ExpireTime] = aReason[_ExpireTime];
+	g_aCurrentGags[pOther][_ExpireTime] = aReason[_ExpireTime];
 
 	// log_amx("aReason[_ExpireTime]=%i, aReason[_Reason]=%s", aReason[_ExpireTime], aReason[_Reason]);
 
@@ -448,10 +511,10 @@ public Menu_Handler_SelectTime(pPlayer, pMenu, iItem)
 
 	// if(sizeof g_aTimes > 0)
 
-	g_aGags[pOther][_ExpireTime] = iTime;
-	// num_to_str(iTime, g_aGags[pOther][_ExpireTime], 31);
+	g_aCurrentGags[pOther][_ExpireTime] = iTime;
+	// num_to_str(iTime, g_aCurrentGags[pOther][_ExpireTime], 31);
 
-	// server_print("SetGAGTIME: '%i'", g_aGags[pOther][_ExpireTime]);
+	// server_print("SetGAGTIME: '%i'", g_aCurrentGags[pOther][_ExpireTime]);
 
 	menu_display(pPlayer, g_pMenu_GagProperties);
 	return PLUGIN_HANDLED;
@@ -473,15 +536,15 @@ public ClCmd_EnterGagReason(pPlayer)
 		return PLUGIN_HANDLED;
 	}
 
-	copy(g_aGags[pOther][_Reason], MAX_REASON_LEN - 1, szCustomReason);
+	copy(g_aCurrentGags[pOther][_Reason], MAX_REASON_LEN - 1, szCustomReason);
 
-	client_print(pPlayer, print_chat, "Вы установили причину затычки: '%s'", g_aGags[pOther][_Reason]);
+	client_print(pPlayer, print_chat, "Вы установили причину затычки: '%s'", g_aCurrentGags[pOther][_Reason]);
 	menu_display(pPlayer, g_pMenu_GagProperties);
 	return PLUGIN_HANDLED;
 }
 
 Gag_Toggle(pOther, gag_flags_s: flag)
-	g_aGags[pOther][_bitFlags] ^= flag;
+	g_aCurrentGags[pOther][_bitFlags] ^= flag;
 
 stock GetStringTime_seconds(iSeconds)
 {
@@ -502,77 +565,24 @@ stock GetStringTime_seconds(iSeconds)
 Get_GagStringReason(pPlayer, pOther)
 {
 	static szText[MAX_REASON_LEN];
-	if(!g_aGags[pOther][_Reason][0])
+	if(!g_aCurrentGags[pOther][_Reason][0])
 		formatex(szText, charsmax(szText), "%L", pPlayer, "CA_Gag_NotSet");
-	else copy(szText, charsmax(szText), g_aGags[pOther][_Reason]);
+	else copy(szText, charsmax(szText), g_aCurrentGags[pOther][_Reason]);
 
 	return szText;
 }
 
 
-public client_putinserver(id) {
-	new bool: bHasGag = ca_get_user_gag(id, g_aGags[id]);
-
-	if(bHasGag)
-		client_print_color(0, print_team_red, "\3Player %n has GAG!", id);
-}
-
-
 public CA_Client_Voice(const listener, const sender) {
-	return (g_aGags[sender][_bitFlags] & m_Voice) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+	return (g_aCurrentGags[sender][_bitFlags] & m_Voice) ? CA_SUPERCEDE : CA_CONTINUE;
 }
 
 public CA_Client_SayTeam(id) {
-	return (g_aGags[id][_bitFlags] & m_SayTeam) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+	return (g_aCurrentGags[id][_bitFlags] & m_SayTeam) ? CA_SUPERCEDE : CA_CONTINUE;
 }
 
 public CA_Client_Say(id) {
-	return (g_aGags[id][_bitFlags] & m_Say) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
-}
-
-
-const MAX_CMD_LEN = 32;
-new const g_szCmds[] = "gag";
-new const szPreCmd[][] = {"say ", "say_team ", ""};
-new const szCtrlChar[][] = {"!", "/", "\\", "." , "?", ""};
-new const FUNC_NAME[] = "ClCmd_Gag";
-
-Init_Cmds()
-{
-	if(!strlen(g_szCmds))
-		return;
-
-	for(new i; i < sizeof(szPreCmd); i++)
-	{
-		for(new k; k < sizeof(szCtrlChar); k++)
-		{
-			new szCmd[MAX_CMD_LEN], ePos, stPos, rawPoint[32];
-
-			do
-			{
-				ePos = strfind(g_szCmds[stPos],",");
-				formatex(rawPoint, ePos, g_szCmds[stPos]);
-				stPos += ePos + 1;
-
-				trim(rawPoint);
-
-				if(rawPoint[0])
-				{
-					formatex(szCmd, charsmax(szCmd),
-						"%s%s%s",
-						szPreCmd[i],
-						szCtrlChar[k],
-						rawPoint
-					);
-						
-					register_clcmd(szCmd, FUNC_NAME, ADMIN_KICK);
-				}
-			}
-			while(ePos != -1);
-		}
-	}
-
-	register_clcmd("enter_GagReason", "ClCmd_EnterGagReason");
+	return (g_aCurrentGags[id][_bitFlags] & m_Say) ? CA_SUPERCEDE : CA_CONTINUE;
 }
 
 public SrvCmd_AddReason()
@@ -636,32 +646,32 @@ SaveGag(pPlayer, pOther)
 {
 	// ca_remove_user_gag(pOther);
 
-	get_user_name(pPlayer, g_aGags[pOther][_AdminName], charsmax(g_aGags[][_AdminName]));
-	get_user_name(pOther, g_aGags[pOther][_Name],  charsmax(g_aGags[][_Name]));
+	get_user_name(pPlayer, g_aCurrentGags[pOther][_AdminName], charsmax(g_aCurrentGags[][_AdminName]));
+	get_user_name(pOther, g_aCurrentGags[pOther][_Name],  charsmax(g_aCurrentGags[][_Name]));
 
-	g_aGags[pOther][_AdminId] = pPlayer;
+	g_aCurrentGags[pOther][_AdminId] = pPlayer;
 	
 #if defined DEBUG
-	//DEBUG__Dump_GagData("SaveGag()", g_aGags[pOther]);
+	//DEBUG__Dump_GagData("SaveGag()", g_aCurrentGags[pOther]);
 #endif
 
 	client_print_color(0, print_team_default, "%L",
-		LANG_PLAYER, "Player_Gagged", pPlayer, pOther, GetStringTime_seconds(g_aGags[pOther][_ExpireTime]));
+		LANG_PLAYER, "Player_Gagged", pPlayer, pOther, GetStringTime_seconds(g_aCurrentGags[pOther][_ExpireTime]));
 
-	if(g_aGags[pOther][_Reason][0])
+	if(g_aCurrentGags[pOther][_Reason][0])
 		client_print_color(0, print_team_default, "Причина: '%s'", Get_GagStringReason(pPlayer, pOther));
 
-	if(g_aGags[pOther][_ExpireTime] == 0)
-		g_aGags[pOther][_ExpireTime] += 99999999;
+	if(g_aCurrentGags[pOther][_ExpireTime] == 0)
+		g_aCurrentGags[pOther][_ExpireTime] += 99999999;
 
-	ca_set_user_gag(pOther, g_aGags[pOther]);
+	ca_set_user_gag(pOther, g_aCurrentGags[pOther]);
 
 	return PLUGIN_CONTINUE;
 }
 
 RemoveGag(pPlayer, pOther)
 {
-	if(g_aGags[pOther][_bitFlags] != m_REMOVED) {
+	if(g_aCurrentGags[pOther][_bitFlags] != m_REMOVED) {
 		ResetOtherData(pOther);
 		ca_remove_user_gag(pOther);
 
@@ -703,14 +713,132 @@ public plugin_cfg()
 	while(ePos != -1);	
 } */
 
-stock ResetAdminData(pPlayer)
-{
-	g_iPlayerMenuPage[pPlayer] = 0;
-	g_apPlayerMenuPlayers[pPlayer] = "";
-	g_iSelectedPlayer[pPlayer] = 0;
-}
-
 stock ResetOtherData(pOther)
 {
-	GagData_Reset(g_aGags[pOther]);
+	GagData_Reset(g_aCurrentGags[pOther]);
 }
+
+/** On Players Events -> */
+	// Client Connected & Authorized 
+public client_putinserver(pPlayer)
+{
+	// Get player gag from Storage
+	load_user_gag(pPlayer);
+}
+
+	// The client left the server
+public client_disconnected(pPlayer)
+{
+	GagData_Reset(g_PlayersGags[pPlayer]);
+}
+/** <- On Players Events */
+
+stock Player_GagSet(pPlayer, aGagData[])
+{
+	g_PlayersGags[pPlayer][_bitFlags]		= any: aGagData[_bitFlags];
+	g_PlayersGags[pPlayer][_Reason]			= any: aGagData[_Reason];
+	g_PlayersGags[pPlayer][_ExpireTime]		= any: aGagData[_ExpireTime];
+}
+
+stock Player_GagReset(pPlayer)
+{
+	GagData_Reset(g_PlayersGags[pPlayer]);
+
+	// Remove player gag from Storage
+	get_user_authid(pPlayer, g_PlayersGags[pPlayer][_AuthId], 31);
+	get_user_ip(pPlayer, g_PlayersGags[pPlayer][_IP], 31, .without_port = true);
+	remove_from_storage(g_PlayersGags[pPlayer][_AuthId], g_PlayersGags[pPlayer][_IP], g_PlayersGags[pPlayer]);
+}
+
+
+save_user_gag(pPlayer, aGagData[gag_s])
+{
+	// static szAuthId[32], szIP[32], szName[MAX_NAME_LENGTH];
+	get_user_authid(pPlayer, aGagData[_AuthId], 31);
+	get_user_ip(pPlayer, aGagData[_IP], 31, .without_port = true);
+	// get_user_name(pPlayer, szName, charsmax(szName));
+	aGagData[_Player] = pPlayer;
+	get_user_authid(aGagData[_AdminId], aGagData[_AdminAuthId], 31);
+	get_user_ip(aGagData[_AdminId], aGagData[_AdminIP], 31, .without_port = true);
+
+	Player_GagSet(pPlayer, aGagData);
+
+	// Save player gag on Storage
+	save_to_storage(aGagData[_AuthId], aGagData[_IP], aGagData);
+
+	client_cmd(pPlayer, "-voicerecord");
+}
+
+load_user_gag(pPlayer)
+{
+	static any: aGagData[gag_s];
+
+	static szIP[32]; get_user_ip(pPlayer, szIP, charsmax(szIP), .without_port = true);
+	static szAuthId[32]; get_user_authid(pPlayer, szAuthId, charsmax(szAuthId));
+	aGagData[_Player] = pPlayer;
+
+	load_from_storage(szAuthId, szIP, aGagData);
+}
+
+check_user_gag(pPlayer)
+{
+	static iSysTime; iSysTime = get_systime();
+
+	if(g_PlayersGags[pPlayer][_bitFlags] != m_REMOVED && g_PlayersGags[pPlayer][_ExpireTime] < iSysTime)
+	{
+		// The user has expired gag - should reset
+		g_PlayersGags[pPlayer][_bitFlags] = m_REMOVED;
+
+			// TODO
+			// Reset user gag
+		// save_user_gag(pPlayer, aGagData);
+#if defined DEBUG
+		server_print("\n   - check_user_gag() USER[%i] HAS EXPIRED GAG - RESETED!", pPlayer);
+#endif
+	}
+}
+
+
+
+/** API -> */
+public native_ca_set_user_gag(pPlugin, iParams)
+{
+	enum { Player = 1, m_GagData };
+
+	static pPlayer; pPlayer = get_param(Player);
+	static aGagData[gag_s]; get_array(m_GagData, aGagData, sizeof aGagData);
+
+	// Sets next ungag time
+	aGagData[_ExpireTime] += get_systime();
+	aGagData[Player] = pPlayer;
+
+	save_user_gag(pPlayer, aGagData);
+}
+
+
+public native_ca_get_user_gag(pPlugin, iParams) {
+	enum { Player = 1, m_GagData };
+
+	new pPlayer = get_param(Player);
+
+	if(g_PlayersGags[pPlayer][_bitFlags] != m_REMOVED) {
+		set_array(m_GagData, g_PlayersGags[pPlayer], sizeof g_PlayersGags[]);
+		return true;
+	}
+
+	return false;
+}
+
+public native_ca_remove_user_gag(pPlugin, iParams)
+{
+	enum { Player = 1 };
+
+	static pPlayer; pPlayer = get_param(Player);
+	Player_GagReset(pPlayer);
+}
+
+public DB_Types: native_ca_get_storage_type(pPlugin, iParams)
+{
+	return DATABASE_TYPE;
+}
+/** <- API */
