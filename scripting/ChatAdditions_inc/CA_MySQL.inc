@@ -157,7 +157,7 @@ public load_from_storage(sAuthId[], sIP[], aGagData[gag_s])
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
 
-public save_to_storage(szAuthId[], szIP[], aGagData[gag_s])
+public save_to_storage(aGagData[gag_s])
 {
 	new szQuery[QUERY_LENGTH * 3];
 
