@@ -10,9 +10,9 @@
 
 #define _Ca_API_included
 
-#pragma reqlib Chats_Additions_API
+#pragma reqlib ChatAdditions_Core
 #if !defined AMXMODX_NOAUTOLOAD
-	#pragma loadlib Chats_Additions_API
+	#pragma loadlib ChatAdditions_Core
 #endif
 
 /**
