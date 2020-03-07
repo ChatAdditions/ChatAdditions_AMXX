@@ -37,16 +37,21 @@ enum qeury_data_s
 
 new g_sqlData[qeury_data_s];
 
-public Init_Storage()
+static Float:g_fStartInitTime;
+public plugin_cfg() {
+	init_storage();
+}
+
+init_storage()
 {
+	g_fStartInitTime = get_gametime();
+
 	if(!SQL_SetAffinity(SQL_DBTYPE))
 		set_fail_state("Failed to use '%s' as DB driver. Check modules.ini", SQL_DBTYPE);
 
 	g_hTuple = SQL_MakeDbTuple( "", "", "", SQL_DBNAME);
 
 	CreateTable();
-
-	return true;
 }
 
 public Storage_Destroy()
@@ -69,8 +74,9 @@ public CreateTable()
 		admin_name		varchar NOT NULL,							\
 		admin_authid	varchar NOT NULL,							\
 		admin_ip		varchar NOT NULL,							\
+		time			INTEGER NOT NULL,							\
 		create_time		INTEGER NOT NULL,							\
-		unban_time		INTEGER NOT NULL,							\
+		expire_time		INTEGER NOT NULL,							\
 		flags			INTEGER NOT NULL							\
 	); CREATE UNIQUE INDEX IF NOT EXISTS authid_unique_idx ON `%s` (authid)", SQL_TBL_GAGS, SQL_TBL_GAGS);
 
@@ -99,54 +105,50 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 	new q_state = qeury_data_s:data[qd_Query_state];
 	switch(q_state)
 	{
-		case SQL_INIT: DB_Inited();
+		case SQL_INIT: Storage_Inited(get_gametime() - g_fStartInitTime);
 		case LOAD_PLAYER: {
-			if(!SQL_NumResults(query)) {
-				server_print("SQL_Handler()::LOAD_PLAYER(UserID=#%i) NOT FOUND in DB", data[qd_UserID]);
+			new bool: bFound = SQL_NumResults(query) != 0;
+			if(!bFound) {
+				Storage_PlayerLoaded(data[qd_UserID]);
+				server_print("CASE #1");
 				return;
 			}
-					
-			enum { res_UnbanTime, res_Flags };
-			new pPlayer = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), data[qd_UserID]);
 
-			g_PlayersGags[pPlayer][_ExpireTime] = SQL_ReadResult(query, res_UnbanTime);
-			g_PlayersGags[pPlayer][_bitFlags]	= gag_flags_s:SQL_ReadResult(query, res_Flags);
+			enum { res_Time, res_ExpireTime, res_Flags, res_Reason };
+			new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), data[qd_UserID]);
 
-			server_print("SQL_Handler()::LOAD_PLAYER(pPlayer=%i)", pPlayer);
+			g_aCurrentGags[target][_ExpireTime] = SQL_ReadResult(query, res_ExpireTime);
+			if(g_aCurrentGags[target][_ExpireTime] <= get_systime()) {
+				Storage_PlayerLoaded(data[qd_UserID]);
+				server_print("CASE #2");
+				return;
+			}
+			
+			g_aCurrentGags[target][_Time] = SQL_ReadResult(query, res_Time);
+			g_aCurrentGags[target][_bitFlags]	= gag_flags_s:SQL_ReadResult(query, res_Flags);
+			SQL_ReadResult(query, res_Reason, g_aCurrentGags[target][_Reason], charsmax(g_aCurrentGags[][_Reason]));
 
-			#if defined DEBUG
-				DEBUG__Dump_GagData("SQL_Handler()::LOAD_PLAYER()", g_PlayersGags[pPlayer]);
-			#endif
+			server_print("CASE #3");
+			Storage_PlayerLoaded(data[qd_UserID], .bFound = true);
 		}
 		case SAVE_PLAYER: {
-			new pPlayer = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), data[qd_UserID]);
-			server_print("SQL_Handler()::SAVE_PLAYER(Player=%i)", pPlayer);
-			DB_PlayerSaved(.pPlayer = pPlayer);
+			Storage_PlayerSaved(data[qd_UserID]);
 		}
 		case REMOVE_BLOCK: {
-			server_print("SQL_Handler()::REMOVE_BLOCK(UserID=#%i)", data[qd_UserID]);
+			Storage_PlayerRemoved(data[qd_UserID]);
 		}
 	}
 
 	server_print("SQL_Handler() queuetime='%.5f'", queuetime);
 }
 
-// TODO!
-DB_Inited()
-{
-	/* static bool: bInitState = false, dummy_ret;
-	if(bInitState)
-		ExecuteForward(g_fwd_Initialized, dummy_ret); */
-
-	server_print("DB_Inited() [OK!] DATABASE INITIALIZED!!!!!");
-}
-
-public load_from_storage(sAuthId[], sIP[], aGagData[gag_s])
+public load_from_storage(aGagData[gag_s])
 {
 	new szQuery[QUERY_LENGTH * 2];
-	formatex(szQuery, charsmax(szQuery), "SELECT unban_time, flags FROM %s WHERE ( \
-		authid = '%s' OR ip = '%s') AND unban_time >= %i LIMIT 1",
-	SQL_TBL_GAGS, sAuthId, sIP, aGagData[_AuthId], get_systime()
+	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM %s WHERE ( \
+		authid = '%s' OR ip = '%s') AND expire_time >= %i LIMIT 1",
+	SQL_TBL_GAGS,
+		aGagData[_AuthId], aGagData[_IP], get_systime()
 	);
 
 	g_sqlData[qd_Query_state] = LOAD_PLAYER;
@@ -154,23 +156,19 @@ public load_from_storage(sAuthId[], sIP[], aGagData[gag_s])
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
 
-public save_to_storage(szAuthId[], szIP[], aGagData[gag_s])
+public save_to_storage(const aGagData[gag_s])
 {
-#if defined DEBUG
-	DEBUG__Dump_GagData("SQLite::save_to_storage()", aGagData);
-#endif
-
 	new szQuery[QUERY_LENGTH * 3];
 
 // TODO!
 	formatex(szQuery, charsmax(szQuery), "REPLACE INTO `%s` (	\
 		name,authid,ip,reason,admin_name,admin_authid,			\
-		admin_ip,create_time,unban_time,flags					\
-	) VALUES('%s','%s','%s','%s','%s','%s','%s',%i,%i,%i)",		\
+		admin_ip,time,create_time,expire_time,flags					\
+	) VALUES('%s','%s','%s','%s','%s','%s','%s',%i,%i,%i,%i)",		\
 	SQL_TBL_GAGS,
 		aGagData[_Name], aGagData[_AuthId], aGagData[_IP], aGagData[_Reason],
 		aGagData[_AdminName], aGagData[_AdminAuthId], aGagData[_AdminIP],
-		get_systime(), aGagData[_ExpireTime], aGagData[_bitFlags]
+		aGagData[_Time], get_systime(), aGagData[_ExpireTime], aGagData[_bitFlags]
 	);
 
 	g_sqlData[qd_Query_state] = SAVE_PLAYER;
@@ -192,14 +190,4 @@ public remove_from_storage(szAuthId[], szIP[], aGagData[gag_s])
 	g_sqlData[qd_UserID] = get_user_userid(aGagData[_Player]);
 
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
-}
-
-// TODO!
-DB_PlayerSaved(pPlayer)
-{
-	/* static bool: bSaveState = false, dummy_ret;
-	if(bSaveState)
-		ExecuteForward(g_fwd_Initialized, dummy_ret); */
-
-	server_print("DB_PlayerSaved() [OK!] Player[%i] SAVED!", pPlayer);
 }
