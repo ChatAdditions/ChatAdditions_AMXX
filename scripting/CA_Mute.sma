@@ -4,7 +4,7 @@
 #pragma semicolon 1
 #pragma ctrlchar '\'
 
-#include <ChatsAdditions_API>
+#include <ChatsAdditions>
 
 
 new bool: g_aMutes[MAX_PLAYERS + 1][MAX_PLAYERS + 1];
@@ -123,5 +123,5 @@ public client_disconnected(id) {
 }
 
 public CA_Client_Voice(const listener, const sender) {
-	return (g_aMutes[listener][sender] == true || g_bGlobalMute[listener] || g_bGlobalMute[sender]) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+	return (g_aMutes[listener][sender] == true || g_bGlobalMute[listener] || g_bGlobalMute[sender]) ? CA_SUPERCEDE : CA_CONTINUE;
 }
