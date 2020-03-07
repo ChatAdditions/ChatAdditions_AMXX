@@ -1,0 +1,36 @@
+name: Build test
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build plugins
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        amxmodx: [
+          "1.9",
+          "1.10"
+        ]
+
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v1
+
+    - name: Download AMXX && ReAPI and unpacking
+      env:
+        AMXMODX: ${{ matrix.amxmodx }}
+        URL_REAPI: https://teamcity.rehlds.org/guestAuth/repository/download/Reapi_Publish/21621:id/reapi_5.12.0.192-dev.zip   
+      run: |
+        curl -s https://www.amxmodx.org/amxxdrop/$AMXMODX/$(curl https://www.amxmodx.org/amxxdrop/$AMXMODX/amxmodx-latest-base-linux) -# | tar xz
+        curl -o reapi.zip $URL_REAPI -# && unzip reapi.zip && rm reapi.zip
+        cd addons/amxmodx && rm scripting/*.sma && rm plugins/*.amxx
+
+    - name: Compile plugins AMXX Version
+      run: |
+        cp -Rf ./amxmodx/* ./addons/amxmodx/
+        cd addons/amxmodx/scripting
+        chmod +x amxxpc32.so
+        chmod +x compile.sh
+        chmod +x amxxpc
+        for sourcefile in *.sma; do echo -n "Compiling $sourcefile ..."; ./amxxpc $sourcefile || exit 1; done
