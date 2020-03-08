@@ -120,7 +120,7 @@ bool: GagData_Equal(const arr1[gag_s], const arr2[gag_s]) {
 	);
 }
 
-GagData_GetPersonalData(id = 0, target, aGagData[gag_s]) {
+GagData_GetPersonalData(const id = 0, const target, aGagData[gag_s]) {
 	// get's target data
 	aGagData[_Player] = target;
 	get_user_authid(target, aGagData[_AuthId], charsmax(aGagData[_AuthId]));
@@ -142,10 +142,8 @@ GagData_GetPersonalData(id = 0, target, aGagData[gag_s]) {
 #include <fakemeta>
 #define SERVER_PRINT(%1) engfunc(EngFunc_ServerPrint, %1)
 
-stock Print_Console(szBuffer[])
-{
-	for(new i; i < strlen(szBuffer); i+=255)
-	{
+stock Print_Console(szBuffer[]) {
+	for(new i; i < strlen(szBuffer); i+=255) {
 		SERVER_PRINT(fmt("%-255s", szBuffer[i]));
 	}
 	SERVER_PRINT("\n");
