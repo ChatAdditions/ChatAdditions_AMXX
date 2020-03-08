@@ -176,8 +176,10 @@ public Callback_PlayersMenu(id, menu, item) {
 }
 
 public Menu_Handler_PlayersList(id, menu, item) {
-	if(item == MENU_EXIT || item < 0)
+	if(item == MENU_EXIT || item < 0) {
+		menu_destroy(menu);
 		return PLUGIN_HANDLED;
+	}
 
 	new null, sInfo[64], sName[64];
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
@@ -185,7 +187,10 @@ public Menu_Handler_PlayersList(id, menu, item) {
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
 
 	if(!is_user_connected(target)) {
-		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
+		menu_destroy(menu);
+		Menu_Show_PlayersList(id);
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
+
 		return PLUGIN_HANDLED;
 	}
 
@@ -199,6 +204,7 @@ public Menu_Handler_PlayersList(id, menu, item) {
 		Menu_Show_GagProperties(id);
 	}
 
+	menu_destroy(menu);
 	return PLUGIN_HANDLED;
 }
 
@@ -217,13 +223,15 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 
 	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
-		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
+		menu_destroy(menu);
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
 		
 		return PLUGIN_HANDLED;
 	}
 
 	if(item == MENU_EXIT || item < 0) {
+		menu_destroy(menu);
 		ResetTargetData(id);
 		Menu_Show_PlayersList(id);
 
@@ -254,6 +262,7 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 		}
 	}
 
+	menu_destroy(menu);
 	Menu_Show_PlayersList(id);
 
 	return PLUGIN_HANDLED;
@@ -322,12 +331,16 @@ public Menu_Handler_GagProperties(id, menu, item) {
 		};
 
 	if(item == MENU_EXIT || item < 0) {
+		menu_destroy(menu);
 		ResetTargetData(id);
+		Menu_Show_PlayersList(id);
+
 		return PLUGIN_HANDLED;
 	}
 
 	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
+		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
 
@@ -339,22 +352,26 @@ public Menu_Handler_GagProperties(id, menu, item) {
 		case menu_TeamChat: 	Gag_ToggleFlags(id, m_SayTeam);
 		case menu_VoiceChat:	Gag_ToggleFlags(id, m_Voice);
 		case menu_Reason: {
+			menu_destroy(menu);
 			Menu_Show_SelectReason(id, target);
 
 			return PLUGIN_HANDLED;
 		}
 		case menu_Time:	{
+			menu_destroy(menu);
 			Menu_Show_SelectTime(id, target);
 
 			return PLUGIN_HANDLED;
 		}
 		case menu_Confirm: {
+			menu_destroy(menu);
 			SaveGag(id ,target);
 
 			return PLUGIN_HANDLED;
 		}
 	}
 
+	menu_destroy(menu);
 	Menu_Show_GagProperties(id);
 
 	return PLUGIN_HANDLED;
@@ -397,6 +414,7 @@ public Menu_Show_SelectReason(id, target) {
 
 public Menu_Handler_SelectReason(id, menu, item) {
 	if(item == MENU_EXIT || item < 0) {
+		menu_destroy(menu);
 		Menu_Show_GagProperties(id);
 		return PLUGIN_HANDLED;
 	}
@@ -404,7 +422,7 @@ public Menu_Handler_SelectReason(id, menu, item) {
 	new target = g_aGags_AdminEditor[id][_Player];
 
 	if(!is_user_connected(target)) {
-		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
+		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 
 		return PLUGIN_HANDLED;
@@ -420,9 +438,6 @@ public Menu_Handler_SelectReason(id, menu, item) {
 		return PLUGIN_HANDLED;
 	}
 
-	if(!g_iArraySize_Reasons)
-		return PLUGIN_HANDLED;
-
 	new aReason[gag_s];
 	ArrayGetArray(g_aReasons, iReason, aReason);
 
@@ -433,11 +448,10 @@ public Menu_Handler_SelectReason(id, menu, item) {
 
 	// log_amx("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason]);
 
+	menu_destroy(menu);
 	Menu_Show_GagProperties(id);
 
 	return PLUGIN_HANDLED;
-	// server_print("iItem=%i", iItem);
-	// server_print("Data[%s]", szItemInfo);
 }
 
 public Menu_Show_SelectTime(id, target) {
@@ -468,13 +482,14 @@ public Menu_Handler_SelectTime(id, menu, item) {
 	enum { menu_CustomTime, menu_Permament };
 
 	if(item == MENU_EXIT || item < 0) {
+		menu_destroy(menu);
 		Menu_Show_GagProperties(id);
 		return PLUGIN_HANDLED;
 	}
 	
 	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
-		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
+		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 
 		return PLUGIN_HANDLED;
@@ -482,11 +497,13 @@ public Menu_Handler_SelectTime(id, menu, item) {
 
 	switch(item) {
 		case menu_CustomTime: {
+			menu_destroy(menu);
 			client_cmd(id, "messagemode enter_GagTime");
 
 			return PLUGIN_HANDLED;
 		}
 		case menu_Permament: {
+			menu_destroy(menu);
 			g_aGags_AdminEditor[id][_Time] = FOREVER;
 			Menu_Show_GagProperties(id);
 
@@ -499,6 +516,7 @@ public Menu_Handler_SelectTime(id, menu, item) {
 
 	g_aGags_AdminEditor[id][_Time] = strtol(sInfo);
 
+	menu_destroy(menu);
 	Menu_Show_GagProperties(id);
 	return PLUGIN_HANDLED;
 }
