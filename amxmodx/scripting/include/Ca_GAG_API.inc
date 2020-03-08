@@ -4,11 +4,11 @@
  *
 */
 
-#if defined _CaGAG_API_included
+#if defined _CA_GAG_API_included
 	#endinput
 #endif
 
-#define _CaGAG_API_included
+#define _CA_GAG_API_included
 
 #pragma reqlib ChatAdditions_GAG_API
 #if !defined AMXMODX_NOAUTOLOAD
