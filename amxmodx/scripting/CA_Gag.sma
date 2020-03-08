@@ -882,9 +882,9 @@ Storage_PlayerLoaded(const iUserID, bool: bFound = false) {
 }
 
 Storage_PlayerRemoved(const iUserID) {
+#if defined DEBUG
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
 
-#if defined DEBUG
 	server_print("[%s] Target [%s] removed!", DB_Names[DATABASE_TYPE],
 		is_user_connected(target) ?
 			fmt("%n (UsedID:%i)", target, iUserID) :
