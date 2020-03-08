@@ -710,6 +710,9 @@ static SaveGag(const id, const target) {
 static RemoveGag(const id, const target) {
 	if(g_aGags_AdminEditor[id][_bitFlags] != m_REMOVED) {
 		ResetTargetData(id);
+
+		remove_from_storage(g_aCurrentGags[id]);
+
 		GagData_Reset(g_aCurrentGags[target]);
 		client_print_color(0, print_team_default, "%L",
 			LANG_PLAYER, "Player_UnGagged", id, target);
@@ -720,13 +723,14 @@ static RemoveGag(const id, const target) {
 	Menu_Show_PlayersList(id);
 
 	return PLUGIN_HANDLED;
-
 }
 
 static GagExpired(const id) {
 	g_aCurrentGags[id][_bitFlags] = m_REMOVED;
 
-	client_print_color(0, print_team_default, "%L", LANG_PLAYER, "Player_ExpiredGag", id);
+	remove_from_storage(g_aCurrentGags[id]);
+
+	client_print_color(0, print_team_default, "%s %L",MSG_PREFIX, LANG_PLAYER, "Player_ExpiredGag", id);
 }
 
 static LoadGag(const target) {
