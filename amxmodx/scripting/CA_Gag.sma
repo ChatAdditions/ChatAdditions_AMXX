@@ -16,6 +16,8 @@
 
 
 		/* ----- START SETTINGS----- */
+new const MSG_PREFIX[] = "\4[GAG]\1";
+
 /**
  *	Database type for storage gags
  *		DB_NVault,
@@ -132,15 +134,13 @@ public Gags_Thinker() {
 }
 
 public ClCmd_Gag(id, level, cid) {
-	
 	#if !defined DEBUG
 	if(!cmd_access(id, level, cid, 1))
 		return PLUGIN_HANDLED;
 	#endif
 
-	if(get_playersnum() < 2)
-	{
-		client_print_color(id, print_team_default, "\3Не достаточно игроков, что бы открыть меню Gag'ов!");
+	if(get_playersnum() < 2) {
+		client_print_color(id, print_team_default, "%s %L", MSG_PREFIX, id, "NotEnoughPlayers");
 		return PLUGIN_HANDLED;
 	}
 
@@ -170,7 +170,7 @@ public Callback_PlayersMenu(id, menu, item) {
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
 	new bool:bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
 
-	menu_item_setname(menu, item, fmt("%n %s", target, GetPostfix(target, bHaveImmunity)));
+	menu_item_setname(menu, item, fmt("%n %s", target, GetPostfix(id, target, bHaveImmunity)));
 
 	return (!bHaveImmunity) ? ITEM_ENABLED : ITEM_DISABLED;
 }
@@ -309,7 +309,7 @@ public Callback_GagProperties(id, menu, item) {
 		case menu_VoiceChat:
 			formatex(sName, charsmax(sName), "%L [ %s ]", id, "CA_Gag_Voice", (gagFlags & m_Voice) ? " \\r+\\w " : "-");
 		case menu_Reason:
-			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Reason", Get_GagStringReason(id));
+			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Reason", Get_GagStringReason(id, target));
 		case menu_Time:
 			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Time", GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]));
 		case menu_Confirm: {
@@ -342,7 +342,7 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	if(!is_user_connected(target)) {
 		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
-		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
 		return PLUGIN_HANDLED;
 	}
@@ -384,7 +384,7 @@ stock bool: Ready_To_Gag(id)  {
 
 public Menu_Show_SelectReason(id, target) {
 	if(!is_user_connected(target)) {
-		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
 		return PLUGIN_HANDLED;
 	}
@@ -407,7 +407,7 @@ public Menu_Show_SelectReason(id, target) {
 				fmt("%i", i));
 			// server_print("ADDMNU[%i]:%s, szInfo(%s)", i, szItemName, szItemInfo);
 		}
-	} else menu_addtext(hMenu, "\\d		No have reasons templates.", .slot = false);
+	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveReasonsTemplates"), .slot = false);
 
 	return menu_display(id, hMenu);
 }
@@ -423,6 +423,7 @@ public Menu_Handler_SelectReason(id, menu, item) {
 
 	if(!is_user_connected(target)) {
 		menu_destroy(menu);
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
 
 		return PLUGIN_HANDLED;
@@ -456,7 +457,7 @@ public Menu_Handler_SelectReason(id, menu, item) {
 
 public Menu_Show_SelectTime(id, target) {
 	if(!is_user_connected(target)) {
-		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
 
 		return PLUGIN_HANDLED;
@@ -473,7 +474,7 @@ public Menu_Show_SelectTime(id, target) {
 
 			menu_additem(hMenu, GetStringTime_seconds(id, iTime), fmt("%i", iTime));
 		}
-	} else menu_addtext(hMenu, "\\d		No have tempate times.", .slot = false);
+	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveTimeTemplates"), .slot = false);
 
 	return menu_display(id, hMenu);
 }
@@ -490,6 +491,7 @@ public Menu_Handler_SelectTime(id, menu, item) {
 	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
 		menu_destroy(menu);
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
 
 		return PLUGIN_HANDLED;
@@ -525,7 +527,7 @@ public ClCmd_EnterGagTime(id) {
 	new target = g_aGags_AdminEditor[id][_Player];
 	
 	if(!is_user_connected(target)) {
-		client_print_color(id, print_team_red, "%L", id, "Player_NotConnected");
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
 
 		return PLUGIN_HANDLED;
@@ -541,7 +543,7 @@ public ClCmd_EnterGagTime(id) {
 	
 	g_aGags_AdminEditor[id][_Time] = strtol(sCustomTime);
 
-	client_print(id, print_chat, "You set custom time: '%s'", GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]));
+	client_print(id, print_chat, "%L '%s'", id, "CustomTime_Setted", GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]));
 	Menu_Show_GagProperties(id);
 
 	return PLUGIN_HANDLED;
@@ -564,7 +566,7 @@ public ClCmd_EnterGagReason(id) {
 
 	copy(g_aGags_AdminEditor[id][_Reason], charsmax(g_aGags_AdminEditor[][_Reason]), szCustomReason);
 
-	client_print(id, print_chat, "Вы установили причину затычки: '%s'", g_aGags_AdminEditor[id][_Reason]);
+	client_print(id, print_chat, "%L '%s'", id, "CustomReason_Setted", g_aGags_AdminEditor[id][_Reason]);
 	Menu_Show_GagProperties(id);
 	return PLUGIN_HANDLED;
 }
@@ -573,22 +575,30 @@ Gag_ToggleFlags(id, gag_flags_s: flag) {
 	g_aGags_AdminEditor[id][_bitFlags] ^= flag;
 }
 
-stock GetStringTime_seconds(id, iSeconds) {
+stock GetStringTime_seconds(const id, const iSeconds) {
 	new sTime[32];
 	get_time_length(id, iSeconds, timeunit_seconds, sTime, charsmax(sTime));
 
 	if(iSeconds == FOREVER)
-		formatex(sTime, charsmax(sTime), "%L", LANG_SERVER, "CA_Gag_Perpapent");
+		formatex(sTime, charsmax(sTime), "%L", id, "CA_Gag_Perpapent");
 
 	if(sTime[0] == EOS)
-		formatex(sTime, charsmax(sTime), "%L", LANG_SERVER, "CA_Gag_NotSet");
+		formatex(sTime, charsmax(sTime), "%L", id, "CA_Gag_NotSet");
 
 	return sTime;
 }
 
 Get_GagStringReason(const id, const target) {
+	static sText[MAX_REASON_LEN], len = charsmax(sText);
 
-	return szText;
+	if(id != LANG_PLAYER)
+		copy(sText, len, g_aGags_AdminEditor[id][_Reason]);
+	else copy(sText, len, g_aCurrentGags[target][_Reason]);
+
+	if(sText[0] == EOS)
+		formatex(sText, len, "%L", id, "CA_Gag_NotSet");
+
+	return sText;
 }
 
 
@@ -664,7 +674,7 @@ static ParseTimes(const sTimes[]) {
 		if(rawPoint[0]) {
 			ArrayPushCell(g_aGagTimes, strtol(rawPoint));
 
-			server_print("Time added: Time:'%i'", strtol(rawPoint));
+			// server_print("Time added: Time:'%i'", strtol(rawPoint));
 		}
 	} while(ePos != -1);
 
@@ -675,14 +685,14 @@ static SaveGag(const id, const target) {
 	GagData_Copy(g_aCurrentGags[target], g_aGags_AdminEditor[id]);
 
 	if(id == 0) {
-		client_print_color(0, print_team_default, "%L",
-			LANG_PLAYER, "Player_Gagged_ByServer", target, GetStringTime_seconds(0, g_aCurrentGags[target][_Time]));
+		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
+			LANG_PLAYER, "Player_Gagged_ByServer", target, GetStringTime_seconds(LANG_PLAYER, g_aCurrentGags[target][_Time]));
 	} else {
-		client_print_color(0, print_team_default, "%L",
-			LANG_PLAYER, "Player_Gagged", id, target, GetStringTime_seconds(0, g_aCurrentGags[target][_Time]));
+		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
+			LANG_PLAYER, "Player_Gagged", id, target, GetStringTime_seconds(LANG_PLAYER, g_aCurrentGags[target][_Time]));
 	}
 	if(g_aCurrentGags[target][_Reason][0])
-		client_print_color(0, print_team_default, "%L '%s'", LANG_PLAYER, "CA_Gag_Reason", Get_GagStringReason(id));
+		client_print_color(0, print_team_default, "\4%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", Get_GagStringReason(LANG_PLAYER, target));
 
 	if(g_aCurrentGags[target][_Time] == FOREVER)
 		g_aCurrentGags[target][_ExpireTime] = FOREVER;
@@ -704,7 +714,7 @@ static RemoveGag(const id, const target) {
 		client_print_color(0, print_team_default, "%L",
 			LANG_PLAYER, "Player_UnGagged", id, target);
 	} else {
-		client_print(id, print_chat, "%L", id, "Player_AlreadyRemovedGag", target);
+		client_print(id, print_chat, "%s %L", MSG_PREFIX, id, "Player_AlreadyRemovedGag", target);
 	}
 
 	Menu_Show_PlayersList(id);
@@ -737,7 +747,7 @@ GetPostfix(const id, const target, const bHaveImmunity) {
 
 	if(bHaveImmunity)
 		formatex(szPostfix, charsmax(szPostfix), " [\\r%L]", id, "Immunity");
-	else if(g_aCurrentGags[id][_bitFlags])
+	else if(g_aCurrentGags[target][_bitFlags])
 		formatex(szPostfix, charsmax(szPostfix), " [\\y%L\\w]", id, "Gag");
 	else szPostfix[0] = '\0';
 
