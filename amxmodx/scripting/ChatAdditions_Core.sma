@@ -1,7 +1,7 @@
 #include <amxmodx>
 #include <reapi>
 
-#include <ChatsAdditions>
+#include <ChatAdditions>
 
 
 #pragma semicolon 1

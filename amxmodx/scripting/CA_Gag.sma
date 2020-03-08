@@ -1,12 +1,13 @@
 
-#define DEBUG
+// #define DEBUG
+// #define CHOOSE_STORAGE [0 .. 3]
 
 
 #include <amxmodx>
 #include <amxmisc>
 #include <time>
 
-#include <ChatsAdditions>
+#include <ChatAdditions>
 #include <CA_GAG_API>
 
 #pragma semicolon 1
@@ -37,20 +38,23 @@ static g_aGags_AdminEditor[MAX_PLAYERS + 1][gag_s];
 static Array: g_aReasons, g_iArraySize_Reasons;
 static Array: g_aGagTimes, g_iArraySize_GagTimes;
 
+#if defined DEBUG && defined CHOOSE_STORAGE
+	#undef DATABASE_TYPE
+	#define DATABASE_TYPE CHOOSE_STORAGE
+#endif
+
 #if defined DATABASE_TYPE
 	#if DATABASE_TYPE == DB_NVault
-		#include <ChatAdditions_inc/CA_NVault>
+		#include <ChatAdditions_inc/_NVault>
 	#elseif DATABASE_TYPE == DB_JSON
-		// #include <ChatAdditions_inc/CA_JSON>
+		// #include <ChatAdditions_inc/_JSON>
 	#elseif DATABASE_TYPE == DB_MySQL
-		#include <ChatAdditions_inc/CA_MySQL>
+		#include <ChatAdditions_inc/_MySQL>
 	#elseif DATABASE_TYPE == DB_SQLite
-		#include <ChatAdditions_inc/CA_SQLite>
+		#include <ChatAdditions_inc/_SQLite>
 	#endif
-
-	#if !defined DATABASE_TYPE
-		#error Please uncomment DATABASE_TYPE and select!
-	#endif
+#else // DATABASE_TYPE
+	#error Please uncomment DATABASE_TYPE and select!
 #endif // DATABASE_TYPE
 
 static bool: g_bStorageInitialized;
@@ -813,7 +817,7 @@ public native_ca_remove_user_gag(pPlugin, iParams) {
 }
 
 public DB_Types: native_ca_get_storage_type(pPlugin, iParams) {
-	return DATABASE_TYPE;
+	return DB_Types:DATABASE_TYPE;
 }
 /** <- API */
 
