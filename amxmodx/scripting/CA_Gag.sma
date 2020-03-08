@@ -808,7 +808,6 @@ public native_ca_set_user_gag(pPlugin, iParams) {
 	return 0;
 }
 
-
 public native_ca_get_user_gag(pPlugin, iParams) {
 	enum { Player = 1, Reason, Time, Flags };
 	CHECK_NATIVE_ARGS_NUM(iParams, 4, false)
@@ -868,21 +867,28 @@ Storage_PlayerSaved(const iUserID) {
 
 Storage_PlayerLoaded(const iUserID, bool: bFound = false) {
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
+	GagData_GetPersonalData(0, target, g_aCurrentGags[target]);
 
-	server_print("[%s] Target [%s] Loaded! (gags %sfound)", DB_Names[DATABASE_TYPE],
+	if(!bFound)
+		return;
+
+#if defined DEBUG
+	server_print("[%s] Target [%s] Loaded! (gag found)", DB_Names[DATABASE_TYPE],
 		is_user_connected(target) ?
 			fmt("%n (UsedID:%i)", target, iUserID) :
-			fmt("UsedID:%i", iUserID),
-		bFound ? "" : "NOT "
+			fmt("UsedID:%i", iUserID)
 	);
+#endif
 }
 
 Storage_PlayerRemoved(const iUserID) {
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
 
+#if defined DEBUG
 	server_print("[%s] Target [%s] removed!", DB_Names[DATABASE_TYPE],
 		is_user_connected(target) ?
 			fmt("%n (UsedID:%i)", target, iUserID) :
 			fmt("UsedID:%i", iUserID)
 	);
+#endif
 }
