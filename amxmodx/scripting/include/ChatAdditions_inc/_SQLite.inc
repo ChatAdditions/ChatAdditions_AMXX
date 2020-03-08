@@ -4,13 +4,11 @@
 
 #define _CA_API_SQLite_included
 
-
 #include <sqlx>
 
-new const SQL_DBNAME[]		= "ChatAdditions";
+new const SQL_DBNAME[]		= "ChatAdditions_Gags";
 new const SQL_TBL_GAGS[]	= "players_gags";
 
-new const SQL_DBTYPE[]		= "sqlite";
 
 
 
@@ -20,8 +18,7 @@ new const SQL_DBTYPE[]		= "sqlite";
 const QUERY_LENGTH	= 1472;
 new Handle: g_hTuple;
 
-enum any: Query_state
-{
+enum any: Query_state {
 	SQL_INIT,
 	DROP_TABLE,
 	LOAD_PLAYER,
@@ -29,8 +26,7 @@ enum any: Query_state
 	REMOVE_BLOCK
 };
 
-enum qeury_data_s
-{
+enum qeury_data_s {
 	qd_Query_state,
 	qd_UserID
 }
@@ -42,10 +38,10 @@ public plugin_cfg() {
 	init_storage();
 }
 
-init_storage()
-{
+static init_storage() {
 	g_fStartInitTime = get_gametime();
 
+	new const SQL_DBTYPE[] = "sqlite";
 	if(!SQL_SetAffinity(SQL_DBTYPE))
 		set_fail_state("Failed to use '%s' as DB driver. Check modules.ini", SQL_DBTYPE);
 
@@ -54,15 +50,11 @@ init_storage()
 	CreateTable();
 }
 
-public Storage_Destroy()
-{
+public destroy_storage() {
 	SQL_FreeHandle(g_hTuple);
-
-	return 1;
 }
 
-public CreateTable()
-{
+public CreateTable() {
 	new szQuery[QUERY_LENGTH * 3];
 // TODO: Disable autocreate table
 	formatex(szQuery, charsmax(szQuery), "CREATE TABLE IF NOT EXISTS `%s` (	\
@@ -84,33 +76,28 @@ public CreateTable()
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
 
-public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime)
-{
+public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
 	switch(failstate) {
 		case TQUERY_CONNECT_FAILED:	{
-			log_amx("SQL: connection failed");
-			log_amx("[ %d ] %s", errnum, error);
-
+			log_amx("SQL: connection failed\n[%i] %s", errnum, error);
 			return;
 		}
 		case TQUERY_QUERY_FAILED: {
-			new lastQue[QUERY_LENGTH * 2];
+			new lastQue[QUERY_LENGTH * 3];
 			SQL_GetQueryString(query, lastQue, charsmax(lastQue));
 			
-			log_amx("SQL: query failed\n [%i] %s\n[QUERY]:'%s'", errnum, error, lastQue);
+			log_amx("SQL: query failed\n[%i] %s\n[QUERY]:'%s'", errnum, error, lastQue);
 			return;
 		}
 	}
 
 	new q_state = qeury_data_s:data[qd_Query_state];
-	switch(q_state)
-	{
+	switch(q_state) {
 		case SQL_INIT: Storage_Inited(get_gametime() - g_fStartInitTime);
 		case LOAD_PLAYER: {
 			new bool: bFound = SQL_NumResults(query) != 0;
 			if(!bFound) {
 				Storage_PlayerLoaded(data[qd_UserID]);
-				server_print("CASE #1");
 				return;
 			}
 
@@ -120,7 +107,6 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 			g_aCurrentGags[target][_ExpireTime] = SQL_ReadResult(query, res_ExpireTime);
 			if(g_aCurrentGags[target][_ExpireTime] <= get_systime()) {
 				Storage_PlayerLoaded(data[qd_UserID]);
-				server_print("CASE #2");
 				return;
 			}
 			
@@ -128,7 +114,6 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 			g_aCurrentGags[target][_bitFlags]	= gag_flags_s:SQL_ReadResult(query, res_Flags);
 			SQL_ReadResult(query, res_Reason, g_aCurrentGags[target][_Reason], charsmax(g_aCurrentGags[][_Reason]));
 
-			server_print("CASE #3");
 			Storage_PlayerLoaded(data[qd_UserID], .bFound = true);
 		}
 		case SAVE_PLAYER: {
@@ -142,8 +127,7 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 	server_print("SQL_Handler() queuetime='%.5f'", queuetime);
 }
 
-public load_from_storage(aGagData[gag_s])
-{
+public load_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 2];
 	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM %s WHERE ( \
 		authid = '%s' OR ip = '%s') AND expire_time >= %i LIMIT 1",
@@ -156,11 +140,9 @@ public load_from_storage(aGagData[gag_s])
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
 
-public save_to_storage(const aGagData[gag_s])
-{
+public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-// TODO!
 	formatex(szQuery, charsmax(szQuery), "REPLACE INTO `%s` (	\
 		name,authid,ip,reason,admin_name,admin_authid,			\
 		admin_ip,time,create_time,expire_time,flags					\
@@ -175,9 +157,8 @@ public save_to_storage(const aGagData[gag_s])
 	g_sqlData[qd_UserID] = get_user_userid(aGagData[_Player]);
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
-	
-public remove_from_storage(szAuthId[], szIP[], aGagData[gag_s])
-{
+
+public remove_from_storage(aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
 	formatex(szQuery, charsmax(szQuery), "DELETE FROM `%s` WHERE ( \
