@@ -1,6 +1,5 @@
 [ru]
 CA_Gag_TITLE = Заткнуть игрока
-CA_Gag_AdditionalModes = Дополнительные режимы
 CA_Gag_Properties = Параметры затычки игрока: [ \r%n\w ]
 MENU_SelectReason = Выберите приину для затычки:
 EnterReason = Ввести причину ->\n
@@ -22,9 +21,54 @@ CA_Gag_Confirm = Подтвердить!
 CA_Gag_NotSet = Не задано
 CA_Gag_Perpapent = *НАВСЕГДА*
 
-Player_Gagged = ^4^1Админ %n заткнул игрока ^4%n^1 (^3%s^1)
-Player_Gagged_ByServer = ^4^1Сервер заткнул игрока ^4%n^1 (^3%s^1)
-Player_UnGagged = ^4^1Админ %n снял затычку с игрока ^4%n^1
-Player_NotConnected = ^4Игрок не доступен!^1
-Player_AlreadyRemovedGag = ^4Игрок '%n' уже удалён!
-Player_ExpiredGag = ^4У игрока '%n' истекло время затычки.
+Player_Gagged = ^3Админ %n заткнул игрока ^4%n^1 (^3%s^1)
+Player_Gagged_ByServer = ^4Сервер заткнул игрока ^4%n^1 (^3%s^1)
+Player_UnGagged = ^3Админ %n снял затычку с игрока ^4%n^1
+Player_NotConnected = ^3Игрок не доступен!^1
+Player_AlreadyRemovedGag = ^3Игрок ^4%n^1 уже удалён!
+Player_ExpiredGag = ^3У игрока ^4%n^1 истекло время затычки.
+
+NotEnoughPlayers = ^3Не достаточно игроков, что бы открыть меню Gag'ов!
+NoHaveReasonsTemplates = ^3Нет шаблонов выбора причин.
+NoHaveTimeTemplates = ^3Нет шаблонов выбора времени.
+
+CustomTime_Setted = ^3Вы установили своё время:
+CustomReason_Setted = ^3Вы установили причину затычки:
+
+[en]
+CA_Gag_TITLE = Gag player
+CA_Gag_Properties = Gag parameters: [ \r%n\w ]
+MENU_SelectReason = Choose gag reason:
+EnterReason = Enter gag reason ->\n
+MENU_SelectTime = Choose gag time:
+SET_CustomTime = Enter gag time ->
+CA_GAG_YES = \yYes\w
+CA_GAG_NO = \rNo (Edit gag)\w
+GAG_Confirm = Confirm remove gag:
+
+Immunity = Immunity
+Gag = *GAG*
+
+CA_Gag_Say = Chat:
+CA_Gag_SayTeam = Team chat:
+CA_Gag_Voice = Voice chat:
+CA_Gag_Reason = Reason:
+CA_Gag_Time = Time:
+CA_Gag_Confirm = Confirm!
+CA_Gag_NotSet = Not selected
+CA_Gag_Perpapent = *PERMAMENT*
+
+Player_Gagged = ^3Admin %n gag player ^4%n^1 (^3%s^1)
+Player_Gagged_ByServer = ^3Server gag player ^4%n^1 (^3%s^1)
+Player_UnGagged = ^3Admin %n remove gag from player ^4%n^1
+Player_NotConnected = ^3Player not connected!
+Player_AlreadyRemovedGag = ^3Player ^4%n^1 already removed!
+Player_ExpiredGag = ^3Player ^4%n^1 has expired gag.
+
+NotEnoughPlayers = ^3Not enough players to open gag menu!
+
+NoHaveReasonsTemplates = No have reasons templates.
+NoHaveTimeTemplates = No have time templates.
+
+CustomTime_Setted = ^3You set custom time:
+CustomReason_Setted = ^3You set custom reason:
