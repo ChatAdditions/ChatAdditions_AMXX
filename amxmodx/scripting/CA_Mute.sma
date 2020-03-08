@@ -4,7 +4,7 @@
 #pragma semicolon 1
 #pragma ctrlchar '\'
 
-#include <ChatsAdditions>
+#include <ChatAdditions>
 
 
 new bool: g_aMutes[MAX_PLAYERS + 1][MAX_PLAYERS + 1];
