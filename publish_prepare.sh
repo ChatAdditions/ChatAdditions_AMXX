@@ -38,3 +38,14 @@ cp amxmodx/data/lang/CA_Mute.txt    publish/CA_Mute/amxmodx/data/lang/
 cd publish && tar -cvzf CA_Mute.tar.gz CA_Mute/* && cd ..
 
 rm -rf publish/CA_Mute
+
+# ChatAdditions: Need kills
+mkdir -p publish/CA_NeedKills/amxmodx/data/lang
+mkdir -p publish/CA_NeedKills/amxmodx/scripting/
+
+cp amxmodx/scripting/CA_NeedKills.sma    publish/CA_NeedKills/amxmodx/scripting/
+cp amxmodx/data/lang/CA_NeedKills.txt    publish/CA_NeedKills/amxmodx/data/lang/
+
+cd publish && tar -cvzf CA_NeedKills.tar.gz CA_NeedKills/* && cd ..
+
+rm -rf publish/CA_NeedKills
