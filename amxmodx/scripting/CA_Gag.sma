@@ -586,11 +586,7 @@ stock GetStringTime_seconds(id, iSeconds) {
 	return sTime;
 }
 
-Get_GagStringReason(id) {
-	static szText[MAX_REASON_LEN];
-	if(g_aGags_AdminEditor[id][_Reason][0] == EOS)
-		formatex(szText, charsmax(szText), "%L", id, "CA_Gag_NotSet");
-	else copy(szText, charsmax(szText), g_aGags_AdminEditor[id][_Reason]);
+Get_GagStringReason(const id, const target) {
 
 	return szText;
 }
@@ -675,7 +671,7 @@ static ParseTimes(const sTimes[]) {
 	g_iArraySize_GagTimes = ArraySize(g_aGagTimes);
 }
 
-static SaveGag(id, target) {
+static SaveGag(const id, const target) {
 	GagData_Copy(g_aCurrentGags[target], g_aGags_AdminEditor[id]);
 
 	if(id == 0) {
@@ -701,7 +697,7 @@ static SaveGag(id, target) {
 	return PLUGIN_CONTINUE;
 }
 
-static RemoveGag(id, target) {
+static RemoveGag(const id, const target) {
 	if(g_aGags_AdminEditor[id][_bitFlags] != m_REMOVED) {
 		ResetTargetData(id);
 		GagData_Reset(g_aCurrentGags[target]);
@@ -717,13 +713,13 @@ static RemoveGag(id, target) {
 
 }
 
-static GagExpired(id) {
+static GagExpired(const id) {
 	g_aCurrentGags[id][_bitFlags] = m_REMOVED;
 
 	client_print_color(0, print_team_default, "%L", LANG_PLAYER, "Player_ExpiredGag", id);
 }
 
-static LoadGag(target) {
+static LoadGag(const target) {
 	new aGagData[gag_s]; {
 		GagData_GetPersonalData(0, target, aGagData);
 	}
@@ -731,12 +727,12 @@ static LoadGag(target) {
 	load_from_storage(aGagData);
 }
 
-stock ResetTargetData(id) {
+stock ResetTargetData(const id) {
 	GagData_Reset(g_aGags_AdminEditor[id]);
 }
 
 	// TODO!
-GetPostfix(id, bHaveImmunity) {
+GetPostfix(const id, const target, const bHaveImmunity) {
 	static szPostfix[32];
 
 	if(bHaveImmunity)
