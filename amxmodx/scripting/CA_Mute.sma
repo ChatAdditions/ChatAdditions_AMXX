@@ -6,32 +6,24 @@
 
 #include <ChatAdditions>
 
+new const MSG_PREFIX[] = "\4[MUTE]\1";
 
 new bool: g_aMutes[MAX_PLAYERS + 1][MAX_PLAYERS + 1];
 new bool: g_bGlobalMute[MAX_PLAYERS + 1];
 
 public plugin_init()
 {
-	register_plugin("[CA] Mute menu", "1.0.0-alpha", "Sergey Shorokhov");
+	register_plugin("[CA] Mute menu", "1.0.0-beta", "Sergey Shorokhov");
 	register_dictionary("CA_Mute.txt");
-	register_menu("Players Mute Menu", 1023, "Menu_Handler_PlayersList", .outside = 1);
 
-	Init_Cmds();
-}
-
-Init_Cmds()
-{
-	new const szCmd[] = "mute";
-	new const szPreCmd[][] = {"say ", "say_team "/*, ""*/};
-	new const szCtrlChar[][] = {"!", "/", "\\", "." , "?", ""};
-
-	for(new i; i < sizeof(szPreCmd); i++) {
-		for(new k; k < sizeof(szCtrlChar); k++) {
-			register_clcmd(fmt("%s%s%s", szPreCmd[i], szCtrlChar[k], szCmd), "ClCmd_Mute");
-		}
+	new const sCmd[] = "mute";
+	new const sCtrlChar[][] = {"!", "/", "\\", "." , "?", ""};
+	for(new i; i < sizeof(sCtrlChar); i++) {
+		register_clcmd(fmt("%s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
+		register_clcmd(fmt("say %s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
+		register_clcmd(fmt("say_team %s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
 	}
 }
-
 
 public ClCmd_Mute(id) {
 	Menu_Show_PlayersList(id);
@@ -40,16 +32,16 @@ public ClCmd_Mute(id) {
 }
 
 public Menu_Show_PlayersList(id) {
-	new pMenu = menu_create("Players for mute:", "Menu_Handler_PlayersList");
+	new pMenu = menu_create(fmt("%L", id, "CA_Mute_TITLE"), "Menu_Handler_PlayersList");
 	new hCallback = menu_makecallback("Callback_PlayersList");
 
 	new aPlayers[MAX_PLAYERS], iCount;
 	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
 
 	if(iCount < 2) {
-		menu_additem(pMenu, "\\rNot enough players!", "-2", .callback = hCallback);
+		menu_additem(pMenu, fmt("\\r %L", id, "Mute_NotEnoughPlayers"), "-2", .callback = hCallback);
 	} else {
-		menu_additem(pMenu, fmt("\\r%sute all?", g_bGlobalMute[id] ? "Unm" : "m"), "-1");
+		menu_additem(pMenu, fmt("\\y %L %s", id, "CA_Mute_MuteALL", g_bGlobalMute[id] ? "\\w[ \\r+\\w ]" : ""), "-1");
 		menu_addblank(pMenu, .slot = false);
 
 		for(new i; i < MaxClients; i++) {
@@ -57,6 +49,10 @@ public Menu_Show_PlayersList(id) {
 				menu_additem(pMenu, "Name", fmt("%i", get_user_userid(i)), .callback = hCallback);
 		}
 	}
+
+	menu_setprop(pMenu, MPROP_BACKNAME, fmt("%L", id, "CA_Mute_Back"));
+	menu_setprop(pMenu, MPROP_NEXTNAME  , fmt("%L", id, "CA_Mute_Next"));
+	menu_setprop(pMenu, MPROP_EXITNAME, fmt("%L", id, "CA_Mute_Exit"));
 
 	menu_display(id, pMenu);
 }
@@ -68,7 +64,7 @@ public Callback_PlayersList(id, menu, item) {
 	new iUserID = strtol(sInfo);
 	if(iUserID > 0) {
 		new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
-		menu_item_setname(menu, item, fmt("%n   %s", player, g_aMutes[id][player] ? "[ \\r+\\w ]" : ""));
+		menu_item_setname(menu, item, fmt("%n   %s", player, g_aMutes[id][player] ? "\\d[ \\r+\\d ]" : ""));
 	}
 
 	return (
@@ -97,7 +93,7 @@ public Menu_Handler_PlayersList(id, menu, item) {
 
 	new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
 	if(!is_user_connected(player)) {
-		client_print(id, print_chat, "Player not connected!");
+		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
 		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
@@ -105,7 +101,7 @@ public Menu_Handler_PlayersList(id, menu, item) {
 	}
 
 	g_aMutes[id][player] ^= true;
-	client_print_color(id, print_team_default, "^1^4Player %n - %smuted.", player, g_aMutes[id][player] ? "" : "un");
+	client_print_color(id, print_team_default, "%s %L \3%n\1", MSG_PREFIX, id, g_aMutes[id][player] ? "CA_Mute_Muted" : "CA_Mute_UnMuted", player);
 
 	menu_destroy(menu);
 	Menu_Show_PlayersList(id);
