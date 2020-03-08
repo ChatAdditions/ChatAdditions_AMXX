@@ -1,16 +1,25 @@
 [ru]
 CA_Mute_TITLE = Заглушить игрока: 
 CA_Mute_MuteALL = Заглушить всех
-CA_Mute_ENABLED = Включено
-CA_Mute_DISABLED = Выключено
 CA_Mute_Next = Следующая
 CA_Mute_Back = Назад
 CA_Mute_Exit = Выход
 
-CA_Mute_PlayerNotAllowed = Игрок[%i] не доступен. (Уже вышел)
-CA_Mute_HasBeenMuted = Игрок %s был %L.
+CA_Mute_Muted = Вы НЕ слышите игрока
+CA_Mute_UnMuted = Вы снова слышите игрока
 
-CA_Mute_Muted = заглушен
-CA_Mute_UnMuted = разоткнут
+Mute_NotEnoughPlayers = Не достаточно игроков!
+Player_NotConnected = ^3Игрок не подключен!
 
 [en]
+CA_Mute_TITLE = Players menu for mute:
+CA_Mute_MuteALL = Mute all
+CA_Mute_Next = Next
+CA_Mute_Back = Back
+CA_Mute_Exit = Exit
+
+CA_Mute_Muted = Now you can 't hear the player
+CA_Mute_UnMuted = You hear the player again
+
+Mute_NotEnoughPlayers = Not enough players!
+Player_NotConnected = ^3Player not connected!
