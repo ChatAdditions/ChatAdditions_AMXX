@@ -62,7 +62,7 @@ static Array: g_aGagTimes, g_iArraySize_GagTimes;
 static bool: g_bStorageInitialized;
 
 public plugin_precache() {
-	register_plugin("[CA] Gag", "1.0.0-alpha", "Sergey Shorokhov");
+	register_plugin("[CA] Gag", "1.0.0-beta", "Sergey Shorokhov");
 
 	register_dictionary("CA_Gag.txt");
 	register_dictionary("common.txt");
