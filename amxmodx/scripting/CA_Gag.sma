@@ -149,6 +149,9 @@ public ClCmd_Gag(id, level, cid) {
 }
 
 static Menu_Show_PlayersList(id) {
+	if(!is_user_connected(id))
+		return;
+
 	new hMenu = menu_create(fmt("%L", id, "CA_Gag_TITLE"), "Menu_Handler_PlayersList");
 
 	new aPlayers[MAX_PLAYERS], iCount;
@@ -210,6 +213,9 @@ public Menu_Handler_PlayersList(id, menu, item) {
 
 // Confirm remove gag
 static Menu_Show_ConfirmRemove(id) {
+	if(!is_user_connected(id))
+		return;
+
 	new hMenu = menu_create(fmt("%L", id, "GAG_Confirm"), "Menu_Handler_ConfirmRemove");
 
 	menu_additem(hMenu, fmt("%L", id, "CA_GAG_YES"));
@@ -270,6 +276,9 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 
 // Gag Properties menu
 static Menu_Show_GagProperties(id) {
+	if(!is_user_connected(id))
+		return;
+	
 	new target = g_aGags_AdminEditor[id][_Player];
 	new hMenu = menu_create(fmt("%L", id, "CA_Gag_Properties", target), "Menu_Handler_GagProperties");
 	new hCallback = menu_makecallback("Callback_GagProperties");

@@ -32,6 +32,9 @@ public ClCmd_Mute(id) {
 }
 
 public Menu_Show_PlayersList(id) {
+	if(!is_user_connected(id))
+		return;
+
 	new pMenu = menu_create(fmt("%L", id, "CA_Mute_TITLE"), "Menu_Handler_PlayersList");
 	new hCallback = menu_makecallback("Callback_PlayersList");
 
