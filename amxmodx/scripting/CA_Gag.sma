@@ -163,6 +163,11 @@ static Menu_Show_PlayersList(id) {
 		if(id != aPlayers[i])
 			menu_additem(hMenu, "-", fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
 	}
+
+	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
+	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
+
 	menu_display(id, hMenu);
 }
 
@@ -418,6 +423,10 @@ public Menu_Show_SelectReason(id, target) {
 		}
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveReasonsTemplates"), .slot = false);
 
+	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
+	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
+
 	return menu_display(id, hMenu);
 }
 
@@ -484,6 +493,10 @@ public Menu_Show_SelectTime(id, target) {
 			menu_additem(hMenu, GetStringTime_seconds(id, iTime), fmt("%i", iTime));
 		}
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveTimeTemplates"), .slot = false);
+
+	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
+	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	return menu_display(id, hMenu);
 }
