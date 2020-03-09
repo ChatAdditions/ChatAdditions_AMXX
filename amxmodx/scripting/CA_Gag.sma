@@ -163,6 +163,11 @@ static Menu_Show_PlayersList(id) {
 		if(id != aPlayers[i])
 			menu_additem(hMenu, "-", fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
 	}
+
+	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
+	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
+
 	menu_display(id, hMenu);
 }
 
@@ -391,20 +396,19 @@ stock bool: Ready_To_Gag(id)  {
 }
 
 
-public Menu_Show_SelectReason(id, target) {
+static Menu_Show_SelectReason(id, target) {
+	if(!is_user_connected(id))
+		return PLUGIN_HANDLED;
+
 	if(!is_user_connected(target)) {
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
 		return PLUGIN_HANDLED;
 	}
 
-	new szTemp[MAX_REASON_LEN];
-	formatex(szTemp, charsmax(szTemp), "%L", id, "MENU_SelectReason");
+	new hMenu = menu_create(fmt("%L", id, "MENU_SelectReason"), "Menu_Handler_SelectReason");
 
-	new hMenu = menu_create(szTemp, "Menu_Handler_SelectReason");
-
-	formatex(szTemp, charsmax(szTemp), "%L", id, "EnterReason");
-	menu_additem(hMenu, szTemp, "-1");
+	menu_additem(hMenu, fmt("%L", id, "EnterReason"), "-1");
 
 	if(g_iArraySize_Reasons) {
 		for(new i; i < g_iArraySize_Reasons; i++) {
@@ -417,6 +421,10 @@ public Menu_Show_SelectReason(id, target) {
 			// server_print("ADDMNU[%i]:%s, szInfo(%s)", i, szItemName, szItemInfo);
 		}
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveReasonsTemplates"), .slot = false);
+
+	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
+	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	return menu_display(id, hMenu);
 }
@@ -464,7 +472,10 @@ public Menu_Handler_SelectReason(id, menu, item) {
 	return PLUGIN_HANDLED;
 }
 
-public Menu_Show_SelectTime(id, target) {
+static Menu_Show_SelectTime(id, target) {
+	if(!is_user_connected(id))
+		return PLUGIN_HANDLED;
+
 	if(!is_user_connected(target)) {
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
@@ -484,6 +495,10 @@ public Menu_Show_SelectTime(id, target) {
 			menu_additem(hMenu, GetStringTime_seconds(id, iTime), fmt("%i", iTime));
 		}
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveTimeTemplates"), .slot = false);
+
+	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
+	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	return menu_display(id, hMenu);
 }
@@ -891,6 +906,7 @@ Storage_PlayerLoaded(const iUserID, bool: bFound = false) {
 }
 
 Storage_PlayerRemoved(const iUserID) {
+#pragma unused iUserID
 #if defined DEBUG
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
 
