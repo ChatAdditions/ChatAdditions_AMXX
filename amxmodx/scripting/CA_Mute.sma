@@ -67,7 +67,15 @@ public Callback_PlayersList(id, menu, item) {
 	new iUserID = strtol(sInfo);
 	if(iUserID > 0) {
 		new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
-		menu_item_setname(menu, item, fmt("%n   %s", player, g_aMutes[id][player] ? "\\d[ \\r+\\d ]" : ""));
+		get_user_name(player, sName, charsmax(sName));
+
+		if(g_aMutes[id][player])
+			strcat(sName, " \\d[ \\r+\\d ]", charsmax(sName));
+
+		if(g_bGlobalMute[player] || g_aMutes[player][id])
+			strcat(sName, fmt(" \\d(\\y%L\\d)", id, "Menu_Muted_you"), charsmax(sName));
+
+		menu_item_setname(menu, item, sName);
 	}
 
 	return (
@@ -89,6 +97,10 @@ public Menu_Handler_PlayersList(id, menu, item) {
 	if(iUserID == -1) {
 		g_bGlobalMute[id] ^= true;
 
+		client_print_color(0, print_team_default, "%s \3%n\1 %L ", MSG_PREFIX,
+			id, LANG_PLAYER, g_bGlobalMute[id] ? "Player_Muted_All" : "Player_UnMuted_All"
+		);
+
 		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 		return PLUGIN_HANDLED;
@@ -104,7 +116,13 @@ public Menu_Handler_PlayersList(id, menu, item) {
 	}
 
 	g_aMutes[id][player] ^= true;
-	client_print_color(id, print_team_default, "%s %L \3%n\1", MSG_PREFIX, id, g_aMutes[id][player] ? "CA_Mute_Muted" : "CA_Mute_UnMuted", player);
+	client_print_color(id, print_team_default, "%s %L \3%n\1", MSG_PREFIX,
+		id, g_aMutes[id][player] ? "CA_Mute_Muted" : "CA_Mute_UnMuted", player
+	);
+
+	client_print_color(player, print_team_default, "%s \3%n\1 %L ", MSG_PREFIX,
+		player, id, g_aMutes[id][player] ? "Player_Muted_you" : "Player_UnMuted_you"
+	);
 
 	menu_destroy(menu);
 	Menu_Show_PlayersList(id);
