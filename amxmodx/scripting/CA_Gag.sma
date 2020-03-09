@@ -398,7 +398,7 @@ stock bool: Ready_To_Gag(id)  {
 
 static Menu_Show_SelectReason(id, target) {
 	if(!is_user_connected(id))
-		return;
+		return PLUGIN_HANDLED;
 
 	if(!is_user_connected(target)) {
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
@@ -406,13 +406,9 @@ static Menu_Show_SelectReason(id, target) {
 		return PLUGIN_HANDLED;
 	}
 
-	new szTemp[MAX_REASON_LEN];
-	formatex(szTemp, charsmax(szTemp), "%L", id, "MENU_SelectReason");
+	new hMenu = menu_create(fmt("%L", id, "MENU_SelectReason"), "Menu_Handler_SelectReason");
 
-	new hMenu = menu_create(szTemp, "Menu_Handler_SelectReason");
-
-	formatex(szTemp, charsmax(szTemp), "%L", id, "EnterReason");
-	menu_additem(hMenu, szTemp, "-1");
+	menu_additem(hMenu, fmt("%L", id, "EnterReason"), "-1");
 
 	if(g_iArraySize_Reasons) {
 		for(new i; i < g_iArraySize_Reasons; i++) {
@@ -478,7 +474,7 @@ public Menu_Handler_SelectReason(id, menu, item) {
 
 static Menu_Show_SelectTime(id, target) {
 	if(!is_user_connected(id))
-		return;
+		return PLUGIN_HANDLED;
 
 	if(!is_user_connected(target)) {
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
@@ -910,6 +906,7 @@ Storage_PlayerLoaded(const iUserID, bool: bFound = false) {
 }
 
 Storage_PlayerRemoved(const iUserID) {
+#pragma unused iUserID
 #if defined DEBUG
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
 
