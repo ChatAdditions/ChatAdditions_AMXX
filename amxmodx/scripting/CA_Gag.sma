@@ -396,7 +396,10 @@ stock bool: Ready_To_Gag(id)  {
 }
 
 
-public Menu_Show_SelectReason(id, target) {
+static Menu_Show_SelectReason(id, target) {
+	if(!is_user_connected(id))
+		return;
+
 	if(!is_user_connected(target)) {
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
@@ -473,7 +476,10 @@ public Menu_Handler_SelectReason(id, menu, item) {
 	return PLUGIN_HANDLED;
 }
 
-public Menu_Show_SelectTime(id, target) {
+static Menu_Show_SelectTime(id, target) {
+	if(!is_user_connected(id))
+		return;
+
 	if(!is_user_connected(target)) {
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
