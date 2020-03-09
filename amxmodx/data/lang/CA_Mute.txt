@@ -11,6 +11,15 @@ CA_Mute_UnMuted = Вы снова слышите игрока
 Mute_NotEnoughPlayers = Не достаточно игроков!
 Player_NotConnected = ^3Игрок не подключен!
 
+Menu_Muted_you = Не слышит вас
+
+Player_Muted_you = теперь НЕ слышит вас.
+Player_UnMuted_you = вновь слышит вас.
+
+
+Player_Muted_All = теперь НЕ слышит никого!
+Player_UnMuted_All = снова слышит всех.
+
 [en]
 CA_Mute_TITLE = Players menu for mute:
 CA_Mute_MuteALL = Mute all
@@ -23,3 +32,12 @@ CA_Mute_UnMuted = You hear the player again
 
 Mute_NotEnoughPlayers = Not enough players!
 Player_NotConnected = ^3Player not connected!
+
+Menu_Muted_you = Muted you
+
+Player_Muted_you = CAN'T hear you now.
+Player_UnMuted_you = can hear you now.
+
+
+Player_Muted_All = CAN'T hear anybody now!
+Player_UnMuted_All = can hear anybody now.
