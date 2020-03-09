@@ -6,7 +6,7 @@ EnterReason = Ввести причину ->\n
 MENU_SelectTime = Выберите время для затычки:
 SET_CustomTime = Указать время ->
 CA_GAG_YES = \yДа\w
-CA_GAG_NO = \rНет (Отредактировать)\w
+CA_GAG_NO = \rНет \w(\yРедактировать\w)
 GAG_Confirm = Подтвердите удаление:
 
 Immunity = Иммунитет
@@ -35,6 +35,10 @@ NoHaveTimeTemplates = ^3Нет шаблонов выбора времени.
 CustomTime_Setted = ^3Вы установили своё время:
 CustomReason_Setted = ^3Вы установили причину затычки:
 
+Gag_Menu_Next = Следующая
+Gag_Menu_Back = Назад
+Gag_Menu_Exit = Выход
+
 [en]
 CA_Gag_TITLE = Gag player
 CA_Gag_Properties = Gag parameters: [ \r%n\w ]
@@ -43,7 +47,7 @@ EnterReason = Enter gag reason ->\n
 MENU_SelectTime = Choose gag time:
 SET_CustomTime = Enter gag time ->
 CA_GAG_YES = \yYes\w
-CA_GAG_NO = \rNo (Edit gag)\w
+CA_GAG_NO = \rNo \w(\yEdit\w)
 GAG_Confirm = Confirm remove gag:
 
 Immunity = Immunity
@@ -72,3 +76,7 @@ NoHaveTimeTemplates = No have time templates.
 
 CustomTime_Setted = ^3You set custom time:
 CustomReason_Setted = ^3You set custom reason:
+
+Gag_Menu_Next = Next
+Gag_Menu_Back = Back
+Gag_Menu_Exit = Exit
