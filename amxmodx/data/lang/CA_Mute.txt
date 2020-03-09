@@ -16,6 +16,7 @@ Menu_Muted_you = Не слышит вас
 Player_Muted_you = теперь НЕ слышит вас.
 Player_UnMuted_you = вновь слышит вас.
 
+Menu_UseToOften = ^3Вы используете слишком часто!
 
 Player_Muted_All = теперь НЕ слышит никого!
 Player_UnMuted_All = снова слышит всех.
@@ -38,6 +39,7 @@ Menu_Muted_you = Muted you
 Player_Muted_you = CAN'T hear you now.
 Player_UnMuted_you = can hear you now.
 
+Menu_UseToOften = ^3You use very often!
 
 Player_Muted_All = CAN'T hear anybody now!
 Player_UnMuted_All = can hear anybody now.
