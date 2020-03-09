@@ -70,7 +70,7 @@ public Menu_Show_PlayersList(id) {
 }
 
 public Callback_PlayersList(id, menu, item) {
-	new null, sInfo[64], sName[64];
+	new null, sInfo[64], sName[128];
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
 
 	new iUserID = strtol(sInfo);
@@ -98,7 +98,7 @@ public Menu_Handler_PlayersList(id, menu, item) {
 		menu_destroy(menu);
 		return PLUGIN_HANDLED;
 	}
-	
+
 	new null, sInfo[64], sName[64];
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
 
