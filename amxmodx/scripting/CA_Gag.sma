@@ -68,20 +68,18 @@ public plugin_precache() {
 	register_dictionary("common.txt");
 	register_dictionary("time.txt");
 
-	register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason");
-	register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates"); // debug
 
 	hook_cvar_change(
 		create_cvar("ca_gag_times", "1, 5, 30, 60, 1440, 10080"),
 		"Hook_CVar_Times"
 	);
 
-	new sConfigsDir[PLATFORM_MAX_PATH];
-	get_localinfo("amxx_configsdir", sConfigsDir, charsmax(sConfigsDir));
-	server_cmd("exec %s/ChatAdditions/gag_reasons.cfg", sConfigsDir);
-	server_exec();
-
+	g_aReasons = ArrayCreate(gag_s);
 	g_aGagTimes = ArrayCreate();
+
+	register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason");
+	register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates"); // debug
+	register_srvcmd("ca_gag_reload_config", "SrvCmd_ReloadConfig");
 
 	new const szCmd[] = "gag";
 	new const szCtrlChar[][] = {"!", "/", "\\", "." , "?", ""};
@@ -99,10 +97,8 @@ public plugin_precache() {
 }
 
 public OnConfigsExecuted() {
-	new sTimes[128];
-	get_cvar_string("ca_gag_times", sTimes, charsmax(sTimes));
-
-	ParseTimes(sTimes);
+	_LoadConfig();
+	_ParseTimes();
 }
 
 public plugin_natives() {
@@ -627,8 +623,6 @@ Get_GagStringReason(const id, const target) {
 
 
 public SrvCmd_AddReason() {
-	if(!g_aReasons) g_aReasons = ArrayCreate(gag_s);
-
 	enum any: args_s { arg0, arg1, arg2, arg3 };
 
 	new szArgs[args_s][32];
@@ -674,17 +668,37 @@ public SrvCmd_ShowTemplates() {
 	return PLUGIN_HANDLED;
 }
 
-public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
+public SrvCmd_ReloadConfig() {
+	_LoadConfig();
+	_ParseTimes();
 
+	log_amx("Config re-loaded!");
+}
+
+public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 	if(!strlen(new_value)) {
 		log_amx("[WARN] not found times! ca_gag_add_time ='%s'", new_value);
 		return;
 	}
 
-	ParseTimes(new_value);
+	_ParseTimes(new_value);
 }
 
-static ParseTimes(const sTimes[]) {
+static _LoadConfig() {
+	ArrayClear(g_aReasons);
+	new sConfigsDir[PLATFORM_MAX_PATH];
+	get_localinfo("amxx_configsdir", sConfigsDir, charsmax(sConfigsDir));
+	server_cmd("exec %s/ChatAdditions/gag_reasons.cfg", sConfigsDir);
+	server_exec();
+}
+
+static _ParseTimes(const _sTimes[] = "") {
+	new sTimes[128];
+
+	if(sTimes[0] == EOS)
+		get_cvar_string("ca_gag_times", sTimes, charsmax(sTimes));
+	else copy(sTimes, charsmax(sTimes), _sTimes);
+
 	ArrayClear(g_aGagTimes);
 
 	new ePos, stPos, rawPoint[32];
@@ -695,11 +709,8 @@ static ParseTimes(const sTimes[]) {
 
 		trim(rawPoint);
 
-		if(rawPoint[0]) {
+		if(rawPoint[0])
 			ArrayPushCell(g_aGagTimes, strtol(rawPoint));
-
-			// server_print("Time added: Time:'%i'", strtol(rawPoint));
-		}
 	} while(ePos != -1);
 
 	g_iArraySize_GagTimes = ArraySize(g_aGagTimes);
