@@ -293,6 +293,10 @@ static Menu_Show_GagProperties(id) {
 	menu_addblank(hMenu, false);
 	menu_additem(hMenu, "Confirm!", .callback = hCallback);
 
+	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
+	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
+
 	menu_display(id, hMenu);
 }
 
