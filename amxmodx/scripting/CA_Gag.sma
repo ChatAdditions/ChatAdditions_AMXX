@@ -1,6 +1,6 @@
 
 // #define DEBUG
-// #define CHOOSE_STORAGE [0 .. 3]
+// #define CHOOSE_STORAGE [0 .. 2]
 
 
 #include <amxmodx>
@@ -46,13 +46,11 @@ static Array: g_aGagTimes, g_iArraySize_GagTimes;
 #endif
 
 #if defined DATABASE_TYPE
-	#if DATABASE_TYPE == DB_NVault
+	#if DATABASE_TYPE == DB_NVault || DATABASE_TYPE == 0
 		#include <ChatAdditions_inc/_NVault>
-	#elseif DATABASE_TYPE == DB_JSON
-		// #include <ChatAdditions_inc/_JSON>
-	#elseif DATABASE_TYPE == DB_MySQL
+	#elseif DATABASE_TYPE == DB_MySQL || DATABASE_TYPE == 1
 		#include <ChatAdditions_inc/_MySQL>
-	#elseif DATABASE_TYPE == DB_SQLite
+	#elseif DATABASE_TYPE == DB_SQLite || DATABASE_TYPE == 2
 		#include <ChatAdditions_inc/_SQLite>
 	#endif
 #else // DATABASE_TYPE
