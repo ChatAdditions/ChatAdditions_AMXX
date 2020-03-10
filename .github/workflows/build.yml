@@ -13,6 +13,9 @@ jobs:
     strategy:
       matrix:
         amxmodx: ["1.9", "1.10"]
+        parameters: ["", "DEBUG=1"]
+        storage:
+          ["", "CHOOSE_STORAGE=0", "CHOOSE_STORAGE=1", "CHOOSE_STORAGE=2"]
 
       fail-fast: false
     steps:
@@ -29,10 +32,13 @@ jobs:
           cd addons/amxmodx && rm scripting/*.sma && rm plugins/*.amxx
 
       - name: Compile plugins AMXX Version
+        env:
+          DEBUG: ${{ matrix.parameters }}
+          STORAGE: ${{ matrix.storage }}
         run: |
           cp -Rf ./amxmodx/* ./addons/amxmodx/
           cd addons/amxmodx/scripting
           chmod +x amxxpc32.so
           chmod +x compile.sh
           chmod +x amxxpc
-          for sourcefile in *.sma; do echo -n "Compiling $sourcefile ..."; ./amxxpc $sourcefile || exit 1; done
+          for sourcefile in *.sma; do echo -n "Compiling $sourcefile ..."; ./amxxpc $sourcefile $DEBUG $STORAGE || exit 1; done
