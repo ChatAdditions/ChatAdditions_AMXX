@@ -19,8 +19,8 @@
 #pragma semicolon 1
 #pragma dynamic 524288
 
-enum DB_Types { DB_NVault, DB_JSON, DB_MySQL, DB_SQLite };
-new stock const DB_Names[DB_Types][] = { "DB_NVault", "DB_JSON", "DB_MySQL", "DB_SQLite" };
+enum _:DB_Types { DB_NVault, DB_MySQL, DB_SQLite };
+new stock const DB_Names[DB_Types][] = { "DB_NVault", "DB_MySQL", "DB_SQLite" };
 
 enum any: gag_flags_s ( <<=1 )
 {
