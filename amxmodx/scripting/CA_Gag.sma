@@ -40,20 +40,20 @@ static g_aGags_AdminEditor[MAX_PLAYERS + 1][gag_s];
 static Array: g_aReasons, g_iArraySize_Reasons;
 static Array: g_aGagTimes, g_iArraySize_GagTimes;
 
-#if defined DEBUG && defined CHOOSE_STORAGE
+#if (defined DEBUG && defined CHOOSE_STORAGE)
 	#undef DATABASE_TYPE
 	#define DATABASE_TYPE CHOOSE_STORAGE
 #endif
 
-#if defined DATABASE_TYPE
-	#if DATABASE_TYPE == DB_NVault || DATABASE_TYPE == 0
+#if (defined DATABASE_TYPE)
+	#if (DATABASE_TYPE == DB_NVault || DATABASE_TYPE == 0)
 		#include <ChatAdditions_inc/_NVault>
-	#elseif DATABASE_TYPE == DB_MySQL || DATABASE_TYPE == 1
+	#elseif (DATABASE_TYPE == DB_MySQL || DATABASE_TYPE == 1)
 		#include <ChatAdditions_inc/_MySQL>
-	#elseif DATABASE_TYPE == DB_SQLite || DATABASE_TYPE == 2
+	#elseif (DATABASE_TYPE == DB_SQLite || DATABASE_TYPE == 2)
 		#include <ChatAdditions_inc/_SQLite>
 	#endif
-#else // DATABASE_TYPE
+#else
 	#error Please uncomment DATABASE_TYPE and select!
 #endif // DATABASE_TYPE
 
