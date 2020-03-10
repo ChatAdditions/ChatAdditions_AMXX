@@ -41,4 +41,7 @@ jobs:
           chmod +x amxxpc32.so
           chmod +x compile.sh
           chmod +x amxxpc
-          for sourcefile in *.sma; do echo -n "Compiling $sourcefile ..."; ./amxxpc $sourcefile $DEBUG $STORAGE || exit 1; done
+          for sourcefile in *.sma; do\
+            echo -n "Compiling $sourcefile ...";\
+            ./amxxpc -d3 $sourcefile $DEBUG $STORAGE -o../plugins/$(echo $sourcefile | sed -e 's/\.sma$/.amxx/') || exit 1;\
+          done
