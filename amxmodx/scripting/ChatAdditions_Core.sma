@@ -7,6 +7,11 @@
 #pragma semicolon 1
 #pragma ctrlchar '\'
 
+new const LOG_DIR_NAME[] = "CA_Core";
+new g_sLogsFile[PLATFORM_MAX_PATH];
+
+new ca_log_type;
+
 new g_pFwd_Client_Say,
 	g_pFwd_Client_SayTeam,
 	g_pFwd_Client_Voice;
@@ -14,10 +19,13 @@ new g_pFwd_Client_Say,
 public plugin_precache()
 {
 	register_plugin(
-		.plugin_name	= "Chats Additions Core",
+		.plugin_name	= "Chat Additions Core",
 		.version		= "1.0.0-beta",
 		.author			= "Sergey Shorokhov"
 	);
+
+	bind_pcvar_num(create_cvar("ca_log_type", "0"), ca_log_type);
+	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
 	register_clcmd("say", "ClCmd_Hook_Say");
 	register_clcmd("say_team", "ClCmd_Hook_SayTeam");
@@ -26,6 +34,8 @@ public plugin_precache()
 	g_pFwd_Client_Say = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL);
 	g_pFwd_Client_SayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL);
 	g_pFwd_Client_Voice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL);
+
+	CA_Log("Chat Additions Core initialized!")
 }
 
 public plugin_natives() {

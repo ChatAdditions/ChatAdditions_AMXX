@@ -59,6 +59,11 @@ static Array: g_aGagTimes, g_iArraySize_GagTimes;
 
 static bool: g_bStorageInitialized;
 
+new const LOG_DIR_NAME[] = "CA_Gag";
+new g_sLogsFile[PLATFORM_MAX_PATH];
+
+new ca_log_type;
+
 public plugin_precache() {
 	register_plugin("[CA] Gag", "1.0.0-beta", "Sergey Shorokhov");
 
@@ -66,6 +71,8 @@ public plugin_precache() {
 	register_dictionary("common.txt");
 	register_dictionary("time.txt");
 
+	bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
+	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
 	hook_cvar_change(
 		create_cvar("ca_gag_times", "1, 5, 30, 60, 1440, 10080"),
@@ -734,6 +741,12 @@ static SaveGag(const id, const target) {
 	if(g_aCurrentGags[target][_Time] == FOREVER)
 		g_aCurrentGags[target][_ExpireTime] = FOREVER;
 	else g_aCurrentGags[target][_ExpireTime] = get_systime() + g_aCurrentGags[target][_Time];
+
+	CA_Log("Gag: '%N' add gag '%N (type:'%s', time:'%s', reason:'%s')", \
+        id, target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
+		GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
+		g_aCurrentGags[target][_Reason] \
+    )
 
 	GagData_Reset(g_aGags_AdminEditor[id]);
 	
