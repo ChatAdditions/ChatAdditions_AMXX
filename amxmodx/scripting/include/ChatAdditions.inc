@@ -50,7 +50,7 @@ enum _:LogType_s {
     }\
 }
 
-stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, sDir[] = "ChatAdditions") {
+stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, const sDir[] = "ChatAdditions") {
     get_localinfo("amxx_logs", sBuffer, iLen);
 
     new iYear, iMonth, iDay;
