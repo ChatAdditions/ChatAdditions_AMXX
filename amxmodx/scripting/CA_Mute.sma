@@ -40,6 +40,8 @@ public plugin_init()
 		register_clcmd(fmt("say %s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
 		register_clcmd(fmt("say_team %s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
 	}
+
+	CA_Log("[CA] Mute initialized!")
 }
 
 public ClCmd_Mute(id) {
@@ -127,6 +129,8 @@ public Menu_Handler_PlayersList(id, menu, item) {
 			id, LANG_PLAYER, g_bGlobalMute[id] ? "Player_Muted_All" : "Player_UnMuted_All"
 		);
 
+		CA_Log("Mute: \"%N\" %smuted everyone", id, g_bGlobalMute[id] ? "" : "Un")
+
 		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 		return PLUGIN_HANDLED;
@@ -150,7 +154,7 @@ public Menu_Handler_PlayersList(id, menu, item) {
 		player, id, g_aMutes[id][player] ? "Player_Muted_you" : "Player_UnMuted_you"
 	);
 
-	CA_Log("Mute: '%N' %smuted '%N'", id, player, g_aMutes[id][player] ? "" : "Un")
+	CA_Log("Mute: \"%N\" %smuted \"%N\"", id, g_aMutes[id][player] ? "" : "Un", player)
 
 	g_fNextUse[id] = gametime + ca_mute_use_delay;
 

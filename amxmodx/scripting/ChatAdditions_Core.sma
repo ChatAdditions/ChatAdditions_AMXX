@@ -24,7 +24,7 @@ public plugin_precache()
 		.author			= "Sergey Shorokhov"
 	);
 
-	bind_pcvar_num(create_cvar("ca_log_type", "0"), ca_log_type);
+	bind_pcvar_num(create_cvar("ca_log_type", "1"), ca_log_type);
 	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
 	register_clcmd("say", "ClCmd_Hook_Say");

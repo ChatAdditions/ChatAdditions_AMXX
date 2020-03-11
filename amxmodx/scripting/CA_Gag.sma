@@ -99,6 +99,8 @@ public plugin_precache() {
 
 	const Float: UPDATER_FREQ = 3.0;
 	set_task(UPDATER_FREQ, "Gags_Thinker", .flags = "b");
+
+	CA_Log("[CA Gag] initialized!")
 }
 
 public OnConfigsExecuted() {
@@ -469,7 +471,7 @@ public Menu_Handler_SelectReason(id, menu, item) {
 // IF NEED OFC
 	g_aGags_AdminEditor[id][_Time] = aReason[_Time];
 
-	// log_amx("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason]);
+	// CA_Log("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason])
 
 	menu_destroy(menu);
 	Menu_Show_GagProperties(id);
@@ -641,7 +643,7 @@ public SrvCmd_AddReason() {
 	new iArgsCount = read_argc();
 
 	if(iArgsCount < 2){
-		log_amx("\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]");
+		CA_Log("\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
 		return;
 	}
 
@@ -654,23 +656,23 @@ public SrvCmd_AddReason() {
 	ArrayPushArray(g_aReasons, aReason);
 	g_iArraySize_Reasons = ArraySize(g_aReasons);
 
-	log_amx("ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",
-			g_iArraySize_Reasons, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]
-		);
+	CA_Log("ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
+		g_iArraySize_Reasons, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
+	)
 }
 
 public SrvCmd_ShowTemplates() {
 	if(/* !g_iArraySize_GagTimes || */ !g_iArraySize_Reasons) {
-		log_amx("\t[WARN] NO REASONS FOUNDED!");
+		CA_Log("\t[WARN] NO REASONS FOUNDED!")
 		return PLUGIN_HANDLED;
 	} else {
 		for(new i; i < g_iArraySize_Reasons; i++) {
 			new aReason[gag_s];
 			ArrayGetArray(g_aReasons, i, aReason);
 
-			server_print("Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",
-				i, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]
-			);
+			CA_Log("Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
+				i, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
+			)
 		}
 	}
 
@@ -681,12 +683,12 @@ public SrvCmd_ReloadConfig() {
 	_LoadConfig();
 	_ParseTimes();
 
-	log_amx("Config re-loaded!");
+	CA_Log("Config re-loaded!")
 }
 
 public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 	if(!strlen(new_value)) {
-		log_amx("[WARN] not found times! ca_gag_add_time ='%s'", new_value);
+		CA_Log("[WARN] not found times! ca_gag_add_time ='%s'", new_value)
 		return;
 	}
 
@@ -731,9 +733,21 @@ static SaveGag(const id, const target) {
 	if(id == 0) {
 		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
 			LANG_PLAYER, "Player_Gagged_ByServer", target, GetStringTime_seconds(LANG_PLAYER, g_aCurrentGags[target][_Time]));
+
+		CA_Log("Gag: \"SERVER\" add gag to \"%N\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+        	target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
+			GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
+			g_aCurrentGags[target][_Reason] \
+    	)
 	} else {
 		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
 			LANG_PLAYER, "Player_Gagged", id, target, GetStringTime_seconds(LANG_PLAYER, g_aCurrentGags[target][_Time]));
+
+		CA_Log("Gag: \"%N\" add gag to \"%N\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+        	id, target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
+			GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
+			g_aCurrentGags[target][_Reason] \
+    	)
 	}
 	if(g_aCurrentGags[target][_Reason][0])
 		client_print_color(0, print_team_default, "\4%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", Get_GagStringReason(LANG_PLAYER, target));
@@ -741,12 +755,6 @@ static SaveGag(const id, const target) {
 	if(g_aCurrentGags[target][_Time] == FOREVER)
 		g_aCurrentGags[target][_ExpireTime] = FOREVER;
 	else g_aCurrentGags[target][_ExpireTime] = get_systime() + g_aCurrentGags[target][_Time];
-
-	CA_Log("Gag: '%N' add gag '%N' (type:'%s', time:'%s', reason:'%s')", \
-        id, target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
-		GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
-		g_aCurrentGags[target][_Reason] \
-    )
 
 	GagData_Reset(g_aGags_AdminEditor[id]);
 	
