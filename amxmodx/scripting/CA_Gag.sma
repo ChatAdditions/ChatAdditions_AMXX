@@ -157,14 +157,20 @@ static Menu_Show_PlayersList(id) {
 
 	new hMenu = menu_create(fmt("%L", id, "CA_Gag_TITLE"), "Menu_Handler_PlayersList");
 
+	static hCallback;
+	if(!hCallback)
+		hCallback = menu_makecallback("Callback_PlayersMenu");
+
 	new aPlayers[MAX_PLAYERS], iCount;
-	get_players(aPlayers, iCount, .flags = "ch");
-
-	new hCallback = menu_makecallback("Callback_PlayersMenu");
-
+	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
 	for(new i; i < iCount; i++) {
-		if(id != aPlayers[i])
-			menu_additem(hMenu, "-", fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
+		new target = aPlayers[i];
+
+		if(target == id)
+			continue;
+
+		new bool:bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
+		menu_additem(hMenu, fmt("%n %s", target, GetPostfix(id, target, bHaveImmunity)), fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
 	}
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
@@ -180,8 +186,6 @@ public Callback_PlayersMenu(id, menu, item) {
 
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
 	new bool:bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
-
-	menu_item_setname(menu, item, fmt("%n %s", target, GetPostfix(id, target, bHaveImmunity)));
 
 	return (!bHaveImmunity) ? ITEM_ENABLED : ITEM_DISABLED;
 }
@@ -289,16 +293,39 @@ static Menu_Show_GagProperties(id) {
 	
 	new target = g_aGags_AdminEditor[id][_Player];
 	new hMenu = menu_create(fmt("%L", id, "CA_Gag_Properties", target), "Menu_Handler_GagProperties");
-	new hCallback = menu_makecallback("Callback_GagProperties");
 
-	menu_additem(hMenu, "Chat:", .callback = hCallback);
-	menu_additem(hMenu, "Team chat:", .callback = hCallback);
-	menu_additem(hMenu, "Voice chat:", .callback = hCallback);
+	static hCallback;
+	if(!hCallback)
+		hCallback = menu_makecallback("Callback_GagProperties");
+
+	new gag_flags_s: gagFlags = g_aGags_AdminEditor[id][_bitFlags];
+	new bool: hasAlreadyGag = g_aCurrentGags[target][_bitFlags] != m_REMOVED;
+	new bool: hasChanges = !GagData_Equal(g_aCurrentGags[target], g_aGags_AdminEditor[id]);	
+
+	menu_additem(hMenu, fmt("%L [ %s ]", id, "CA_Gag_Say",
+		(gagFlags & m_Say) ? " \\r+\\w " : "-")
+	);
+	menu_additem(hMenu, fmt("%L [ %s ]", id, "CA_Gag_SayTeam",
+		(gagFlags & m_SayTeam) ? " \\r+\\w " : "-")
+	);
+	menu_additem(hMenu, fmt("%L [ %s ]", id, "CA_Gag_Voice",
+		(gagFlags & m_Voice) ? " \\r+\\w " : "-")
+	);
+
 	menu_addblank(hMenu, false);
-	menu_additem(hMenu, "Reason:", .callback = hCallback);
-	menu_additem(hMenu, "Time:", .callback = hCallback);
+
+	menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Reason",
+		Get_GagStringReason(id, target)), .callback = hCallback
+	);
+	menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Time",
+		GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]))
+	);
+
 	menu_addblank(hMenu, false);
-	menu_additem(hMenu, "Confirm!", .callback = hCallback);
+
+	menu_additem(hMenu, fmt("%L %s", id, "CA_Gag_Confirm",
+		(hasAlreadyGag && hasChanges) ? "edit" : ""), .callback = hCallback
+	);
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
 	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
@@ -308,41 +335,13 @@ static Menu_Show_GagProperties(id) {
 }
 
 public Callback_GagProperties(id, menu, item) {
-	enum { menu_Chat, menu_TeamChat, menu_VoiceChat,
-			menu_Reason, menu_Time, menu_Confirm
+	enum { /* menu_Chat, menu_TeamChat, menu_VoiceChat, */
+			menu_Reason = 3, /* menu_Time, */ menu_Confirm = 5
 		};
-
-	new gag_flags_s: gagFlags = g_aGags_AdminEditor[id][_bitFlags];
-	new target = g_aGags_AdminEditor[id][_Player];
-	new bool: hasAlreadyGag = g_aCurrentGags[target][_bitFlags] != m_REMOVED;
-	new bool: hasChanges = !GagData_Equal(g_aCurrentGags[target], g_aGags_AdminEditor[id]);
-
-	// DEBUG__Dump_GagData("Callback_GagProperties", g_aGags_AdminEditor[id]);
-
-	new null, sInfo[64], sName[64];
-	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
-
-	switch(item) {
-		case menu_Chat:
-			formatex(sName, charsmax(sName), "%L [ %s ]", id, "CA_Gag_Say", (gagFlags & m_Say) ? " \\r+\\w " : "-");
-		case menu_TeamChat:
-			formatex(sName, charsmax(sName), "%L [ %s ]", id, "CA_Gag_SayTeam", (gagFlags & m_SayTeam) ? " \\r+\\w " : "-");
-		case menu_VoiceChat:
-			formatex(sName, charsmax(sName), "%L [ %s ]", id, "CA_Gag_Voice", (gagFlags & m_Voice) ? " \\r+\\w " : "-");
-		case menu_Reason:
-			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Reason", Get_GagStringReason(id, target));
-		case menu_Time:
-			formatex(sName, charsmax(sName), "%L [ \\y%s\\w ]", id, "CA_Gag_Time", GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]));
-		case menu_Confirm: {
-			formatex(sName, charsmax(sName), "%L %s", id, "CA_Gag_Confirm", (hasAlreadyGag && hasChanges) ? "edit" : "");
-		}
-	}
-
-	menu_item_setname(menu, item, sName);
 
 	return (
 		item == menu_Confirm && !Ready_To_Gag(id)
-		|| DATABASE_TYPE == DB_NVault && item == menu_Reason
+		|| (DATABASE_TYPE == DB_NVault && item == menu_Reason)
 		) ? ITEM_DISABLED : ITEM_ENABLED;
 }
 
@@ -414,7 +413,6 @@ static Menu_Show_SelectReason(id, target) {
 	}
 
 	new hMenu = menu_create(fmt("%L", id, "MENU_SelectReason"), "Menu_Handler_SelectReason");
-
 	menu_additem(hMenu, fmt("%L", id, "EnterReason"), "-1");
 
 	if(g_iArraySize_Reasons) {
@@ -468,7 +466,7 @@ public Menu_Handler_SelectReason(id, menu, item) {
 
 	copy(g_aGags_AdminEditor[id][_Reason], charsmax(g_aGags_AdminEditor[][_Reason]), aReason[_Reason]);
 
-// IF NEED OFC
+	// IF NEED OFC
 	g_aGags_AdminEditor[id][_Time] = aReason[_Time];
 
 	// CA_Log("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason])
