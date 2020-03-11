@@ -64,6 +64,12 @@ new g_sLogsFile[PLATFORM_MAX_PATH];
 
 new ca_log_type;
 
+enum _:GagMenuType_s {
+	_MenuType_Custom,
+	_MenuType_Sequential
+}
+new ca_gag_menu_type;
+
 public plugin_precache() {
 	register_plugin("[CA] Gag", "1.0.0-beta", "Sergey Shorokhov");
 
@@ -78,6 +84,8 @@ public plugin_precache() {
 		create_cvar("ca_gag_times", "1, 5, 30, 60, 1440, 10080"),
 		"Hook_CVar_Times"
 	);
+
+	bind_pcvar_num(create_cvar("ca_gag_menu_type", "1"), ca_gag_menu_type);
 
 	g_aReasons = ArrayCreate(gag_s);
 	g_aGagTimes = ArrayCreate();
@@ -213,10 +221,13 @@ public Menu_Handler_PlayersList(id, menu, item) {
 		GagData_Copy(g_aGags_AdminEditor[id], g_aCurrentGags[target]);
 		g_aGags_AdminEditor[id][_Player] = target;
 		Menu_Show_ConfirmRemove(id);
-	}else {
+	} else {
 		GagData_GetPersonalData(id, target, g_aGags_AdminEditor[id]);
-
-		Menu_Show_GagProperties(id);
+		if(ca_gag_menu_type == _MenuType_Custom) {
+			Menu_Show_GagProperties(id);
+		} else if (ca_gag_menu_type == _MenuType_Sequential) {
+			Menu_Show_SelectReason(id);
+		}
 	}
 
 	menu_destroy(menu);
@@ -312,20 +323,26 @@ static Menu_Show_GagProperties(id) {
 		(gagFlags & m_Voice) ? " \\r+\\w " : "-")
 	);
 
-	menu_addblank(hMenu, false);
+	if(ca_gag_menu_type == _MenuType_Custom) {
+		menu_addblank(hMenu, false);
 
-	menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Reason",
-		Get_GagStringReason(id, target)), .callback = hCallback
-	);
-	menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Time",
-		GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]))
-	);
+		menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Reason",
+			Get_GagStringReason(id, target)), .callback = hCallback
+		);
+		menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Time",
+			GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]))
+		);
+	}
 
 	menu_addblank(hMenu, false);
 
 	menu_additem(hMenu, fmt("%L %s", id, "CA_Gag_Confirm",
 		(hasAlreadyGag && hasChanges) ? "edit" : ""), .callback = hCallback
 	);
+
+	menu_addtext(hMenu, fmt("\n%L", id, "Menu_WannaGag",
+		GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]),
+		Get_GagStringReason(id, target)), false);
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
 	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
@@ -339,16 +356,25 @@ public Callback_GagProperties(id, menu, item) {
 			menu_Reason = 3, /* menu_Time, */ menu_Confirm = 5
 		};
 
+	enum { sequential_Confirm = 3};
+
+	new bool: IsConfirmItem = (
+		item == menu_Confirm && ca_gag_menu_type == _MenuType_Custom
+		|| item == sequential_Confirm && ca_gag_menu_type == _MenuType_Sequential
+	);
+
 	return (
-		item == menu_Confirm && !Ready_To_Gag(id)
-		|| (DATABASE_TYPE == DB_NVault && item == menu_Reason)
+		IsConfirmItem && !Ready_To_Gag(id)
+		|| (DATABASE_TYPE == DB_NVault && item == menu_Reason && ca_gag_menu_type == _MenuType_Custom)
 		) ? ITEM_DISABLED : ITEM_ENABLED;
 }
 
-public Menu_Handler_GagProperties(id, menu, item) {	
+public Menu_Handler_GagProperties(id, menu, item) {
 	enum { menu_Chat, menu_TeamChat, menu_VoiceChat,
 			menu_Reason, menu_Time, menu_Confirm
 		};
+
+	enum { sequential_Confirm = 3 };
 
 	if(item == MENU_EXIT || item < 0) {
 		menu_destroy(menu);
@@ -371,23 +397,37 @@ public Menu_Handler_GagProperties(id, menu, item) {
 		case menu_Chat:			Gag_ToggleFlags(id, m_Say);
 		case menu_TeamChat: 	Gag_ToggleFlags(id, m_SayTeam);
 		case menu_VoiceChat:	Gag_ToggleFlags(id, m_Voice);
-		case menu_Reason: {
-			menu_destroy(menu);
-			Menu_Show_SelectReason(id, target);
+	}
 
-			return PLUGIN_HANDLED;
+	if(ca_gag_menu_type == _MenuType_Custom) {
+		switch(item) {
+			case menu_Reason: {
+				menu_destroy(menu);
+				Menu_Show_SelectReason(id);
+
+				return PLUGIN_HANDLED;
+			}
+			case menu_Time:	{
+				menu_destroy(menu);
+				Menu_Show_SelectTime(id);
+
+				return PLUGIN_HANDLED;
+			}
+			case menu_Confirm: {
+				menu_destroy(menu);
+				SaveGag(id ,target);
+
+				return PLUGIN_HANDLED;
+			}
 		}
-		case menu_Time:	{
-			menu_destroy(menu);
-			Menu_Show_SelectTime(id, target);
+	} else {
+		switch(item) {
+			case sequential_Confirm: {
+				menu_destroy(menu);
+				SaveGag(id ,target);
 
-			return PLUGIN_HANDLED;
-		}
-		case menu_Confirm: {
-			menu_destroy(menu);
-			SaveGag(id ,target);
-
-			return PLUGIN_HANDLED;
+				return PLUGIN_HANDLED;
+			}
 		}
 	}
 
@@ -402,10 +442,11 @@ stock bool: Ready_To_Gag(id)  {
 }
 
 
-static Menu_Show_SelectReason(id, target) {
+static Menu_Show_SelectReason(id) {
 	if(!is_user_connected(id))
 		return PLUGIN_HANDLED;
 
+	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
@@ -437,7 +478,12 @@ static Menu_Show_SelectReason(id, target) {
 public Menu_Handler_SelectReason(id, menu, item) {
 	if(item == MENU_EXIT || item < 0) {
 		menu_destroy(menu);
-		Menu_Show_GagProperties(id);
+		
+		if(ca_gag_menu_type == _MenuType_Custom) {
+			Menu_Show_GagProperties(id);
+		} else if(ca_gag_menu_type == _MenuType_Sequential) {
+			Menu_Show_PlayersList(id);
+		}
 		return PLUGIN_HANDLED;
 	}
 
@@ -472,15 +518,21 @@ public Menu_Handler_SelectReason(id, menu, item) {
 	// CA_Log("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason])
 
 	menu_destroy(menu);
-	Menu_Show_GagProperties(id);
+
+	if(ca_gag_menu_type == _MenuType_Custom) {
+		Menu_Show_GagProperties(id);
+	} else if(ca_gag_menu_type == _MenuType_Sequential) {
+		Menu_Show_SelectTime(id);
+	}
 
 	return PLUGIN_HANDLED;
 }
 
-static Menu_Show_SelectTime(id, target) {
+static Menu_Show_SelectTime(id) {
 	if(!is_user_connected(id))
 		return PLUGIN_HANDLED;
 
+	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
@@ -493,11 +545,12 @@ static Menu_Show_SelectTime(id, target) {
 	menu_additem(hMenu, fmt("%L", id, "CA_Gag_Perpapent"));
 	menu_addblank(hMenu, .slot = false);
 
+	new iSelectedTime = g_aGags_AdminEditor[id][_Time];
+
 	if(g_iArraySize_GagTimes) {
 		for(new i; i < g_iArraySize_GagTimes; i++) {
 			new iTime = ArrayGetCell(g_aGagTimes, i) * SECONDS_IN_MINUTE;
-
-			menu_additem(hMenu, GetStringTime_seconds(id, iTime), fmt("%i", iTime));
+			menu_additem(hMenu, fmt("%s%s", (iSelectedTime == iTime) ? "\\r" : "", GetStringTime_seconds(id, iTime)), fmt("%i", iTime));
 		}
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveTimeTemplates"), .slot = false);
 
@@ -513,7 +566,13 @@ public Menu_Handler_SelectTime(id, menu, item) {
 
 	if(item == MENU_EXIT || item < 0) {
 		menu_destroy(menu);
-		Menu_Show_GagProperties(id);
+
+		if(ca_gag_menu_type == _MenuType_Custom) {
+			Menu_Show_GagProperties(id);
+		} else if(ca_gag_menu_type == _MenuType_Sequential) {
+			Menu_Show_PlayersList(id);
+		}
+
 		return PLUGIN_HANDLED;
 	}
 	
@@ -548,7 +607,33 @@ public Menu_Handler_SelectTime(id, menu, item) {
 	g_aGags_AdminEditor[id][_Time] = strtol(sInfo);
 
 	menu_destroy(menu);
-	Menu_Show_GagProperties(id);
+
+	if(ca_gag_menu_type == _MenuType_Custom || ca_gag_menu_type == _MenuType_Sequential)
+		Menu_Show_GagProperties(id);
+
+	return PLUGIN_HANDLED;
+}
+
+public ClCmd_EnterGagReason(id) {
+	new target = g_aGags_AdminEditor[id][_Player];
+	
+	if(!is_user_connected(target))
+		return PLUGIN_HANDLED;
+	
+	static szCustomReason[128];
+	read_argv(1, szCustomReason, charsmax(szCustomReason));
+
+	if(!szCustomReason[0])
+	{
+		Menu_Show_SelectReason(id);
+		return PLUGIN_HANDLED;
+	}
+
+	copy(g_aGags_AdminEditor[id][_Reason], charsmax(g_aGags_AdminEditor[][_Reason]), szCustomReason);
+
+	client_print(id, print_chat, "%L '%s'", id, "CustomReason_Setted", g_aGags_AdminEditor[id][_Reason]);
+
+	Menu_Show_SelectTime(id);
 	return PLUGIN_HANDLED;
 }
 
@@ -566,7 +651,7 @@ public ClCmd_EnterGagTime(id) {
 	read_argv(1, sCustomTime, charsmax(sCustomTime));
 
 	if(!sCustomTime[0]) {
-		Menu_Show_SelectTime(id, target);
+		Menu_Show_SelectTime(id);
 		return PLUGIN_HANDLED;
 	}
 	
@@ -575,28 +660,6 @@ public ClCmd_EnterGagTime(id) {
 	client_print(id, print_chat, "%L '%s'", id, "CustomTime_Setted", GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]));
 	Menu_Show_GagProperties(id);
 
-	return PLUGIN_HANDLED;
-}
-
-public ClCmd_EnterGagReason(id) {
-	new target = g_aGags_AdminEditor[id][_Player];
-	
-	if(!is_user_connected(target))
-		return PLUGIN_HANDLED;
-	
-	static szCustomReason[128];
-	read_argv(1, szCustomReason, charsmax(szCustomReason));
-
-	if(!szCustomReason[0])
-	{
-		Menu_Show_SelectReason(id, target);
-		return PLUGIN_HANDLED;
-	}
-
-	copy(g_aGags_AdminEditor[id][_Reason], charsmax(g_aGags_AdminEditor[][_Reason]), szCustomReason);
-
-	client_print(id, print_chat, "%L '%s'", id, "CustomReason_Setted", g_aGags_AdminEditor[id][_Reason]);
-	Menu_Show_GagProperties(id);
 	return PLUGIN_HANDLED;
 }
 
@@ -748,7 +811,7 @@ static SaveGag(const id, const target) {
     	)
 	}
 	if(g_aCurrentGags[target][_Reason][0])
-		client_print_color(0, print_team_default, "\4%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", Get_GagStringReason(LANG_PLAYER, target));
+		client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", Get_GagStringReason(LANG_PLAYER, target));
 
 	if(g_aCurrentGags[target][_Time] == FOREVER)
 		g_aCurrentGags[target][_ExpireTime] = FOREVER;
