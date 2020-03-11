@@ -20,12 +20,9 @@ new const MSG_PREFIX[] = "\4[GAG]\1";
 
 /**
  *	Database type for storage gags
- *		DB_NVault,
- *		DB_JSON,  // TODO: 
- *		DB_MySQL,
- *		DB_SQLite
+ *	DB_NVault, DB_MySQL, DB_SQLite, DB_GameCMS
  */
-#define DATABASE_TYPE DB_SQLite
+#define DATABASE_TYPE DB_GameCMS
 
 #define FLAGS_ACCESS    ( ADMIN_KICK )
 #define FLAGS_IMMUNITY    ( ADMIN_IMMUNITY )
@@ -66,6 +63,8 @@ new ca_gag_menu_type;
 		#include <ChatAdditions_inc/_MySQL>
 	#elseif (DATABASE_TYPE == DB_SQLite || DATABASE_TYPE == 2)
 		#include <ChatAdditions_inc/_SQLite>
+	#elseif (DATABASE_TYPE == DB_GameCMS || DATABASE_TYPE == 3)
+		#include <ChatAdditions_inc/_GameCMS>
 	#endif
 #else
 	#error Please uncomment DATABASE_TYPE and select!
