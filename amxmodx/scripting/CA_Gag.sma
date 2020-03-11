@@ -340,6 +340,10 @@ static Menu_Show_GagProperties(id) {
 		(hasAlreadyGag && hasChanges) ? "edit" : ""), .callback = hCallback
 	);
 
+	menu_addtext(hMenu, fmt("\n%L", id, "Menu_WannaGag",
+		GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]),
+		Get_GagStringReason(id, target)), false);
+
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
 	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
 	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
