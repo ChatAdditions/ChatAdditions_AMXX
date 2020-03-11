@@ -56,8 +56,6 @@ stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, const sDir[] = "ChatA
     new iYear, iMonth, iDay;
     date(iYear, iMonth, iDay);
     strcat(sBuffer, fmt("/%s/L%i%02i%02i.log", sDir, iYear, iMonth, iDay), iLen);
-
-    server_print("==============sLogsDir:'%s'", sBuffer);
 }
 
 /**
