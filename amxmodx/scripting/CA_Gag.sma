@@ -742,7 +742,7 @@ static SaveGag(const id, const target) {
 		g_aCurrentGags[target][_ExpireTime] = FOREVER;
 	else g_aCurrentGags[target][_ExpireTime] = get_systime() + g_aCurrentGags[target][_Time];
 
-	CA_Log("Gag: '%N' add gag '%N (type:'%s', time:'%s', reason:'%s')", \
+	CA_Log("Gag: '%N' add gag '%N' (type:'%s', time:'%s', reason:'%s')", \
         id, target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
 		GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
 		g_aCurrentGags[target][_Reason] \

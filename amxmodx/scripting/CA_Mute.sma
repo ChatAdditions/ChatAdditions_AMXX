@@ -14,10 +14,18 @@ new bool: g_bGlobalMute[MAX_PLAYERS + 1];
 new Float:g_fNextUse[MAX_PLAYERS + 1];
 new Float:ca_mute_use_delay;
 
+new const LOG_DIR_NAME[] = "CA_Mute";
+new g_sLogsFile[PLATFORM_MAX_PATH];
+
+new ca_log_type;
+
 public plugin_init()
 {
 	register_plugin("[CA] Mute menu", "1.0.0-beta", "Sergey Shorokhov");
 	register_dictionary("CA_Mute.txt");
+
+	bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
+	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
 	bind_pcvar_float(create_cvar("ca_mute_use_delay", "5.0",
 		.description = "How often can players use menu.",
@@ -141,6 +149,8 @@ public Menu_Handler_PlayersList(id, menu, item) {
 	client_print_color(player, print_team_default, "%s \3%n\1 %L ", MSG_PREFIX,
 		player, id, g_aMutes[id][player] ? "Player_Muted_you" : "Player_UnMuted_you"
 	);
+
+	CA_Log("Mute: '%N' %smuted '%N'", id, player, g_aMutes[id][player] ? "" : "Un")
 
 	g_fNextUse[id] = gametime + ca_mute_use_delay;
 
