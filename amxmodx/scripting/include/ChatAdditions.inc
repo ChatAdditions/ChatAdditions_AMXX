@@ -36,6 +36,28 @@ enum
 		return %2; \
 	}
 
+
+enum _:LogType_s {
+    _Default,
+	_LogToDir
+}
+
+#define CA_Log(%1) {\
+	if(ca_log_type == _LogToDir) {\
+        log_to_file(g_sLogsFile, %1);\
+    } else {\
+        log_amx(%1);\
+    }\
+}
+
+stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, const sDir[] = "ChatAdditions") {
+    get_localinfo("amxx_logs", sBuffer, iLen);
+
+    new iYear, iMonth, iDay;
+    date(iYear, iMonth, iDay);
+    strcat(sBuffer, fmt("/%s/L%i%02i%02i.log", sDir, iYear, iMonth, iDay), iLen);
+}
+
 /**
  * Called when player say to chat.
  *
