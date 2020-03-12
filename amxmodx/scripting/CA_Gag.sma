@@ -37,6 +37,19 @@ static g_aGags_AdminEditor[MAX_PLAYERS + 1][gag_s];
 static Array: g_aReasons, g_iArraySize_Reasons;
 static Array: g_aGagTimes, g_iArraySize_GagTimes;
 
+static bool: g_bStorageInitialized;
+
+new const LOG_DIR_NAME[] = "CA_Gag";
+new g_sLogsFile[PLATFORM_MAX_PATH];
+
+new ca_log_type;
+
+enum _:GagMenuType_s {
+	_MenuType_Custom,
+	_MenuType_Sequential
+}
+new ca_gag_menu_type;
+
 #if (defined DEBUG && defined CHOOSE_STORAGE)
 	#undef DATABASE_TYPE
 	#define DATABASE_TYPE CHOOSE_STORAGE
@@ -55,19 +68,6 @@ static Array: g_aGagTimes, g_iArraySize_GagTimes;
 #else
 	#error Please uncomment DATABASE_TYPE and select!
 #endif // DATABASE_TYPE
-
-static bool: g_bStorageInitialized;
-
-new const LOG_DIR_NAME[] = "CA_Gag";
-new g_sLogsFile[PLATFORM_MAX_PATH];
-
-new ca_log_type;
-
-enum _:GagMenuType_s {
-	_MenuType_Custom,
-	_MenuType_Sequential
-}
-new ca_gag_menu_type;
 
 public plugin_precache() {
 	register_plugin("[CA] Gag", "1.0.0-beta", "Sergey Shorokhov");
