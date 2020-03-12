@@ -60,7 +60,7 @@ public destroy_storage() {
 public CreateTable() {
 	new szQuery[QUERY_LENGTH * 3];
 
-// TODO: Disable autocreate table
+	// TODO: Disable autocreate table
 	formatex(szQuery, charsmax(szQuery), "CREATE TABLE IF NOT EXISTS `%s` (\
 		id				int(11) NOT NULL AUTO_INCREMENT,\
 		name			varchar(32) NOT NULL,\
