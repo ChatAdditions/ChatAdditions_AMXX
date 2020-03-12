@@ -129,7 +129,8 @@ public OnConfigsExecuted() {
 
 public plugin_natives() {
 	register_library("ChatAdditions_GAG_API");
-
+	set_native_filter("native_filter");
+	
 	// TODO: Need CRUD
 	register_native("ca_set_user_gag", "native_ca_set_user_gag");
 	register_native("ca_get_user_gag", "native_ca_get_user_gag");
@@ -140,6 +141,9 @@ public plugin_natives() {
 	// TODO: Create forwards: gagged, ungagged, loaded from storage, saved to storage
 }
 
+public native_filter(const name[], index, trap) {
+    return !trap ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
+}
 public Gags_Thinker() {
 	static aPlayers[MAX_PLAYERS], iCount;
 	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
