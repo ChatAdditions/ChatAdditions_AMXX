@@ -82,7 +82,7 @@ public destroy_storage() {
 
 }
 
-static CreateTable() {
+static stock CreateTable() {
 	new szQuery[QUERY_LENGTH * 3];
 	formatex(szQuery, charsmax(szQuery),
 	"CREATE TABLE IF NOT EXISTS comms ( \
