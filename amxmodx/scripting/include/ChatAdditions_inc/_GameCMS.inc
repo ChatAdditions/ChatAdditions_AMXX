@@ -198,7 +198,7 @@ public save_to_storage(const aGagData[gag_s]) {
 	#if defined _SQL_TESTDB
 	formatex(szQuery, charsmax(szQuery),
 		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
-		values ('%d', '%s', '%s', '%d', '%d', '%d', '%s', '%d', '%s', '%d', '%s', '%d');",
+		values ('%i', '%s', '%s', '%i', '%i', '%i', '%s', '%i', '%s', '%i', '%s', '%i');",
 		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
 		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
 		cmsapi_get_admin_ident(aGagData[_AdminId]), aGagData[_AdminName], g_iServerId, "plBlockInfo[id][GModifiedBy]", aGagData[_bitFlags]
@@ -208,10 +208,10 @@ public save_to_storage(const aGagData[gag_s]) {
 
 	formatex(szQuery, charsmax(szQuery),
 		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
-		values ('%d', '%s', '%s', '%d', '%d', '%d', '%s', '%d', '%s', '%d', '%s', '%d');",
+		values ('%i', '%s', '%s', '%i', '%i', '%i', '%s', '%i', '%s', '%i', '%s', '%i');",
 		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
 		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
-		cmsapi_get_admin_ident(aGagData[_AdminId]), aGagData[_AdminName], g_iServerId, "plBlockInfo[id][GModifiedBy]", _CAGAGFlags_to_GCMS_Flags(aGagData[_bitFlags])
+		cmsapi_get_admin_ident(aGagData[_AdminId]), aGagData[_AdminName], g_iServerId, aGagData[_AdminName], _CAGAGFlags_to_GCMS_Flags(aGagData[_bitFlags])
 	);
 
 	#endif
