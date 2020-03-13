@@ -221,8 +221,16 @@ public save_to_storage(const aGagData[gag_s]) {
 }
 
 public remove_from_storage(const aGagData[gag_s]) {
-/* 	formatex(szQuery, charsmax(szQuery), "UPDATE `%s` SET expired='%d', modified_by='%s' WHERE `bid` = '%d';",
-					sqlTable, plBlockInfo[id][GExpired], plBlockInfo[id][GModifiedBy], plBlockInfo[id][GBid]); */
+    new szQuery[QUERY_LENGTH * 3];
+
+	formatex(szQuery, charsmax(szQuery),
+        "UPDATE `%s` SET expired='%i', modified_by='%s' WHERE authId = '%s';",
+		SQL_TBL_GAGS, aGagData[_ExpireTime], aGagData[_AdminName], aGagData[_AuthId]
+    );
+
+    g_sqlData[qd_Query_state] = REMOVE_BLOCK;
+	g_sqlData[qd_UserID] = get_user_userid(aGagData[_Player]);
+	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
 
 static gag_flags_s: _GCMS_FlagsTo_CAGAGFlags(const flag) {
