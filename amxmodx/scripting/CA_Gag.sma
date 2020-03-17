@@ -109,8 +109,6 @@ public plugin_precache() {
 
 	const Float: UPDATER_FREQ = 3.0;
 	set_task(UPDATER_FREQ, "Gags_Thinker", .flags = "b");
-
-	CA_Log("[CA Gag] initialized!")
 }
 
 public plugin_init() {
@@ -718,7 +716,7 @@ public SrvCmd_AddReason() {
 	new iArgsCount = read_argc();
 
 	if(iArgsCount < 2){
-		CA_Log("\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
+		CA_Log(_Warnings, "\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
 		return;
 	}
 
@@ -731,21 +729,21 @@ public SrvCmd_AddReason() {
 	ArrayPushArray(g_aReasons, aReason);
 	g_iArraySize_Reasons = ArraySize(g_aReasons);
 
-	CA_Log("ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
+	CA_Log(_Warnings, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
 		g_iArraySize_Reasons, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
 	)
 }
 
 public SrvCmd_ShowTemplates() {
 	if(/* !g_iArraySize_GagTimes || */ !g_iArraySize_Reasons) {
-		CA_Log("\t[WARN] NO REASONS FOUNDED!")
+		CA_Log(_Warnings, "\t[WARN] NO REASONS FOUNDED!")
 		return PLUGIN_HANDLED;
 	} else {
 		for(new i; i < g_iArraySize_Reasons; i++) {
 			new aReason[gag_s];
 			ArrayGetArray(g_aReasons, i, aReason);
 
-			CA_Log("Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
+			CA_Log(_Warnings, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
 				i, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
 			)
 		}
@@ -758,12 +756,12 @@ public SrvCmd_ReloadConfig() {
 	_LoadConfig();
 	_ParseTimes();
 
-	CA_Log("Config re-loaded!")
+	CA_Log(_Info, "Config re-loaded!")
 }
 
 public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 	if(!strlen(new_value)) {
-		CA_Log("[WARN] not found times! ca_gag_add_time ='%s'", new_value)
+		CA_Log(_Warnings, "[WARN] not found times! ca_gag_add_time ='%s'", new_value)
 		return;
 	}
 
