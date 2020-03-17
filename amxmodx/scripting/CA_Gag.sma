@@ -29,7 +29,7 @@ new const MSG_PREFIX[] = "\4[GAG]\1";
 		/* ----- END OF SETTINGS----- */
 
 
-enum any: TIME_CONST_s (+=1) { FOREVER = -1 };
+enum any: TIME_CONST_s (+=1) { GAG_REMOVED = -1, GAG_FOREVER = 0 };
 
 new g_aCurrentGags[MAX_PLAYERS + 1][gag_s];
 static g_aGags_AdminEditor[MAX_PLAYERS + 1][gag_s];
@@ -154,8 +154,10 @@ public Gags_Thinker() {
 		new id = aPlayers[i];
 
 		// server_print("GAG TIME LEFT: %n (%i)", id, (g_aCurrentGags[id][_ExpireTime] - iSysTime));
-		if(g_aCurrentGags[id][_bitFlags] != m_REMOVED && g_aCurrentGags[id][_ExpireTime] < iSysTime)
-			GagExpired(id);
+		new iExpireTime = g_aCurrentGags[id][_ExpireTime];
+		if(g_aCurrentGags[id][_bitFlags] != m_REMOVED && iExpireTime != GAG_REMOVED
+			&& (iExpireTime != GAG_FOREVER && iExpireTime < iSysTime)
+		) GagExpired(id);
 	}
 }
 
@@ -609,7 +611,7 @@ public Menu_Handler_SelectTime(id, menu, item) {
 		}
 		case menu_Permament: {
 			menu_destroy(menu);
-			g_aGags_AdminEditor[id][_Time] = FOREVER;
+			g_aGags_AdminEditor[id][_Time] = GAG_FOREVER;
 			Menu_Show_GagProperties(id);
 
 			return PLUGIN_HANDLED;
@@ -686,7 +688,7 @@ stock GetStringTime_seconds(const id, const iSeconds) {
 	new sTime[32];
 	get_time_length(id, iSeconds, timeunit_seconds, sTime, charsmax(sTime));
 
-	if(iSeconds == FOREVER)
+	if(iSeconds == GAG_FOREVER)
 		formatex(sTime, charsmax(sTime), "%L", id, "CA_Gag_Perpapent");
 
 	if(sTime[0] == EOS)
@@ -828,8 +830,8 @@ static SaveGag(const id, const target) {
 	if(g_aCurrentGags[target][_Reason][0])
 		client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", Get_GagStringReason(LANG_PLAYER, target));
 
-	if(g_aCurrentGags[target][_Time] == FOREVER)
-		g_aCurrentGags[target][_ExpireTime] = FOREVER;
+	if(g_aCurrentGags[target][_Time] == GAG_FOREVER)
+		g_aCurrentGags[target][_ExpireTime] = GAG_FOREVER;
 	else g_aCurrentGags[target][_ExpireTime] = get_systime() + g_aCurrentGags[target][_Time];
   
 	GagData_Reset(g_aGags_AdminEditor[id]);
@@ -845,6 +847,7 @@ static RemoveGag(const id, const target) {
 	if(g_aGags_AdminEditor[id][_bitFlags] != m_REMOVED) {
 		ResetTargetData(id);
 
+		g_aCurrentGags[target][_ExpireTime] = GAG_REMOVED;
 		remove_from_storage(g_aCurrentGags[id]);
 
 		GagData_Reset(g_aCurrentGags[target]);
