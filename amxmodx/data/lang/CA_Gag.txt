@@ -15,7 +15,7 @@ Gag = *МОЛЧУН*
 CA_Gag_Say = Чат:
 CA_Gag_SayTeam = Командный чат:
 CA_Gag_Voice = Голосовое общение:
-CA_Gag_Reason = Причина:
+CA_Gag_Reason = ^4Причина:^1
 CA_Gag_Time = Время:
 CA_Gag_Confirm = Подтвердить!
 CA_Gag_NotSet = Не задано
@@ -39,6 +39,8 @@ Gag_Menu_Next = Следующая
 Gag_Menu_Back = Назад
 Gag_Menu_Exit = Выход
 
+Menu_WannaGag = Время: \y%s\w (причина: \y%s\w)
+
 [en]
 CA_Gag_TITLE = Gag player
 CA_Gag_Properties = Gag parameters: [ \r%n\w ]
@@ -56,7 +58,7 @@ Gag = *GAG*
 CA_Gag_Say = Chat:
 CA_Gag_SayTeam = Team chat:
 CA_Gag_Voice = Voice chat:
-CA_Gag_Reason = Reason:
+CA_Gag_Reason = ^4Reason:^1
 CA_Gag_Time = Time:
 CA_Gag_Confirm = Confirm!
 CA_Gag_NotSet = Not selected
@@ -80,3 +82,5 @@ CustomReason_Setted = ^3You set custom reason:
 Gag_Menu_Next = Next
 Gag_Menu_Back = Back
 Gag_Menu_Exit = Exit
+
+Menu_WannaGag =  Time: \y%s\w (reason: \y%s\w)

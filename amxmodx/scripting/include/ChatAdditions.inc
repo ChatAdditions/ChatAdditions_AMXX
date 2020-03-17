@@ -59,7 +59,7 @@ stock LogLevel_s: ParseLogLevel(const sLogLevel[], len = MAX_LOGLEVEL_LEN) {
 }
 
 enum _:LogType_s {
-    _Default,
+	_Default,
 	_LogToDir
 }
 
@@ -74,11 +74,16 @@ enum _:LogType_s {
 }
 
 stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, const sDir[] = "ChatAdditions") {
-    get_localinfo("amxx_logs", sBuffer, iLen);
+	get_localinfo("amxx_logs", sBuffer, iLen);
+	strcat(sBuffer, fmt("/%s", sDir), iLen);
 
-    new iYear, iMonth, iDay;
-    date(iYear, iMonth, iDay);
-    strcat(sBuffer, fmt("/%s/L%i%02i%02i.log", sDir, iYear, iMonth, iDay), iLen);
+	if(!dir_exists(sBuffer) && mkdir(sBuffer) == -1) {
+		set_fail_state("[Core API] Can't create folder! (%s)", sBuffer);
+	}
+
+	new iYear, iMonth, iDay;
+	date(iYear, iMonth, iDay);
+	strcat(sBuffer, fmt("/L%i%02i%02i.log", iYear, iMonth, iDay), iLen);
 }
 
 /**
