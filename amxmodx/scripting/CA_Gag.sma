@@ -830,7 +830,7 @@ static SaveGag(const id, const target) {
 	if(g_aCurrentGags[target][_Time] == FOREVER)
 		g_aCurrentGags[target][_ExpireTime] = FOREVER;
 	else g_aCurrentGags[target][_ExpireTime] = get_systime() + g_aCurrentGags[target][_Time];
-
+  
 	GagData_Reset(g_aGags_AdminEditor[id]);
 	
 	client_cmd(target, "-voicerecord");
