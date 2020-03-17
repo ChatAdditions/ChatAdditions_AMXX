@@ -40,6 +40,20 @@ static g_aGags_AdminEditor[MAX_PLAYERS + 1][gag_s];
 static Array: g_aReasons, g_iArraySize_Reasons;
 static Array: g_aGagTimes, g_iArraySize_GagTimes;
 
+static bool: g_bStorageInitialized;
+
+new const LOG_DIR_NAME[] = "CA_Gag";
+new g_sLogsFile[PLATFORM_MAX_PATH];
+
+new ca_log_type,
+	LogLevel_s: ca_log_level = _Info;
+
+enum _:GagMenuType_s {
+	_MenuType_Custom,
+	_MenuType_Sequential
+}
+new ca_gag_menu_type;
+
 #if (defined DEBUG && defined CHOOSE_STORAGE)
 	#undef DATABASE_TYPE
 	#define DATABASE_TYPE CHOOSE_STORAGE
@@ -57,19 +71,6 @@ static Array: g_aGagTimes, g_iArraySize_GagTimes;
 	#error Please uncomment DATABASE_TYPE and select!
 #endif // DATABASE_TYPE
 
-static bool: g_bStorageInitialized;
-
-new const LOG_DIR_NAME[] = "CA_Gag";
-new g_sLogsFile[PLATFORM_MAX_PATH];
-
-new ca_log_type;
-
-enum _:GagMenuType_s {
-	_MenuType_Custom,
-	_MenuType_Sequential
-}
-new ca_gag_menu_type;
-
 public plugin_precache() {
 	register_plugin("[CA] Gag", "1.0.0-beta", "Sergey Shorokhov");
 
@@ -78,6 +79,7 @@ public plugin_precache() {
 	register_dictionary("time.txt");
 
 	bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
+	hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel");
 	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
 	hook_cvar_change(
@@ -107,8 +109,18 @@ public plugin_precache() {
 
 	const Float: UPDATER_FREQ = 3.0;
 	set_task(UPDATER_FREQ, "Gags_Thinker", .flags = "b");
+}
 
-	CA_Log("[CA Gag] initialized!")
+public plugin_init() {
+	new sLogLevel[MAX_LOGLEVEL_LEN];
+	get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel));
+	ca_log_level = ParseLogLevel(sLogLevel);
+
+	CA_Log(_Info, "[CA]: Gag initialized!")
+}
+
+public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
+	ca_log_level = ParseLogLevel(new_value);
 }
 
 public OnConfigsExecuted() {
@@ -704,7 +716,7 @@ public SrvCmd_AddReason() {
 	new iArgsCount = read_argc();
 
 	if(iArgsCount < 2){
-		CA_Log("\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
+		CA_Log(_Warnings, "\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
 		return;
 	}
 
@@ -717,21 +729,21 @@ public SrvCmd_AddReason() {
 	ArrayPushArray(g_aReasons, aReason);
 	g_iArraySize_Reasons = ArraySize(g_aReasons);
 
-	CA_Log("ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
+	CA_Log(_Warnings, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
 		g_iArraySize_Reasons, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
 	)
 }
 
 public SrvCmd_ShowTemplates() {
 	if(/* !g_iArraySize_GagTimes || */ !g_iArraySize_Reasons) {
-		CA_Log("\t[WARN] NO REASONS FOUNDED!")
+		CA_Log(_Warnings, "\t[WARN] NO REASONS FOUNDED!")
 		return PLUGIN_HANDLED;
 	} else {
 		for(new i; i < g_iArraySize_Reasons; i++) {
 			new aReason[gag_s];
 			ArrayGetArray(g_aReasons, i, aReason);
 
-			CA_Log("Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
+			CA_Log(_Warnings, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
 				i, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
 			)
 		}
@@ -744,12 +756,12 @@ public SrvCmd_ReloadConfig() {
 	_LoadConfig();
 	_ParseTimes();
 
-	CA_Log("Config re-loaded!")
+	CA_Log(_Info, "Config re-loaded!")
 }
 
 public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 	if(!strlen(new_value)) {
-		CA_Log("[WARN] not found times! ca_gag_add_time ='%s'", new_value)
+		CA_Log(_Warnings, "[WARN] not found times! ca_gag_add_time ='%s'", new_value)
 		return;
 	}
 
@@ -795,7 +807,7 @@ static SaveGag(const id, const target) {
 		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
 			LANG_PLAYER, "Player_Gagged_ByServer", target, GetStringTime_seconds(LANG_PLAYER, g_aCurrentGags[target][_Time]));
 
-		CA_Log("Gag: \"SERVER\" add gag to \"%N\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+		CA_Log(_Info, "Gag: \"SERVER\" add gag to \"%N\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
         	target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
 			GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
 			g_aCurrentGags[target][_Reason] \
@@ -804,7 +816,7 @@ static SaveGag(const id, const target) {
 		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
 			LANG_PLAYER, "Player_Gagged", id, target, GetStringTime_seconds(LANG_PLAYER, g_aCurrentGags[target][_Time]));
 
-		CA_Log("Gag: \"%N\" add gag to \"%N\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+		CA_Log(_Info, "Gag: \"%N\" add gag to \"%N\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
         	id, target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
 			GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
 			g_aCurrentGags[target][_Reason] \
@@ -816,7 +828,7 @@ static SaveGag(const id, const target) {
 	if(g_aCurrentGags[target][_Time] == FOREVER)
 		g_aCurrentGags[target][_ExpireTime] = FOREVER;
 	else g_aCurrentGags[target][_ExpireTime] = get_systime() + g_aCurrentGags[target][_Time];
-
+  
 	GagData_Reset(g_aGags_AdminEditor[id]);
 	
 	client_cmd(target, "-voicerecord");

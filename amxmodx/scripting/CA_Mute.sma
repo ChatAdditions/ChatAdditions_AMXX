@@ -17,7 +17,8 @@ new Float:ca_mute_use_delay;
 new const LOG_DIR_NAME[] = "CA_Mute";
 new g_sLogsFile[PLATFORM_MAX_PATH];
 
-new ca_log_type;
+new ca_log_type,
+	LogLevel_s: ca_log_level = _Info;
 
 public plugin_init()
 {
@@ -25,6 +26,7 @@ public plugin_init()
 	register_dictionary("CA_Mute.txt");
 
 	bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
+	hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel");
 	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
 	bind_pcvar_float(create_cvar("ca_mute_use_delay", "5.0",
@@ -40,9 +42,20 @@ public plugin_init()
 		register_clcmd(fmt("say %s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
 		register_clcmd(fmt("say_team %s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
 	}
-
-	CA_Log("[CA] Mute initialized!")
 }
+
+public plugin_cfg() {
+	new sLogLevel[MAX_LOGLEVEL_LEN];
+	get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel));
+	ca_log_level = ParseLogLevel(sLogLevel);
+
+	CA_Log(_Info, "[CA]: Mute initialized!")
+}
+
+public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
+	ca_log_level = ParseLogLevel(new_value);
+}
+
 
 public ClCmd_Mute(id) {
 	Menu_Show_PlayersList(id);
@@ -134,7 +147,7 @@ public Menu_Handler_PlayersList(id, menu, item) {
 			id, LANG_PLAYER, g_bGlobalMute[id] ? "Player_Muted_All" : "Player_UnMuted_All"
 		);
 
-		CA_Log("Mute: \"%N\" %smuted everyone", id, g_bGlobalMute[id] ? "" : "Un")
+		CA_Log(_Info, "Mute: \"%N\" %smuted everyone", id, g_bGlobalMute[id] ? "" : "Un")
 
 		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
@@ -159,7 +172,7 @@ public Menu_Handler_PlayersList(id, menu, item) {
 		player, id, g_aMutes[id][player] ? "Player_Muted_you" : "Player_UnMuted_you"
 	);
 
-	CA_Log("Mute: \"%N\" %smuted \"%N\"", id, g_aMutes[id][player] ? "" : "Un", player)
+	CA_Log(_Info, "Mute: '%N' %smuted '%N'", id, player, g_aMutes[id][player] ? "" : "Un")
 
 	g_fNextUse[id] = gametime + ca_mute_use_delay;
 

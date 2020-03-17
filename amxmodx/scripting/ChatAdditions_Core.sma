@@ -10,7 +10,8 @@
 new const LOG_DIR_NAME[] = "CA_Core";
 new g_sLogsFile[PLATFORM_MAX_PATH];
 
-new ca_log_type;
+new ca_log_type, 
+	LogLevel_s: ca_log_level = _Info;
 
 new g_pFwd_Client_Say,
 	g_pFwd_Client_SayTeam,
@@ -25,6 +26,7 @@ public plugin_precache()
 	);
 
 	bind_pcvar_num(create_cvar("ca_log_type", "1"), ca_log_type);
+	hook_cvar_change(create_cvar("ca_log_level", "abc"), "Hook_CVar_LogLevel");
 	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
 	register_clcmd("say", "ClCmd_Hook_Say");
@@ -34,8 +36,18 @@ public plugin_precache()
 	g_pFwd_Client_Say = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL);
 	g_pFwd_Client_SayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL);
 	g_pFwd_Client_Voice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL);
+}
 
-	CA_Log("Chat Additions Core initialized!")
+public plugin_cfg() {
+	new sLogLevel[MAX_LOGLEVEL_LEN];
+	get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel));
+	ca_log_level = ParseLogLevel(sLogLevel);
+
+	CA_Log(_Info, "Chat Additions Core initialized!")
+}
+
+public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
+	ca_log_level = ParseLogLevel(new_value);
 }
 
 public plugin_natives() {
