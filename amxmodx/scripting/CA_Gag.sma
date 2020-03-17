@@ -22,7 +22,7 @@ new const MSG_PREFIX[] = "\4[GAG]\1";
  *	Database type for storage gags
  *	DB_NVault, DB_MySQL, DB_SQLite, DB_GameCMS
  */
-#define DATABASE_TYPE DB_GameCMS
+#define DATABASE_TYPE DB_SQLite
 
 #define FLAGS_ACCESS    ( ADMIN_KICK )
 #define FLAGS_IMMUNITY    ( ADMIN_IMMUNITY )
