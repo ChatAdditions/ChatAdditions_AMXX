@@ -42,8 +42,6 @@ public plugin_init()
 		register_clcmd(fmt("say %s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
 		register_clcmd(fmt("say_team %s%s", sCtrlChar[i], sCmd), "ClCmd_Mute");
 	}
-
-	CA_Log("[CA] Mute initialized!")
 }
 
 public plugin_cfg() {
@@ -149,7 +147,7 @@ public Menu_Handler_PlayersList(id, menu, item) {
 			id, LANG_PLAYER, g_bGlobalMute[id] ? "Player_Muted_All" : "Player_UnMuted_All"
 		);
 
-		CA_Log("Mute: \"%N\" %smuted everyone", id, g_bGlobalMute[id] ? "" : "Un")
+		CA_Log(_Info, "Mute: \"%N\" %smuted everyone", id, g_bGlobalMute[id] ? "" : "Un")
 
 		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
