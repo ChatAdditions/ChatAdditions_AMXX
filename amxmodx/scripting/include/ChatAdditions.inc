@@ -45,9 +45,9 @@ enum LogLevel_s ( <<=1 ) {
 	_Debug
 }
 
-stock LogLevel_s: ParseLogLevel(const sLogLevel[], len = MAX_LOGLEVEL_LEN) {
+stock LogLevel_s: ParseLogLevel(const sLogLevel[]) {
 	new LogLevel_s: logFlags = _Off;
-	for(new i; i < len - 1; i++) {
+	for(new i; i < strlen(sLogLevel); i++) {
 		switch(sLogLevel[i]) {
 			case 'a': logFlags += _Info;
 			case 'b': logFlags += _Warnings;
