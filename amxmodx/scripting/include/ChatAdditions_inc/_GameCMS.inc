@@ -75,7 +75,7 @@ public OnAPIPluginLoaded(Handle: sqlTuple) {
 }
 
 public OnAPIAdminsLoaded() {
-    g_bitGameCMS_APILevel |= UseGameCmsAdmins;
+	g_bitGameCMS_APILevel |= UseGameCmsAdmins;
 }
 
 public destroy_storage() {
@@ -107,14 +107,14 @@ static stock CreateTable() {
 public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
 	switch(failstate) {
 		case TQUERY_CONNECT_FAILED:	{
-			CA_Log("SQL: connection failed\n[%i] %s", errnum, error)
+			CA_Log(_Warnings, "SQL: connection failed\n[%i] %s", errnum, error)
 			return;
 		}
 		case TQUERY_QUERY_FAILED: {
 			new lastQue[QUERY_LENGTH * 3];
 			SQL_GetQueryString(query, lastQue, charsmax(lastQue));
 			
-			CA_Log("SQL: query failed\n[%i] %s\n[QUERY]:'%s'", errnum, error, lastQue)
+			CA_Log(_Warnings, "SQL: query failed\n[%i] %s\n[QUERY]:'%s'", errnum, error, lastQue)
 			return;
 		}
 	}
@@ -152,7 +152,7 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 		}
 	}
 
-	server_print("SQL_Handler() queuetime='%.5f'", queuetime);
+	CA_Log(_Debug, "SQL_Handler() queuetime='%.5f'", queuetime)
 }
 
 public load_from_storage(const aGagData[gag_s]) {
@@ -195,13 +195,14 @@ public load_from_storage(const aGagData[gag_s]) {
 
 public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
+
 	#if defined _SQL_TESTDB
 	formatex(szQuery, charsmax(szQuery),
 		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
 		values ('%i', '%s', '%s', '%i', '%i', '%i', '%s', '%i', '%s', '%i', '%s', '%i');",
 		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
 		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
-		cmsapi_get_admin_ident(aGagData[_AdminId]), aGagData[_AdminName], g_iServerId, "plBlockInfo[id][GModifiedBy]", aGagData[_bitFlags]
+		12345, aGagData[_AdminName], g_iServerId, "plBlockInfo[id][GModifiedBy]", aGagData[_bitFlags]
 	);
 
 	#else
@@ -221,14 +222,14 @@ public save_to_storage(const aGagData[gag_s]) {
 }
 
 public remove_from_storage(const aGagData[gag_s]) {
-    new szQuery[QUERY_LENGTH * 3];
+	new szQuery[QUERY_LENGTH * 3];
 
 	formatex(szQuery, charsmax(szQuery),
-        "UPDATE `%s` SET expired='%i', modified_by='%s' WHERE authId = '%s';",
+		"UPDATE `%s` SET expired='%i', modified_by='%s' WHERE authId = '%s';",
 		SQL_TBL_GAGS, aGagData[_ExpireTime], aGagData[_AdminName], aGagData[_AuthId]
-    );
+	);
 
-    g_sqlData[qd_Query_state] = REMOVE_BLOCK;
+	g_sqlData[qd_Query_state] = REMOVE_BLOCK;
 	g_sqlData[qd_UserID] = get_user_userid(aGagData[_Player]);
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
 }
@@ -241,7 +242,7 @@ static gag_flags_s: _GCMS_FlagsTo_CAGAGFlags(const flag) {
 		case BLOCK_STATUS_VOICE:	return (m_Voice);
 	}
 
-	CA_Log("[WARN]: _GCMS_FlagsTo_CAGAGFlags() => Undefinded flag:%i", flag)
+	CA_Log(_Warnings, "[WARN]: _GCMS_FlagsTo_CAGAGFlags() => Undefinded flag:%i", flag)
 	return m_REMOVED;
 }
 
