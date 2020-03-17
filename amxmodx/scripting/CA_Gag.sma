@@ -24,8 +24,9 @@ new const MSG_PREFIX[] = "\4[GAG]\1";
  */
 #define DATABASE_TYPE DB_SQLite
 
-#define FLAGS_ACCESS    ( ADMIN_KICK )
-#define FLAGS_IMMUNITY    ( ADMIN_IMMUNITY )
+#define FLAGS_ACCESS    	( ADMIN_KICK )
+#define FLAGS_ADMIN_ACCESS  ( ADMIN_RCON )
+#define FLAGS_IMMUNITY    	( ADMIN_IMMUNITY )
 		/* ----- END OF SETTINGS----- */
 
 
@@ -188,18 +189,21 @@ static Menu_Show_PlayersList(id) {
 
 	new aPlayers[MAX_PLAYERS], iCount;
 	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
+	new flags = get_user_flags(id);
+
 	for(new i; i < iCount; i++) {
 		new target = aPlayers[i];
 
 		if(target == id)
 			continue;
 
-		new bool:bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
+		new bool: bHaveImmunity = _IsHaveImmunity(flags, get_user_flags(target));
+		
 		menu_additem(hMenu, fmt("%n %s", target, GetPostfix(id, target, bHaveImmunity)), fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
 	}
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
-	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_NEXTNAME, fmt("%L", id, "Gag_Menu_Next"));
 	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	menu_display(id, hMenu);
@@ -210,7 +214,7 @@ public Callback_PlayersMenu(id, menu, item) {
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
 
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
-	new bool:bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
+	new bool: bHaveImmunity = _IsHaveImmunity(flags, get_user_flags(target));
 
 	return (!bHaveImmunity) ? ITEM_ENABLED : ITEM_DISABLED;
 }
@@ -893,6 +897,20 @@ GetPostfix(const id, const target, const bHaveImmunity) {
 	else szPostfix[0] = '\0';
 
 	return szPostfix;
+}
+
+
+stock bool: _IsHaveImmunity(id_flags, target_flags) {
+	if(id_flags & FLAGS_ADMIN_ACCESS)
+		return false;
+	
+	if(target_flags & FLAGS_ADMIN_ACCESS)
+		return true;
+	
+	if(target_flags & FLAGS_IMMUNITY)
+		return true;
+	
+	return false;
 }
 
 public client_putinserver(id) {
