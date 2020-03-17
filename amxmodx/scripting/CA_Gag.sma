@@ -40,6 +40,15 @@ static g_aGags_AdminEditor[MAX_PLAYERS + 1][gag_s];
 static Array: g_aReasons, g_iArraySize_Reasons;
 static Array: g_aGagTimes, g_iArraySize_GagTimes;
 
+static bool: g_bStorageInitialized;
+
+new const LOG_DIR_NAME[] = "CA_Gag";
+new g_sLogsFile[PLATFORM_MAX_PATH];
+
+new ca_log_type,
+	LogLevel_s: ca_log_level = _Info;
+
+
 #if (defined DEBUG && defined CHOOSE_STORAGE)
 	#undef DATABASE_TYPE
 	#define DATABASE_TYPE CHOOSE_STORAGE
@@ -57,13 +66,6 @@ static Array: g_aGagTimes, g_iArraySize_GagTimes;
 	#error Please uncomment DATABASE_TYPE and select!
 #endif // DATABASE_TYPE
 
-static bool: g_bStorageInitialized;
-
-new const LOG_DIR_NAME[] = "CA_Gag";
-new g_sLogsFile[PLATFORM_MAX_PATH];
-
-new ca_log_type;
-
 public plugin_precache() {
 	register_plugin("[CA] Gag", "1.0.0-beta", "Sergey Shorokhov");
 
@@ -72,6 +74,7 @@ public plugin_precache() {
 	register_dictionary("time.txt");
 
 	bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
+	hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel");
 	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
 	hook_cvar_change(
@@ -99,6 +102,18 @@ public plugin_precache() {
 
 	const Float: UPDATER_FREQ = 3.0;
 	set_task(UPDATER_FREQ, "Gags_Thinker", .flags = "b");
+}
+
+public plugin_init() {
+	new sLogLevel[MAX_LOGLEVEL_LEN];
+	get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel));
+	ca_log_level = ParseLogLevel(sLogLevel);
+
+	CA_Log(_Info, "[CA]: Gag initialized!")
+}
+
+public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
+	ca_log_level = ParseLogLevel(new_value);
 }
 
 public OnConfigsExecuted() {
@@ -742,7 +757,7 @@ static SaveGag(const id, const target) {
 		g_aCurrentGags[target][_ExpireTime] = FOREVER;
 	else g_aCurrentGags[target][_ExpireTime] = get_systime() + g_aCurrentGags[target][_Time];
 
-	CA_Log("Gag: '%N' add gag '%N' (type:'%s', time:'%s', reason:'%s')", \
+	CA_Log(_Info, "Gag: '%N' add gag '%N' (type:'%s', time:'%s', reason:'%s')", \
         id, target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
 		GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
 		g_aCurrentGags[target][_Reason] \

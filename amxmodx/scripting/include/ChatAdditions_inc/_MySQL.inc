@@ -85,14 +85,14 @@ public CreateTable() {
 public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
 	switch(failstate) {
 		case TQUERY_CONNECT_FAILED:	{
-			log_amx("SQL: connection failed\n[%i] %s", errnum, error);
+			CA_Log(_Warnings, "SQL: connection failed\n[%i] %s", errnum, error)
 			return;
 		}
 		case TQUERY_QUERY_FAILED: {
 			new lastQue[QUERY_LENGTH * 3];
 			SQL_GetQueryString(query, lastQue, charsmax(lastQue));
-			
-			log_amx("SQL: query failed\n[%i] %s\n[QUERY]:'%s'", errnum, error, lastQue);
+
+			CA_Log(_Warnings, "SQL: query failed\n[%i] %s\n[QUERY]:'%s'", errnum, error, lastQue)
 			return;
 		}
 	}
@@ -130,7 +130,7 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 		}
 	}
 
-	server_print("SQL_Handler() queuetime='%.5f'", queuetime);
+	CA_Log(_Debug, "SQL_Handler() queuetime='%.5f'", queuetime)
 }
 
 public load_from_storage(const aGagData[gag_s]) {

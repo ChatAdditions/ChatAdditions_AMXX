@@ -37,17 +37,40 @@ enum
 	}
 
 
+const MAX_LOGLEVEL_LEN = 10;
+enum LogLevel_s ( <<=1 ) {
+	_Off = 0,
+	_Info = 1,
+	_Warnings,
+	_Debug
+}
+
+stock LogLevel_s: ParseLogLevel(const sLogLevel[], len = MAX_LOGLEVEL_LEN) {
+	new LogLevel_s: logFlags = _Off;
+	for(new i; i < len - 1; i++) {
+		switch(sLogLevel[i]) {
+			case 'a': logFlags += _Info;
+			case 'b': logFlags += _Warnings;
+			case 'c': logFlags += _Debug;
+		}
+	}
+
+	return LogLevel_s: logFlags;
+}
+
 enum _:LogType_s {
     _Default,
 	_LogToDir
 }
 
-#define CA_Log(%1) {\
-	if(ca_log_type == _LogToDir) {\
-        log_to_file(g_sLogsFile, %1);\
-    } else {\
-        log_amx(%1);\
-    }\
+#define CA_Log(%0,%1) {\
+	if(ca_log_level & %0) {\
+		if(ca_log_type == _LogToDir) {\
+    	    log_to_file(g_sLogsFile, %1);\
+    	} else {\
+    	    log_amx(%1);\
+    	}\
+	}\
 }
 
 stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, const sDir[] = "ChatAdditions") {
