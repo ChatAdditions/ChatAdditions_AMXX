@@ -139,6 +139,8 @@ public Menu_Handler_PlayersList(id, menu, item) {
 		return PLUGIN_HANDLED;
 	}
 
+	g_fNextUse[id] = gametime + ca_mute_use_delay;
+
 	new iUserID = strtol(sInfo);
 	if(iUserID == -1) {
 		g_bGlobalMute[id] ^= true;
@@ -169,12 +171,10 @@ public Menu_Handler_PlayersList(id, menu, item) {
 	);
 
 	client_print_color(player, print_team_default, "%s \3%n\1 %L ", MSG_PREFIX,
-		player, id, g_aMutes[id][player] ? "Player_Muted_you" : "Player_UnMuted_you"
+		id, player, g_aMutes[id][player] ? "Player_Muted_you" : "Player_UnMuted_you"
 	);
 
-	CA_Log(_Info, "Mute: '%N' %smuted '%N'", id, player, g_aMutes[id][player] ? "" : "Un")
-
-	g_fNextUse[id] = gametime + ca_mute_use_delay;
+	CA_Log(_Info, "Mute: '%N' %smuted '%N'", id, g_aMutes[id][player] ? "" : "Un", player)
 
 	menu_destroy(menu);
 	Menu_Show_PlayersList(id);
