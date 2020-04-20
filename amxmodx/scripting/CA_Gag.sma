@@ -186,6 +186,8 @@ static Menu_Show_PlayersList(id) {
 	if(!hCallback)
 		hCallback = menu_makecallback("Callback_PlayersMenu");
 
+	static bool:bHaveImmunity = false;
+
 	new aPlayers[MAX_PLAYERS], iCount;
 	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
 	for(new i; i < iCount; i++) {
@@ -194,7 +196,7 @@ static Menu_Show_PlayersList(id) {
 		if(target == id)
 			continue;
 
-		new bool:bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
+		bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
 		menu_additem(hMenu, fmt("%n %s", target, GetPostfix(id, target, bHaveImmunity)), fmt("%i", get_user_userid(aPlayers[i])), .callback = hCallback);
 	}
 
@@ -206,11 +208,12 @@ static Menu_Show_PlayersList(id) {
 }
 
 public Callback_PlayersMenu(id, menu, item) {
+	static bool:bHaveImmunity = false;
 	new null, sInfo[64], sName[64];
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
 
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
-	new bool:bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
+	bHaveImmunity = !!(get_user_flags(target) & FLAGS_IMMUNITY);
 
 	return (!bHaveImmunity) ? ITEM_ENABLED : ITEM_DISABLED;
 }
@@ -223,11 +226,11 @@ public Menu_Handler_PlayersList(id, menu, item) {
 
 	new null, sInfo[64], sName[64];
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
+	menu_destroy(menu);
 
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
 
 	if(!is_user_connected(target)) {
-		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
@@ -247,7 +250,6 @@ public Menu_Handler_PlayersList(id, menu, item) {
 		}
 	}
 
-	menu_destroy(menu);
 	return PLUGIN_HANDLED;
 }
 
@@ -265,11 +267,12 @@ static Menu_Show_ConfirmRemove(id) {
 }
 
 public Menu_Handler_ConfirmRemove(id, menu, item) {
+	menu_destroy(menu);
+
 	enum { menu_Yes, menu_No };
 
 	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
-		menu_destroy(menu);
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
 		
@@ -277,7 +280,6 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 	}
 
 	if(item == MENU_EXIT || item < 0) {
-		menu_destroy(menu);
 		ResetTargetData(id);
 		Menu_Show_PlayersList(id);
 
@@ -308,7 +310,6 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 		}
 	}
 
-	menu_destroy(menu);
 	Menu_Show_PlayersList(id);
 
 	return PLUGIN_HANDLED;
@@ -387,6 +388,8 @@ public Callback_GagProperties(id, menu, item) {
 }
 
 public Menu_Handler_GagProperties(id, menu, item) {
+	menu_destroy(menu);
+
 	enum { menu_Chat, menu_TeamChat, menu_VoiceChat,
 			menu_Reason, menu_Time, menu_Confirm
 		};
@@ -394,7 +397,6 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	enum { sequential_Confirm = 3 };
 
 	if(item == MENU_EXIT || item < 0) {
-		menu_destroy(menu);
 		ResetTargetData(id);
 		Menu_Show_PlayersList(id);
 
@@ -403,7 +405,6 @@ public Menu_Handler_GagProperties(id, menu, item) {
 
 	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
-		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
@@ -419,19 +420,16 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	if(ca_gag_menu_type == _MenuType_Custom) {
 		switch(item) {
 			case menu_Reason: {
-				menu_destroy(menu);
 				Menu_Show_SelectReason(id);
 
 				return PLUGIN_HANDLED;
 			}
 			case menu_Time:	{
-				menu_destroy(menu);
 				Menu_Show_SelectTime(id);
 
 				return PLUGIN_HANDLED;
 			}
 			case menu_Confirm: {
-				menu_destroy(menu);
 				SaveGag(id ,target);
 
 				return PLUGIN_HANDLED;
@@ -440,7 +438,6 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	} else {
 		switch(item) {
 			case sequential_Confirm: {
-				menu_destroy(menu);
 				SaveGag(id ,target);
 
 				return PLUGIN_HANDLED;
@@ -448,7 +445,6 @@ public Menu_Handler_GagProperties(id, menu, item) {
 		}
 	}
 
-	menu_destroy(menu);
 	Menu_Show_GagProperties(id);
 
 	return PLUGIN_HANDLED;
@@ -521,8 +517,11 @@ public Menu_Handler_SelectReason(id, menu, item) {
 
 	if(iReason == -1) {
 		client_cmd(id, "messagemode enter_GagReason");
+		menu_display(id, menu);
 		return PLUGIN_HANDLED;
 	}
+
+	menu_destroy(menu);
 
 	new aReason[gag_s];
 	ArrayGetArray(g_aReasons, iReason, aReason);
@@ -533,8 +532,6 @@ public Menu_Handler_SelectReason(id, menu, item) {
 	g_aGags_AdminEditor[id][_Time] = aReason[_Time];
 
 	// CA_Log("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason])
-
-	menu_destroy(menu);
 
 	if(ca_gag_menu_type == _MenuType_Custom) {
 		Menu_Show_GagProperties(id);
@@ -620,10 +617,9 @@ public Menu_Handler_SelectTime(id, menu, item) {
 
 	static sInfo[64], dummy[1];
 	menu_item_getinfo(menu, item, dummy[0], sInfo, charsmax(sInfo), dummy[0], charsmax(dummy), dummy[0]);
+	menu_destroy(menu);
 
 	g_aGags_AdminEditor[id][_Time] = strtol(sInfo);
-
-	menu_destroy(menu);
 
 	if(ca_gag_menu_type == _MenuType_Custom || ca_gag_menu_type == _MenuType_Sequential)
 		Menu_Show_GagProperties(id);
