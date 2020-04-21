@@ -160,9 +160,9 @@ public load_from_storage(const aGagData[gag_s]) {
 
 	#if defined _SQL_TESTDB
 	formatex(szQuery, charsmax(szQuery),
-	"SELECT length, expired, type, reason FROM `%s` WHERE \
-		server_id = '%i' \
-		AND authid = '%s' \
+	"SELECT length, expired, type, reason FROM \"%s\" WHERE \
+		server_id = %i \
+		AND authid = \"%s\" \
 		AND ( \
 				(expired > strftime('%%s','now') OR expired = '0') \
 				AND length != '-1' \
@@ -175,9 +175,9 @@ public load_from_storage(const aGagData[gag_s]) {
 	#else
 
 	formatex(szQuery, charsmax(szQuery),
-	"SELECT length, expired, type, reason FROM `%s` WHERE \
-		server_id = '%i' \
-		AND authid = '%s' \
+	"SELECT length, expired, type, reason FROM \"%s\" WHERE \
+		server_id = %i \
+		AND authid = \"%s\" \
 		AND ( \
 				(expired > UNIX_TIMESTAMP(NOW()) OR expired = '0') \
 				AND length != '-1' \
@@ -197,9 +197,9 @@ public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
 	#if defined _SQL_TESTDB
-	formatex(szQuery, charsmax(szQuery),
-		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
-		values ('%i', '%s', '%s', '%i', '%i', '%i', '%s', '%i', '%s', '%i', '%s', '%i');",
+	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery),
+		"REPLACE INTO \"%s\" (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
+		values (%i, \"%s\", \"%s\", %i, %i, %i, \"%s\", %i, \"%s\", %i, \"%s\", %i);",
 		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
 		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
 		12345, aGagData[_AdminName], g_iServerId, "plBlockInfo[id][GModifiedBy]", aGagData[_bitFlags]
@@ -207,9 +207,9 @@ public save_to_storage(const aGagData[gag_s]) {
 
 	#else
 
-	formatex(szQuery, charsmax(szQuery),
-		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
-		values ('%i', '%s', '%s', '%i', '%i', '%i', '%s', '%i', '%s', '%i', '%s', '%i');",
+	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery),
+		"REPLACE INTO \"%s\" (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
+		values (%i, \"%s\", \"%s\", %i, %i, %i, \"%s\", %i, \"%s\", %i, \"%s\", %i);",
 		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
 		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
 		cmsapi_get_admin_ident(aGagData[_AdminId]), aGagData[_AdminName], g_iServerId, aGagData[_AdminName], _CAGAGFlags_to_GCMS_Flags(aGagData[_bitFlags])
@@ -224,8 +224,8 @@ public save_to_storage(const aGagData[gag_s]) {
 public remove_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	formatex(szQuery, charsmax(szQuery),
-		"UPDATE `%s` SET expired='%i', modified_by='%s' WHERE authId = '%s';",
+	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery),
+		"UPDATE \"%s\" SET expired=%i, modified_by=\"%s\" WHERE authId = \"%s\";",
 		SQL_TBL_GAGS, aGagData[_ExpireTime], aGagData[_AdminName], aGagData[_AuthId]
 	);
 
