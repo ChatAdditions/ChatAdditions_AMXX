@@ -57,7 +57,7 @@ public destroy_storage() {
 public CreateTable() {
 	new szQuery[QUERY_LENGTH * 3];
 // TODO: Disable autocreate table
-	formatex(szQuery, charsmax(szQuery), "CREATE TABLE IF NOT EXISTS `%s` (	\
+	formatex(szQuery, charsmax(szQuery), "CREATE TABLE IF NOT EXISTS \"%s\" (	\
 		id 				INTEGER PRIMARY KEY AUTOINCREMENT,			\
 		name			varchar NOT NULL,							\
 		authid			varchar NOT NULL,							\
@@ -70,7 +70,7 @@ public CreateTable() {
 		create_time		INTEGER NOT NULL,							\
 		expire_time		INTEGER NOT NULL,							\
 		flags			INTEGER NOT NULL							\
-	); CREATE UNIQUE INDEX IF NOT EXISTS authid_unique_idx ON `%s` (authid)", SQL_TBL_GAGS, SQL_TBL_GAGS);
+	); CREATE UNIQUE INDEX IF NOT EXISTS authid_unique_idx ON \"%s\" (authid)", SQL_TBL_GAGS, SQL_TBL_GAGS);
 
 	g_sqlData[qd_Query_state] = SQL_INIT;
 	SQL_ThreadQuery(g_hTuple, "SQL_Handler", szQuery, g_sqlData, sizeof(g_sqlData));
@@ -129,8 +129,8 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 
 public load_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 2];
-	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM %s WHERE ( \
-		authid = '%s' OR ip = '%s') AND expire_time >= %i LIMIT 1",
+	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM \"%s\" WHERE ( \
+		authid = \"%s\" OR ip = \"%s\") AND expire_time >= %i LIMIT 1",
 	SQL_TBL_GAGS,
 		aGagData[_AuthId], aGagData[_IP], get_systime()
 	);
@@ -143,10 +143,10 @@ public load_from_storage(const aGagData[gag_s]) {
 public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	formatex(szQuery, charsmax(szQuery), "REPLACE INTO `%s` (	\
-		name,authid,ip,reason,admin_name,admin_authid,			\
-		admin_ip,time,create_time,expire_time,flags					\
-	) VALUES('%s','%s','%s','%s','%s','%s','%s',%i,%i,%i,%i)",		\
+	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery), "REPLACE INTO \"%s\" (\
+		name,authid,ip,reason,admin_name,admin_authid,\
+		admin_ip,time,create_time,expire_time,flags\
+	) VALUES(\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%i,%i,%i,%i)",\
 	SQL_TBL_GAGS,
 		aGagData[_Name], aGagData[_AuthId], aGagData[_IP], aGagData[_Reason],
 		aGagData[_AdminName], aGagData[_AdminAuthId], aGagData[_AdminIP],
@@ -161,8 +161,8 @@ public save_to_storage(const aGagData[gag_s]) {
 public remove_from_storage(aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	formatex(szQuery, charsmax(szQuery), "DELETE FROM `%s` WHERE ( \
-		authid = '%s' AND ip = '%s')",
+	formatex(szQuery, charsmax(szQuery), "DELETE FROM \"%s\" WHERE ( \
+		authid = \"%s\" AND ip = \"%s\")",
 	SQL_TBL_GAGS,
 		aGagData[_AuthId], aGagData[_IP]
 	);
