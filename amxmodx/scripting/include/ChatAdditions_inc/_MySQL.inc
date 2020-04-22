@@ -61,7 +61,7 @@ public CreateTable() {
 	new szQuery[QUERY_LENGTH * 3];
 
 	// TODO: Disable autocreate table
-	formatex(szQuery, charsmax(szQuery), "CREATE TABLE IF NOT EXISTS \"%s\" (\
+	formatex(szQuery, charsmax(szQuery), "CREATE TABLE IF NOT EXISTS `%s` (\
 		id				int(11) NOT NULL AUTO_INCREMENT,\
 		name			varchar(32) NOT NULL,\
 		authid			varchar(32) NOT NULL,\
@@ -74,8 +74,8 @@ public CreateTable() {
 		create_time		int(11) NOT NULL,\
 		expire_time		int(11) NOT NULL,\
 		flags			int(11) NOT NULL,\
-				PRIMARY KEY (\"id\"),\
-			INDEX (\"authid\")\
+				PRIMARY KEY (`id`),\
+			INDEX (`authid`)\
 	)", SQL_TBL_GAGS);
 
 	g_sqlData[qd_Query_state] = SQL_INIT;
@@ -135,7 +135,7 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 
 public load_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 2];
-	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM \"%s\" WHERE ( \
+	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM `%s` WHERE ( \
 		authid = \"%s\" OR ip = \"%s\") AND expire_time >= %i LIMIT 1",
 	SQL_TBL_GAGS,
 		aGagData[_AuthId], aGagData[_IP], get_systime()
@@ -149,7 +149,7 @@ public load_from_storage(const aGagData[gag_s]) {
 public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery), "REPLACE INTO \"%s\" (\
+	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery), "REPLACE INTO `%s` (\
 		name,authid,ip,reason,admin_name,admin_authid,\
 		admin_ip,time,create_time,expire_time,flags\
 	) VALUES(\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%i,%i,%i,%i)",\
@@ -167,7 +167,7 @@ public save_to_storage(const aGagData[gag_s]) {
 public remove_from_storage(aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	formatex(szQuery, charsmax(szQuery), "DELETE FROM \"%s\" WHERE ( \
+	formatex(szQuery, charsmax(szQuery), "DELETE FROM `%s` WHERE ( \
 		authid = \"%s\" AND ip = \"%s\")",
 	SQL_TBL_GAGS,
 		aGagData[_AuthId], aGagData[_IP]
