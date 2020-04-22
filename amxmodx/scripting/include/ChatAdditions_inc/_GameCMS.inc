@@ -160,7 +160,7 @@ public load_from_storage(const aGagData[gag_s]) {
 
 	#if defined _SQL_TESTDB
 	formatex(szQuery, charsmax(szQuery),
-	"SELECT length, expired, type, reason FROM \"%s\" WHERE \
+	"SELECT length, expired, type, reason FROM `%s` WHERE \
 		server_id = %i \
 		AND authid = \"%s\" \
 		AND ( \
@@ -175,7 +175,7 @@ public load_from_storage(const aGagData[gag_s]) {
 	#else
 
 	formatex(szQuery, charsmax(szQuery),
-	"SELECT length, expired, type, reason FROM \"%s\" WHERE \
+	"SELECT length, expired, type, reason FROM `%s` WHERE \
 		server_id = %i \
 		AND authid = \"%s\" \
 		AND ( \
@@ -198,7 +198,7 @@ public save_to_storage(const aGagData[gag_s]) {
 
 	#if defined _SQL_TESTDB
 	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery),
-		"REPLACE INTO \"%s\" (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
+		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
 		values (%i, \"%s\", \"%s\", %i, %i, %i, \"%s\", %i, \"%s\", %i, \"%s\", %i);",
 		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
 		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
@@ -208,7 +208,7 @@ public save_to_storage(const aGagData[gag_s]) {
 	#else
 
 	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery),
-		"REPLACE INTO \"%s\" (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
+		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
 		values (%i, \"%s\", \"%s\", %i, %i, %i, \"%s\", %i, \"%s\", %i, \"%s\", %i);",
 		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
 		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
@@ -225,7 +225,7 @@ public remove_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
 	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery),
-		"UPDATE \"%s\" SET expired=%i, modified_by=\"%s\" WHERE authId = \"%s\";",
+		"UPDATE `%s` SET expired=%i, modified_by=\"%s\" WHERE authId = \"%s\";",
 		SQL_TBL_GAGS, aGagData[_ExpireTime], aGagData[_AdminName], aGagData[_AuthId]
 	);
 
