@@ -196,9 +196,9 @@ public load_from_storage(const aGagData[gag_s]) {
 public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	new sName_safe[MAX_NAME_LEN * 2];
+	new sName_safe[MAX_NAME_LENGTH * 2];
 	SQL_QuoteStringFmt(Empty_Handle, sName_safe, aGagData[_Name]);
-	new sAdminName_safe[MAX_NAME_LEN * 2];
+	new sAdminName_safe[MAX_NAME_LENGTH * 2];
 	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, aGagData[_AdminName]);
 	new sReason_safe[MAX_REASON_LEN * 2];
 	SQL_QuoteStringFmt(Empty_Handle, sReason_safe, aGagData[_Reason]);
@@ -231,7 +231,7 @@ public save_to_storage(const aGagData[gag_s]) {
 public remove_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	new sAdminName_safe[MAX_NAME_LEN * 2];
+	new sAdminName_safe[MAX_NAME_LENGTH * 2];
 	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, aGagData[_AdminName]);
 
 	formatex(szQuery, charsmax(szQuery),
