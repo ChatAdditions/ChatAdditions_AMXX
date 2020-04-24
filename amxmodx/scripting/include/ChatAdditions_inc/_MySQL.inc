@@ -149,13 +149,20 @@ public load_from_storage(const aGagData[gag_s]) {
 public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	SQL_QuoteStringFmt(Empty_Handle, szQuery, charsmax(szQuery), "REPLACE INTO `%s` (\
+	new sName_safe[MAX_NAME_LEN * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sName_safe, aGagData[_Name]);
+	new sAdminName_safe[MAX_NAME_LEN * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, aGagData[_AdminName]);
+	new sReason_safe[MAX_REASON_LEN * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sReason_safe, aGagData[_Reason]);
+
+	formatex(szQuery, charsmax(szQuery), "REPLACE INTO `%s` (\
 		name,authid,ip,reason,admin_name,admin_authid,\
 		admin_ip,time,create_time,expire_time,flags\
 	) VALUES(\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%i,%i,%i,%i)",\
 	SQL_TBL_GAGS,
-		aGagData[_Name], aGagData[_AuthId], aGagData[_IP], aGagData[_Reason],
-		aGagData[_AdminName], aGagData[_AdminAuthId], aGagData[_AdminIP],
+		sName_safe, aGagData[_AuthId], aGagData[_IP], sReason_safe,
+		sAdminName_safe, aGagData[_AdminAuthId], aGagData[_AdminIP],
 		aGagData[_Time], get_systime(), aGagData[_ExpireTime], aGagData[_bitFlags]
 	);
 
