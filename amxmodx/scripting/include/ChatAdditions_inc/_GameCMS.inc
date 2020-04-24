@@ -197,11 +197,11 @@ public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
 	new sName_safe[MAX_NAME_LENGTH * 2];
-	SQL_QuoteStringFmt(Empty_Handle, sName_safe, aGagData[_Name]);
+	SQL_QuoteStringFmt(Empty_Handle, sName_safe, charsmax(sName_safe), aGagData[_Name]);
 	new sAdminName_safe[MAX_NAME_LENGTH * 2];
-	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, aGagData[_AdminName]);
+	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, charsmax(sAdminName_safe), aGagData[_AdminName]);
 	new sReason_safe[MAX_REASON_LEN * 2];
-	SQL_QuoteStringFmt(Empty_Handle, sReason_safe, aGagData[_Reason]);
+	SQL_QuoteStringFmt(Empty_Handle, sReason_safe, charsnax(sReason_safe), aGagData[_Reason]);
 
 	#if defined _SQL_TESTDB
 	formatex(szQuery, charsmax(szQuery),
@@ -232,7 +232,7 @@ public remove_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
 	new sAdminName_safe[MAX_NAME_LENGTH * 2];
-	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, aGagData[_AdminName]);
+	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, charsmax(sAdminName_safe), aGagData[_AdminName]);
 
 	formatex(szQuery, charsmax(szQuery),
 		"UPDATE `%s` SET expired=%i, modified_by=\"%s\" WHERE authId = \"%s\";",
