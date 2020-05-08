@@ -164,9 +164,9 @@ public remove_from_storage(aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
 	formatex(szQuery, charsmax(szQuery), "DELETE FROM `%s` WHERE ( \
-		ip = \"%s\")",
+		authid = \"%s\" AND ip = \"%s\")",
 	SQL_TBL_GAGS,
-		aGagData[_IP]
+		aGagData[_AuthId], aGagData[_IP]
 	);
 
 	g_sqlData[qd_Query_state] = REMOVE_BLOCK;
