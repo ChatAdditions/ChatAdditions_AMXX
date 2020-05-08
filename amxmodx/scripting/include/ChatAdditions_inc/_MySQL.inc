@@ -111,11 +111,6 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 			new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), data[qd_UserID]);
 
 			g_aCurrentGags[target][_ExpireTime] = SQL_ReadResult(query, res_ExpireTime);
-			if(g_aCurrentGags[target][_ExpireTime] <= get_systime()) {
-				Storage_PlayerLoaded(data[qd_UserID]);
-				return;
-			}
-			
 			g_aCurrentGags[target][_Time] = SQL_ReadResult(query, res_Time);
 			g_aCurrentGags[target][_bitFlags]	= gag_flags_s:SQL_ReadResult(query, res_Flags);
 			SQL_ReadResult(query, res_Reason, g_aCurrentGags[target][_Reason], charsmax(g_aCurrentGags[][_Reason]));
@@ -136,9 +131,9 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 public load_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 2];
 	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM `%s` WHERE ( \
-		authid = \"%s\" OR ip = \"%s\") AND expire_time >= %i LIMIT 1",
+		authid = \"%s\" OR ip = \"%s\") AND (expire_time >= %i OR expire_time = %i) LIMIT 1",
 	SQL_TBL_GAGS,
-		aGagData[_AuthId], aGagData[_IP], get_systime()
+		aGagData[_AuthId], aGagData[_IP], get_systime(), GAG_FOREVER
 	);
 
 	g_sqlData[qd_Query_state] = LOAD_PLAYER;
