@@ -846,7 +846,7 @@ static RemoveGag(const id, const target) {
 		ResetTargetData(id);
 
 		g_aCurrentGags[target][_ExpireTime] = GAG_REMOVED;
-		remove_from_storage(g_aCurrentGags[id]);
+		remove_from_storage(g_aCurrentGags[target]);
 
 		GagData_Reset(g_aCurrentGags[target]);
 		client_print_color(0, print_team_default, "%L",
