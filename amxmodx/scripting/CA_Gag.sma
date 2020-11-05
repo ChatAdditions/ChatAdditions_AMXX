@@ -883,7 +883,7 @@ GetPostfix(const id, const target, const bHaveImmunity) {
 	static szPostfix[32];
 
 	if(bHaveImmunity)
-		formatex(szPostfix, charsmax(szPostfix), " [\\r%L]", id, "Immunity");
+		formatex(szPostfix, charsmax(szPostfix), " [\\r%L\w]", id, "Immunity");
 	else if(g_aCurrentGags[target][_bitFlags])
 		formatex(szPostfix, charsmax(szPostfix), " [\\y%L\\w]", id, "Gag");
 	else szPostfix[0] = '\0';
