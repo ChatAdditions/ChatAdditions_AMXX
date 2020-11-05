@@ -263,6 +263,8 @@ static Menu_Show_ConfirmRemove(id) {
 	menu_additem(hMenu, fmt("%L", id, "CA_GAG_YES"));
 	menu_additem(hMenu, fmt("%L", id, "CA_GAG_NO"));
 
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "CA_GAG_CANCEL"));
+
 	menu_display(id, hMenu);
 }
 
@@ -467,7 +469,7 @@ static Menu_Show_SelectReason(id) {
 	}
 
 	new hMenu = menu_create(fmt("%L", id, "MENU_SelectReason"), "Menu_Handler_SelectReason");
-	menu_additem(hMenu, fmt("%L", id, "EnterReason"), "-1");
+	menu_additem(hMenu, fmt("%L\n", id, "EnterReason"), "-1");
 
 	if(g_iArraySize_Reasons) {
 		for(new i; i < g_iArraySize_Reasons; i++) {
@@ -772,7 +774,7 @@ public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 static _LoadConfig() {
 	ArrayClear(g_aReasons);
 	new sConfigsDir[PLATFORM_MAX_PATH];
-	get_localinfo("amxx_configsdir", sConfigsDir, charsmax(sConfigsDir));
+	get_configsdir(sConfigsDir, charsmax(sConfigsDir));
 	server_cmd("exec %s/ChatAdditions/gag_reasons.cfg", sConfigsDir);
 	server_exec();
 }
