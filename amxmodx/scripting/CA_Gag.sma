@@ -201,7 +201,7 @@ static Menu_Show_PlayersList(id) {
 	}
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
-	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_NEXTNAME, fmt("%L", id, "Gag_Menu_Next"));
 	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	menu_display(id, hMenu);
@@ -363,7 +363,7 @@ static Menu_Show_GagProperties(id) {
 		Get_GagStringReason(id, target)), false);
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
-	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_NEXTNAME, fmt("%L", id, "Gag_Menu_Next"));
 	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	menu_display(id, hMenu);
@@ -482,7 +482,7 @@ static Menu_Show_SelectReason(id) {
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveReasonsTemplates"), .slot = false);
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
-	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_NEXTNAME, fmt("%L", id, "Gag_Menu_Next"));
 	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	return menu_display(id, hMenu);
@@ -569,7 +569,7 @@ static Menu_Show_SelectTime(id) {
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveTimeTemplates"), .slot = false);
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
-	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_NEXTNAME, fmt("%L", id, "Gag_Menu_Next"));
 	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	return menu_display(id, hMenu);
