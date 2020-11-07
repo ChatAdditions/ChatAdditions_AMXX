@@ -21,14 +21,14 @@ CA_Gag_Confirm = Подтвердить!
 CA_Gag_NotSet = Не задано
 CA_Gag_Perpapent = *НАВСЕГДА*
 
-Player_Gagged = ^3Админ %n заткнул игрока ^4%n^1 (^3%s^1)
+Player_Gagged = ^3Админ ^4%n ^3заткнул игрока ^4%n^1 (^3%s^1)
 Player_Gagged_ByServer = ^4Сервер заткнул игрока ^4%n^1 (^3%s^1)
-Player_UnGagged = ^3Админ %n снял затычку с игрока ^4%n^1
+Player_UnGagged = ^3Админ ^4%n ^3снял затычку с игрока ^4%n^1.
 Player_NotConnected = ^3Игрок не доступен!^1
 Player_AlreadyRemovedGag = ^3Игрок ^4%n^1 уже удалён!
 Player_ExpiredGag = ^3У игрока ^4%n^1 истекло время затычки.
 
-NotEnoughPlayers = ^3Не достаточно игроков, что бы открыть меню Gag'ов!
+NotEnoughPlayers = ^3Недостаточно игроков, чтобы открыть меню Gag'ов!
 NoHaveReasonsTemplates = ^3Нет шаблонов выбора причин.
 NoHaveTimeTemplates = ^3Нет шаблонов выбора времени.
 
@@ -38,6 +38,8 @@ CustomReason_Setted = ^3Вы установили причину затычки:
 Gag_Menu_Next = Следующая
 Gag_Menu_Back = Назад
 Gag_Menu_Exit = Выход
+Gag_Menu_Reason = Причина:
+Gag_Menu_Cancel = Отмена
 
 Menu_WannaGag = Время: \y%s\w (причина: \y%s\w)
 
@@ -64,9 +66,9 @@ CA_Gag_Confirm = Confirm!
 CA_Gag_NotSet = Not selected
 CA_Gag_Perpapent = *PERMAMENT*
 
-Player_Gagged = ^3Admin %n gag player ^4%n^1 (^3%s^1)
+Player_Gagged = ^3Admin ^4%n ^3gag player ^4%n^1 (^3%s^1)
 Player_Gagged_ByServer = ^3Server gag player ^4%n^1 (^3%s^1)
-Player_UnGagged = ^3Admin %n remove gag from player ^4%n^1
+Player_UnGagged = ^3Admin ^4%n ^3remove gag from player ^4%n^1.
 Player_NotConnected = ^3Player not connected!
 Player_AlreadyRemovedGag = ^3Player ^4%n^1 already removed!
 Player_ExpiredGag = ^3Player ^4%n^1 has expired gag.
@@ -82,5 +84,7 @@ CustomReason_Setted = ^3You set custom reason:
 Gag_Menu_Next = Next
 Gag_Menu_Back = Back
 Gag_Menu_Exit = Exit
+Gag_Menu_Cancel = Cancel
+Gag_Menu_Reason = Reason:
 
 Menu_WannaGag =  Time: \y%s\w (reason: \y%s\w)
