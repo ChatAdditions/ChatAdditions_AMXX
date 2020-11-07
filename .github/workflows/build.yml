@@ -25,10 +25,10 @@ jobs:
       - name: Download AMXX && ReAPI and unpacking
         env:
           AMXMODX: ${{ matrix.amxmodx }}
-          URL_REAPI: https://teamcity.rehlds.org/guestAuth/repository/download/Reapi_Publish/21621:id/reapi_5.12.0.192-dev.zip
         run: |
           curl -s https://www.amxmodx.org/amxxdrop/$AMXMODX/$(curl https://www.amxmodx.org/amxxdrop/$AMXMODX/amxmodx-latest-base-linux) -# | tar xz
-          curl -o reapi.zip $URL_REAPI -# && unzip reapi.zip && rm reapi.zip
+          curl -OL https://github.com/s1lentq/reapi/releases/download/5.12.0.192/reapi_5.12.0.192-dev.zip -#
+          unzip reapi_*-dev.zip && rm reapi_*-dev.zip
           cd addons/amxmodx && rm scripting/*.sma && rm plugins/*.amxx
 
       - name: Compile plugins AMXX Version
