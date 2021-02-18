@@ -111,11 +111,6 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 			new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), data[qd_UserID]);
 
 			g_aCurrentGags[target][_ExpireTime] = SQL_ReadResult(query, res_ExpireTime);
-			if(g_aCurrentGags[target][_ExpireTime] <= get_systime()) {
-				Storage_PlayerLoaded(data[qd_UserID]);
-				return;
-			}
-			
 			g_aCurrentGags[target][_Time] = SQL_ReadResult(query, res_Time);
 			g_aCurrentGags[target][_bitFlags]	= gag_flags_s:SQL_ReadResult(query, res_Flags);
 			SQL_ReadResult(query, res_Reason, g_aCurrentGags[target][_Reason], charsmax(g_aCurrentGags[][_Reason]));
@@ -135,10 +130,10 @@ public SQL_Handler(failstate, Handle: query, error[], errnum, data[], size, Floa
 
 public load_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 2];
-	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM %s WHERE ( \
-		authid = '%s' OR ip = '%s') AND expire_time >= %i LIMIT 1",
+	formatex(szQuery, charsmax(szQuery), "SELECT time, expire_time, flags, reason FROM `%s` WHERE ( \
+		authid = \"%s\" OR ip = \"%s\") AND (expire_time >= %i OR expire_time = %i) LIMIT 1",
 	SQL_TBL_GAGS,
-		aGagData[_AuthId], aGagData[_IP], get_systime()
+		aGagData[_AuthId], aGagData[_IP], get_systime(), GAG_FOREVER
 	);
 
 	g_sqlData[qd_Query_state] = LOAD_PLAYER;
@@ -149,13 +144,20 @@ public load_from_storage(const aGagData[gag_s]) {
 public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
-	formatex(szQuery, charsmax(szQuery), "REPLACE INTO `%s` (	\
-		name,authid,ip,reason,admin_name,admin_authid,			\
-		admin_ip,time,create_time,expire_time,flags					\
-	) VALUES('%s','%s','%s','%s','%s','%s','%s',%i,%i,%i,%i)",		\
+	new sName_safe[MAX_NAME_LENGTH * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sName_safe, charsmax(sName_safe), aGagData[_Name]);
+	new sAdminName_safe[MAX_NAME_LENGTH * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, charsmax(sAdminName_safe), aGagData[_AdminName]);
+	new sReason_safe[MAX_REASON_LEN * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sReason_safe, charsmax(sReason_safe), aGagData[_Reason]);
+
+	formatex(szQuery, charsmax(szQuery), "REPLACE INTO `%s` (\
+		name,authid,ip,reason,admin_name,admin_authid,\
+		admin_ip,time,create_time,expire_time,flags\
+	) VALUES(\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%i,%i,%i,%i)",\
 	SQL_TBL_GAGS,
-		aGagData[_Name], aGagData[_AuthId], aGagData[_IP], aGagData[_Reason],
-		aGagData[_AdminName], aGagData[_AdminAuthId], aGagData[_AdminIP],
+		sName_safe, aGagData[_AuthId], aGagData[_IP], sReason_safe,
+		sAdminName_safe, aGagData[_AdminAuthId], aGagData[_AdminIP],
 		aGagData[_Time], get_systime(), aGagData[_ExpireTime], aGagData[_bitFlags]
 	);
 
@@ -168,7 +170,7 @@ public remove_from_storage(aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
 	formatex(szQuery, charsmax(szQuery), "DELETE FROM `%s` WHERE ( \
-		authid = '%s' AND ip = '%s')",
+		authid = \"%s\" AND ip = \"%s\")",
 	SQL_TBL_GAGS,
 		aGagData[_AuthId], aGagData[_IP]
 	);

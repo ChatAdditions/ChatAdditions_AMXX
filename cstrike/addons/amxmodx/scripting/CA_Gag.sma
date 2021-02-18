@@ -187,6 +187,8 @@ static Menu_Show_PlayersList(id) {
 	if(!hCallback)
 		hCallback = menu_makecallback("Callback_PlayersMenu");
 
+	static bool:bHaveImmunity = false;
+
 	new aPlayers[MAX_PLAYERS], iCount;
 	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
 	new flags = get_user_flags(id);
@@ -210,6 +212,7 @@ static Menu_Show_PlayersList(id) {
 }
 
 public Callback_PlayersMenu(id, menu, item) {
+	static bool:bHaveImmunity = false;
 	new null, sInfo[64], sName[64];
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
 
@@ -227,11 +230,11 @@ public Menu_Handler_PlayersList(id, menu, item) {
 
 	new null, sInfo[64], sName[64];
 	menu_item_getinfo(menu, item, null, sInfo, charsmax(sInfo), sName, charsmax(sName), null);
+	menu_destroy(menu);
 
 	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), strtol(sInfo));
 
 	if(!is_user_connected(target)) {
-		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
@@ -251,7 +254,6 @@ public Menu_Handler_PlayersList(id, menu, item) {
 		}
 	}
 
-	menu_destroy(menu);
 	return PLUGIN_HANDLED;
 }
 
@@ -265,15 +267,29 @@ static Menu_Show_ConfirmRemove(id) {
 	menu_additem(hMenu, fmt("%L", id, "CA_GAG_YES"));
 	menu_additem(hMenu, fmt("%L", id, "CA_GAG_NO"));
 
+	menu_addblank2(hMenu);
+	menu_addblank2(hMenu);
+	menu_addblank2(hMenu);
+	menu_addblank2(hMenu);
+	menu_addblank2(hMenu);
+	menu_addblank2(hMenu);
+	menu_addblank2(hMenu);
+
+	menu_setprop(hMenu, MPROP_PERPAGE, 0);
+	menu_setprop(hMenu, MPROP_EXIT, MEXIT_FORCE);
+
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Cancel"));
+
 	menu_display(id, hMenu);
 }
 
 public Menu_Handler_ConfirmRemove(id, menu, item) {
+	menu_destroy(menu);
+
 	enum { menu_Yes, menu_No };
 
 	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
-		menu_destroy(menu);
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 		Menu_Show_PlayersList(id);
 		
@@ -281,7 +297,6 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 	}
 
 	if(item == MENU_EXIT || item < 0) {
-		menu_destroy(menu);
 		ResetTargetData(id);
 		Menu_Show_PlayersList(id);
 
@@ -312,7 +327,6 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 		}
 	}
 
-	menu_destroy(menu);
 	Menu_Show_PlayersList(id);
 
 	return PLUGIN_HANDLED;
@@ -347,7 +361,7 @@ static Menu_Show_GagProperties(id) {
 	if(ca_gag_menu_type == _MenuType_Custom) {
 		menu_addblank(hMenu, false);
 
-		menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Reason",
+		menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "Gag_Menu_Reason",
 			Get_GagStringReason(id, target)), .callback = hCallback
 		);
 		menu_additem(hMenu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Time",
@@ -365,9 +379,20 @@ static Menu_Show_GagProperties(id) {
 		GetStringTime_seconds(id, g_aGags_AdminEditor[id][_Time]),
 		Get_GagStringReason(id, target)), false);
 
-	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
-	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
-	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
+	if(ca_gag_menu_type == _MenuType_Sequential)
+	{
+		menu_addblank2(hMenu);
+		menu_addblank2(hMenu);
+	}
+
+	menu_addblank2(hMenu);
+	menu_addblank2(hMenu);
+	menu_addblank2(hMenu);
+
+	menu_setprop(hMenu, MPROP_PERPAGE, 0);
+	menu_setprop(hMenu, MPROP_EXIT, MEXIT_FORCE);
+
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Cancel"));
 
 	menu_display(id, hMenu);
 }
@@ -391,6 +416,8 @@ public Callback_GagProperties(id, menu, item) {
 }
 
 public Menu_Handler_GagProperties(id, menu, item) {
+	menu_destroy(menu);
+
 	enum { menu_Chat, menu_TeamChat, menu_VoiceChat,
 			menu_Reason, menu_Time, menu_Confirm
 		};
@@ -398,7 +425,6 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	enum { sequential_Confirm = 3 };
 
 	if(item == MENU_EXIT || item < 0) {
-		menu_destroy(menu);
 		ResetTargetData(id);
 		Menu_Show_PlayersList(id);
 
@@ -407,7 +433,6 @@ public Menu_Handler_GagProperties(id, menu, item) {
 
 	new target = g_aGags_AdminEditor[id][_Player];
 	if(!is_user_connected(target)) {
-		menu_destroy(menu);
 		Menu_Show_PlayersList(id);
 		client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected");
 
@@ -423,20 +448,17 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	if(ca_gag_menu_type == _MenuType_Custom) {
 		switch(item) {
 			case menu_Reason: {
-				menu_destroy(menu);
 				Menu_Show_SelectReason(id);
 
 				return PLUGIN_HANDLED;
 			}
 			case menu_Time:	{
-				menu_destroy(menu);
 				Menu_Show_SelectTime(id);
 
 				return PLUGIN_HANDLED;
 			}
 			case menu_Confirm: {
-				menu_destroy(menu);
-				SaveGag(id ,target);
+				SaveGag(id, target);
 
 				return PLUGIN_HANDLED;
 			}
@@ -444,15 +466,13 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	} else {
 		switch(item) {
 			case sequential_Confirm: {
-				menu_destroy(menu);
-				SaveGag(id ,target);
+				SaveGag(id, target);
 
 				return PLUGIN_HANDLED;
 			}
 		}
 	}
 
-	menu_destroy(menu);
 	Menu_Show_GagProperties(id);
 
 	return PLUGIN_HANDLED;
@@ -475,7 +495,7 @@ static Menu_Show_SelectReason(id) {
 	}
 
 	new hMenu = menu_create(fmt("%L", id, "MENU_SelectReason"), "Menu_Handler_SelectReason");
-	menu_additem(hMenu, fmt("%L", id, "EnterReason"), "-1");
+	menu_additem(hMenu, fmt("%L\n", id, "EnterReason"), "-1");
 
 	if(g_iArraySize_Reasons) {
 		for(new i; i < g_iArraySize_Reasons; i++) {
@@ -490,7 +510,7 @@ static Menu_Show_SelectReason(id) {
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveReasonsTemplates"), .slot = false);
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
-	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_NEXTNAME, fmt("%L", id, "Gag_Menu_Next"));
 	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
 
 	return menu_display(id, hMenu);
@@ -525,8 +545,11 @@ public Menu_Handler_SelectReason(id, menu, item) {
 
 	if(iReason == -1) {
 		client_cmd(id, "messagemode enter_GagReason");
+		menu_display(id, menu);
 		return PLUGIN_HANDLED;
 	}
+
+	menu_destroy(menu);
 
 	new aReason[gag_s];
 	ArrayGetArray(g_aReasons, iReason, aReason);
@@ -537,8 +560,6 @@ public Menu_Handler_SelectReason(id, menu, item) {
 	g_aGags_AdminEditor[id][_Time] = aReason[_Time];
 
 	// CA_Log("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason])
-
-	menu_destroy(menu);
 
 	if(ca_gag_menu_type == _MenuType_Custom) {
 		Menu_Show_GagProperties(id);
@@ -576,8 +597,8 @@ static Menu_Show_SelectTime(id) {
 	} else menu_addtext(hMenu, fmt("\\d		%L", id, "NoHaveTimeTemplates"), .slot = false);
 
 	menu_setprop(hMenu, MPROP_BACKNAME, fmt("%L", id, "Gag_Menu_Back"));
-	menu_setprop(hMenu, MPROP_NEXTNAME  , fmt("%L", id, "Gag_Menu_Next"));
-	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Exit"));
+	menu_setprop(hMenu, MPROP_NEXTNAME, fmt("%L", id, "Gag_Menu_Next"));
+	menu_setprop(hMenu, MPROP_EXITNAME, fmt("%L", id, "Gag_Menu_Cancel"));
 
 	return menu_display(id, hMenu);
 }
@@ -624,10 +645,9 @@ public Menu_Handler_SelectTime(id, menu, item) {
 
 	static sInfo[64], dummy[1];
 	menu_item_getinfo(menu, item, dummy[0], sInfo, charsmax(sInfo), dummy[0], charsmax(dummy), dummy[0]);
+	menu_destroy(menu);
 
 	g_aGags_AdminEditor[id][_Time] = strtol(sInfo);
-
-	menu_destroy(menu);
 
 	if(ca_gag_menu_type == _MenuType_Custom || ca_gag_menu_type == _MenuType_Sequential)
 		Menu_Show_GagProperties(id);
@@ -780,7 +800,7 @@ public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 static _LoadConfig() {
 	ArrayClear(g_aReasons);
 	new sConfigsDir[PLATFORM_MAX_PATH];
-	get_localinfo("amxx_configsdir", sConfigsDir, charsmax(sConfigsDir));
+	get_configsdir(sConfigsDir, charsmax(sConfigsDir));
 	server_cmd("exec %s/ChatAdditions/gag_reasons.cfg", sConfigsDir);
 	server_exec();
 }
@@ -852,10 +872,10 @@ static RemoveGag(const id, const target) {
 		ResetTargetData(id);
 
 		g_aCurrentGags[target][_ExpireTime] = GAG_REMOVED;
-		remove_from_storage(g_aCurrentGags[id]);
+		remove_from_storage(g_aCurrentGags[target]);
 
 		GagData_Reset(g_aCurrentGags[target]);
-		client_print_color(0, print_team_default, "%L",
+		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
 			LANG_PLAYER, "Player_UnGagged", id, target);
 	} else {
 		client_print(id, print_chat, "%s %L", MSG_PREFIX, id, "Player_AlreadyRemovedGag", target);
@@ -871,7 +891,7 @@ static GagExpired(const id) {
 
 	remove_from_storage(g_aCurrentGags[id]);
 
-	client_print_color(0, print_team_default, "%s %L",MSG_PREFIX, LANG_PLAYER, "Player_ExpiredGag", id);
+	client_print_color(0, print_team_default, "%s %L", MSG_PREFIX, LANG_PLAYER, "Player_ExpiredGag", id);
 }
 
 static LoadGag(const target) {
@@ -891,7 +911,7 @@ GetPostfix(const id, const target, const bHaveImmunity) {
 	static szPostfix[32];
 
 	if(bHaveImmunity)
-		formatex(szPostfix, charsmax(szPostfix), " [\\r%L]", id, "Immunity");
+		formatex(szPostfix, charsmax(szPostfix), " [\\r%L\\d]", id, "Immunity");
 	else if(g_aCurrentGags[target][_bitFlags])
 		formatex(szPostfix, charsmax(szPostfix), " [\\y%L\\w]", id, "Gag");
 	else szPostfix[0] = '\0';

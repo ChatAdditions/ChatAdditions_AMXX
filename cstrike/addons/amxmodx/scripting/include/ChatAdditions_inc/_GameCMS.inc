@@ -161,8 +161,8 @@ public load_from_storage(const aGagData[gag_s]) {
 	#if defined _SQL_TESTDB
 	formatex(szQuery, charsmax(szQuery),
 	"SELECT length, expired, type, reason FROM `%s` WHERE \
-		server_id = '%i' \
-		AND authid = '%s' \
+		server_id = %i \
+		AND authid = \"%s\" \
 		AND ( \
 				(expired > strftime('%%s','now') OR expired = '0') \
 				AND length != '-1' \
@@ -176,8 +176,8 @@ public load_from_storage(const aGagData[gag_s]) {
 
 	formatex(szQuery, charsmax(szQuery),
 	"SELECT length, expired, type, reason FROM `%s` WHERE \
-		server_id = '%i' \
-		AND authid = '%s' \
+		server_id = %i \
+		AND authid = \"%s\" \
 		AND ( \
 				(expired > UNIX_TIMESTAMP(NOW()) OR expired = '0') \
 				AND length != '-1' \
@@ -196,23 +196,30 @@ public load_from_storage(const aGagData[gag_s]) {
 public save_to_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
+	new sName_safe[MAX_NAME_LENGTH * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sName_safe, charsmax(sName_safe), aGagData[_Name]);
+	new sAdminName_safe[MAX_NAME_LENGTH * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, charsmax(sAdminName_safe), aGagData[_AdminName]);
+	new sReason_safe[MAX_REASON_LEN * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sReason_safe, charsmax(sReason_safe), aGagData[_Reason]);
+
 	#if defined _SQL_TESTDB
 	formatex(szQuery, charsmax(szQuery),
 		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
-		values ('%i', '%s', '%s', '%i', '%i', '%i', '%s', '%i', '%s', '%i', '%s', '%i');",
-		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
-		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
-		12345, aGagData[_AdminName], g_iServerId, "plBlockInfo[id][GModifiedBy]", aGagData[_bitFlags]
+		values (%i, \"%s\", \"%s\", %i, %i, %i, \"%s\", %i, \"%s\", %i, \"%s\", %i);",
+		SQL_TBL_GAGS, 0, aGagData[_AuthId], sName_safe, get_systime(), 
+		aGagData[_ExpireTime], aGagData[_Time], sReason_safe, 
+		12345, sAdminName_safe, g_iServerId, "plBlockInfo[id][GModifiedBy]", aGagData[_bitFlags]
 	);
 
 	#else
 
 	formatex(szQuery, charsmax(szQuery),
 		"REPLACE INTO `%s` (bid, authId, name, created, expired, length, reason, admin_id, admin_nick, server_id, modified_by, type) \
-		values ('%i', '%s', '%s', '%i', '%i', '%i', '%s', '%i', '%s', '%i', '%s', '%i');",
+		values (%i, \"%s\", \"%s\", %i, %i, %i, \"%s\", %i, \"%s\", %i, \"%s\", %i);",
 		SQL_TBL_GAGS, 0, aGagData[_AuthId], aGagData[_Name], get_systime(), 
-		aGagData[_ExpireTime], aGagData[_Time], aGagData[_Reason], 
-		cmsapi_get_admin_ident(aGagData[_AdminId]), aGagData[_AdminName], g_iServerId, aGagData[_AdminName], _CAGAGFlags_to_GCMS_Flags(aGagData[_bitFlags])
+		aGagData[_ExpireTime], aGagData[_Time], sReason_safe, 
+		cmsapi_get_admin_ident(aGagData[_AdminId]), sAdminName_safe, g_iServerId, sAdminName_safe, _CAGAGFlags_to_GCMS_Flags(aGagData[_bitFlags])
 	);
 
 	#endif
@@ -224,9 +231,12 @@ public save_to_storage(const aGagData[gag_s]) {
 public remove_from_storage(const aGagData[gag_s]) {
 	new szQuery[QUERY_LENGTH * 3];
 
+	new sAdminName_safe[MAX_NAME_LENGTH * 2];
+	SQL_QuoteStringFmt(Empty_Handle, sAdminName_safe, charsmax(sAdminName_safe), aGagData[_AdminName]);
+
 	formatex(szQuery, charsmax(szQuery),
-		"UPDATE `%s` SET expired='%i', modified_by='%s' WHERE authId = '%s';",
-		SQL_TBL_GAGS, aGagData[_ExpireTime], aGagData[_AdminName], aGagData[_AuthId]
+		"UPDATE `%s` SET expired=%i, modified_by=\"%s\" WHERE authId = \"%s\";",
+		SQL_TBL_GAGS, aGagData[_ExpireTime], sAdminName_safe, aGagData[_AuthId]
 	);
 
 	g_sqlData[qd_Query_state] = REMOVE_BLOCK;
