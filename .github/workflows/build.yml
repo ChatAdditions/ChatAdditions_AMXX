@@ -36,7 +36,7 @@ jobs:
           DEBUG: ${{ matrix.parameters }}
           STORAGE: ${{ matrix.storage }}
         run: |
-          cp -Rf ./amxmodx/* ./addons/amxmodx/
+          cp -Rf ./cstrike/addons/amxmodx/* ./addons/amxmodx/
           cd addons/amxmodx/scripting
           chmod +x amxxpc32.so
           chmod +x compile.sh
