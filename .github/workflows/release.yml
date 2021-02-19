@@ -16,6 +16,13 @@ jobs:
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
           zip -r my-artifact cstrike
+      - name: "Build Changelog"
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@main
+        with:
+          configuration: ".github/build_changelog_config.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -24,6 +31,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
+          body: ${{steps.github_release.outputs.changelog}}
           draft: false
           prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
       - name: Upload Release Asset
@@ -36,3 +44,4 @@ jobs:
           asset_path: ./my-artifact.zip
           asset_name: ChatAdditions.zip
           asset_content_type: application/zip
+
