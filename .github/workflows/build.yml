@@ -14,14 +14,6 @@ jobs:
       matrix:
         amxmodx: ["1.9"]
         parameters: ["", "DEBUG=1"]
-        storage:
-          [
-            "",
-            "CHOOSE_STORAGE=0",
-            "CHOOSE_STORAGE=1",
-            "CHOOSE_STORAGE=2",
-            "CHOOSE_STORAGE=3",
-          ]
 
       fail-fast: false
     steps:
@@ -40,7 +32,6 @@ jobs:
       - name: Compile plugins AMXX Version
         env:
           DEBUG: ${{ matrix.parameters }}
-          STORAGE: ${{ matrix.storage }}
         run: |
           cp -Rf ./cstrike/addons/amxmodx/* ./addons/amxmodx/
           cd addons/amxmodx/scripting
@@ -49,5 +40,5 @@ jobs:
           chmod +x amxxpc
           for sourcefile in *.sma; do\
             echo -n "Compiling $sourcefile ...";\
-            ./amxxpc -d3 $sourcefile $DEBUG $STORAGE -o../plugins/$(echo $sourcefile | sed -e 's/\.sma$/.amxx/') || exit 1;\
+            ./amxxpc -d3 $sourcefile $DEBUG -o../plugins/$(echo $sourcefile | sed -e 's/\.sma$/.amxx/') || exit 1;\
           done
