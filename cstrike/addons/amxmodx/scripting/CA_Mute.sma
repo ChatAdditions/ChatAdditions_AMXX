@@ -22,7 +22,7 @@ new ca_log_type,
 
 public plugin_init()
 {
-	register_plugin("[CA] Mute menu", "1.0.0-beta", "Sergey Shorokhov");
+	register_plugin("[CA] Mute menu", CA_VERSION, "Sergey Shorokhov");
 	register_dictionary("CA_Mute.txt");
 
 	bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
