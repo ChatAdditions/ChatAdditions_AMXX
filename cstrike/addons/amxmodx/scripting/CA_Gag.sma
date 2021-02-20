@@ -71,7 +71,7 @@ new ca_gag_menu_type;
 #endif // DATABASE_TYPE
 
 public plugin_precache() {
-	register_plugin("[CA] Gag", "1.0.0-beta", "Sergey Shorokhov");
+	register_plugin("[CA] Gag", CA_VERSION, "Sergey Shorokhov");
 
 	register_dictionary("CA_Gag.txt");
 	register_dictionary("common.txt");

@@ -22,14 +22,20 @@ jobs:
           input_string: ${{ github.ref }}
           version_extractor_regex: '\/v(.*)$'
 
-      - name: Use parsed semver
+      - name: Update version in plugins
         run: |
-          echo "v${{ steps.semver_parser.outputs.major }}"
-          echo "v${{ steps.semver_parser.outputs.minor }}"
-          echo "v${{ steps.semver_parser.outputs.patch }}"
-          echo "v${{ steps.semver_parser.outputs.prerelease }}"
-          echo "v${{ steps.semver_parser.outputs.build }}"
-          echo "v${{ steps.semver_parser.outputs.fullversion }}"
+          VERSION="v${{ steps.semver_parser.outputs.fullversion }}"
+          FILE_PATH="cstrike/addons/amxmodx/scripting/include/ChatAdditions.inc"
+          sed -i 's/%CA_VERSION%/${VERSION}/g' ${FILE_PATH}
+
+      # - name: Use parsed semver
+      #   run: |
+      #     echo "v${{ steps.semver_parser.outputs.major }}"
+      #     echo "v${{ steps.semver_parser.outputs.minor }}"
+      #     echo "v${{ steps.semver_parser.outputs.patch }}"
+      #     echo "v${{ steps.semver_parser.outputs.prerelease }}"
+      #     echo "v${{ steps.semver_parser.outputs.build }}"
+      #     echo "v${{ steps.semver_parser.outputs.fullversion }}"
 
       - name: Upload Release Asset
         id: upload-release-asset
