@@ -5,6 +5,7 @@
 [![AMXModX dependency](https://img.shields.io/badge/AMXModX-%3E%3D1.9.0-blue)](https://www.amxmodx.org/downloads-new.php)
 
 </br>
+
 Плагин **Chat Additions** предназначен для управления *голосовым* и *текстовым* чатом игроков. 
 
 ### Состав плагина:
