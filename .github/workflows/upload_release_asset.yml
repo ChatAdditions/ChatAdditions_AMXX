@@ -1,0 +1,43 @@
+name: Upload Release Asset
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Upload Release Asset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build project
+        run: |
+          zip -r my-artifact cstrike
+
+      - name: Parse semver string
+        id: semver_parser
+        uses: booxmedialtd/ws-action-parse-semver@v1
+        with:
+          input_string: ${{ github.ref }}
+          version_extractor_regex: '\/v(.*)$'
+
+      - name: Use parsed semver
+        run: |
+          echo "v${{ steps.semver_parser.outputs.major }}"
+          echo "v${{ steps.semver_parser.outputs.minor }}"
+          echo "v${{ steps.semver_parser.outputs.patch }}"
+          echo "v${{ steps.semver_parser.outputs.prerelease }}"
+          echo "v${{ steps.semver_parser.outputs.build }}"
+          echo "v${{ steps.semver_parser.outputs.fullversion }}"
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./my-artifact.zip
+          asset_name: ChatAdditions.zip
+          asset_content_type: application/zip
