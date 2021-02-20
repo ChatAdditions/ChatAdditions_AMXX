@@ -1,4 +1,4 @@
-name-template: "v$RESOLVED_VERSION 🌈"
+name-template: "v$RESOLVED_VERSION"
 tag-template: "v$RESOLVED_VERSION"
 categories:
   - title: "🚀 Features"
@@ -18,15 +18,23 @@ version-resolver:
   major:
     labels:
       - "major"
+      - "breaking"
   minor:
     labels:
       - "minor"
+      - "feature"
   patch:
     labels:
       - "patch"
+      - "bug"
+      - "maintenance"
+      - "docs"
+      - "dependencies"
+      - "security"
   default: patch
+prerelease: true
 template: |
-  ## Changes
+  ## What's Changed
 
   $CHANGES
 
