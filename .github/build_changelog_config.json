@@ -24,5 +24,6 @@
                 "dependencies"
             ]
         }
-    ]
+    ],
+    "pr_template": "- ${{TITLE}} (#${{NUMBER}})"
 }

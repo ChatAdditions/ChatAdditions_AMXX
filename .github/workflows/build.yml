@@ -15,7 +15,13 @@ jobs:
         amxmodx: ["1.9", "1.10"]
         parameters: ["", "DEBUG=1"]
         storage:
-          ["", "CHOOSE_STORAGE=0", "CHOOSE_STORAGE=1", "CHOOSE_STORAGE=2", "CHOOSE_STORAGE=3"]
+          [
+            "",
+            "CHOOSE_STORAGE=0",
+            "CHOOSE_STORAGE=1",
+            "CHOOSE_STORAGE=2",
+            "CHOOSE_STORAGE=3",
+          ]
 
       fail-fast: false
     steps:
