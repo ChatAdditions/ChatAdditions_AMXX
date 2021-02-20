@@ -22,6 +22,12 @@ jobs:
           input_string: ${{ github.ref }}
           version_extractor_regex: '\/v(.*)$'
 
+      - name: Update version in plugins
+        run: |
+          VERSION="v${{ steps.semver_parser.outputs.fullversion }}"
+          FILE_PATH=cstrike/addons/amxmodx/scripting/include/ChatAdditions.inc
+          sed -i 's/%CA_VERSION%/${VERSION}/g' ${FILE_PATH}
+
       - name: Use parsed semver
         run: |
           echo "v${{ steps.semver_parser.outputs.major }}"
