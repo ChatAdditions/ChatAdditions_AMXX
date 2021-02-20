@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        amxmodx: ["1.9", "1.10"]
+        amxmodx: ["1.9"]
         parameters: ["", "DEBUG=1"]
         storage:
           [
