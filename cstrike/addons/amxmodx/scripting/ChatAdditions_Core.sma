@@ -21,7 +21,7 @@ public plugin_precache()
 {
 	register_plugin(
 		.plugin_name	= "Chat Additions Core",
-		.version		= "1.0.0-beta",
+		.version		= CA_VERSION,
 		.author			= "Sergey Shorokhov"
 	);
 
