@@ -3,7 +3,7 @@
 [![Release status](https://img.shields.io/github/v/release/wopox1337/ChatsAdditions_AMXX?include_prereleases)](https://github.com/wopox1337/ChatsAdditions_AMXX/releases)
 [![Downloads status](https://img.shields.io/github/downloads/wopox1337/ChatsAdditions_AMXX/total)](https://github.com/wopox1337/ChatsAdditions_AMXX/releases)
 [![AMXModX dependency](https://img.shields.io/badge/AMXModX-%3E%3D1.9.0-blue)](https://www.amxmodx.org/downloads-new.php)
-
+[![Discussions](https://img.shields.io/badge/discussions-on%20github-informational)](https://github.com/wopox1337/ChatsAdditions_AMXX/discussions)
 </br>
 
 Плагин **Chat Additions** предназначен для управления *голосовым* и *текстовым* чатом игроков. 
