@@ -553,7 +553,7 @@ static Menu_Show_SelectTime(id) {
 
 	new hMenu = menu_create(fmt("%L", id, "MENU_SelectTime"), "Menu_Handler_SelectTime");
 	menu_additem(hMenu, fmt("%L", id, "SET_CustomTime"));
-	menu_additem(hMenu, fmt("%L", id, "CA_Gag_Perpapent"));
+	// menu_additem(hMenu, fmt("%L", id, "CA_Gag_Perpapent"));
 	menu_addblank(hMenu, .slot = false);
 
 	new iSelectedTime = g_aGags_AdminEditor[id][_Time];
@@ -573,7 +573,7 @@ static Menu_Show_SelectTime(id) {
 }
 
 public Menu_Handler_SelectTime(id, menu, item) {
-	enum { menu_CustomTime, menu_Permament };
+	enum { menu_CustomTime/* , menu_Permament  */};
 
 	if(item == MENU_EXIT || item < 0) {
 		menu_destroy(menu);
@@ -603,13 +603,13 @@ public Menu_Handler_SelectTime(id, menu, item) {
 
 			return PLUGIN_HANDLED;
 		}
-		case menu_Permament: {
+		/* case menu_Permament: {
 			menu_destroy(menu);
 			g_aGags_AdminEditor[id][_Time] = GAG_FOREVER;
 			Menu_Show_GagProperties(id);
 
 			return PLUGIN_HANDLED;
-		}
+		} */
 	}
 
 	static sInfo[64], dummy[1];
@@ -680,9 +680,6 @@ Gag_ToggleFlags(id, gag_flags_s: flag) {
 stock GetStringTime_seconds(const id, const iSeconds) {
 	new sTime[32];
 	get_time_length(id, iSeconds, timeunit_seconds, sTime, charsmax(sTime));
-
-	if(iSeconds == GAG_FOREVER)
-		formatex(sTime, charsmax(sTime), "%L", id, "CA_Gag_Perpapent");
 
 	if(sTime[0] == EOS)
 		formatex(sTime, charsmax(sTime), "%L", id, "CA_Gag_NotSet");
@@ -916,7 +913,7 @@ public native_ca_set_user_gag(pPlugin, iParams) {
 	g_aGags_AdminEditor[0][_Time] = iTime;
 	g_aGags_AdminEditor[0][_bitFlags] = iFlags;
 
-	SaveGag(0, target);
+	// SaveGag(0, target);
 
 	return 0;
 }
