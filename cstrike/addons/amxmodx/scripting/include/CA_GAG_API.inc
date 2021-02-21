@@ -19,9 +19,6 @@
 #pragma semicolon 1
 #pragma dynamic 524288
 
-enum _:DB_Types { DB_NVault, DB_MySQL, DB_SQLite, DB_GameCMS };
-new stock const DB_Names[DB_Types][] = { "DB_NVault", "DB_MySQL", "DB_SQLite", "DB_GameCMS" };
-
 enum any: gag_flags_s ( <<=1 )
 {
 	m_REMOVED = 0,
@@ -58,8 +55,6 @@ stock flags_to_bit(szFlags[])
 	if(containi(szFlags, "b") != -1) bits |= m_SayTeam;
 	if(containi(szFlags, "c") != -1) bits |= m_Voice;
 
-	// server_print("flags_to_bit() '%s'=%i",szFlags, bits);
-
 	return bits;
 }
 
@@ -69,8 +64,6 @@ stock bits_to_flags(gag_flags_s: bits)
 	if(bits & m_Say) add(szFlags, charsmax(szFlags), "a");
 	if(bits & m_SayTeam) add(szFlags, charsmax(szFlags), "b");
 	if(bits & m_Voice) add(szFlags, charsmax(szFlags), "c");
-
-	// server_print("bits_to_flags()='%s'", szFlags);
 
 	return szFlags;
 }

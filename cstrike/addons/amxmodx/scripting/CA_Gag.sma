@@ -1,7 +1,5 @@
 
 // #define DEBUG
-// #define CHOOSE_STORAGE [0 .. 2]
-
 
 #include <amxmodx>
 #include <amxmisc>
@@ -9,6 +7,7 @@
 
 #include <ChatAdditions>
 #include <CA_GAG_API>
+#include <CA_StorageAPI>
 
 #pragma semicolon 1
 #pragma ctrlchar '\'
@@ -18,26 +17,15 @@
 		/* ----- START SETTINGS----- */
 new const MSG_PREFIX[] = "\4[GAG]\1";
 
-/**
- *	Database type for storage gags
- *	DB_NVault, DB_MySQL, DB_SQLite, DB_GameCMS
- */
-#define DATABASE_TYPE DB_SQLite
-
 #define FLAGS_ACCESS    ( ADMIN_KICK )
 #define FLAGS_IMMUNITY    ( ADMIN_IMMUNITY )
 		/* ----- END OF SETTINGS----- */
-
-
-enum any: TIME_CONST_s (+=1) { GAG_REMOVED = -1, GAG_FOREVER = 0 };
 
 new g_aCurrentGags[MAX_PLAYERS + 1][gag_s];
 static g_aGags_AdminEditor[MAX_PLAYERS + 1][gag_s];
 
 static Array: g_aReasons, g_iArraySize_Reasons;
 static Array: g_aGagTimes, g_iArraySize_GagTimes;
-
-static bool: g_bStorageInitialized;
 
 new const LOG_DIR_NAME[] = "CA_Gag";
 new g_sLogsFile[PLATFORM_MAX_PATH];
@@ -50,25 +38,6 @@ enum _:GagMenuType_s {
 	_MenuType_Sequential
 }
 new ca_gag_menu_type;
-
-#if (defined DEBUG && defined CHOOSE_STORAGE)
-	#undef DATABASE_TYPE
-	#define DATABASE_TYPE CHOOSE_STORAGE
-#endif
-
-#if (defined DATABASE_TYPE)
-	#if (DATABASE_TYPE == DB_NVault || DATABASE_TYPE == 0)
-		#include <ChatAdditions_inc/_NVault>
-	#elseif (DATABASE_TYPE == DB_MySQL || DATABASE_TYPE == 1)
-		#include <ChatAdditions_inc/_MySQL>
-	#elseif (DATABASE_TYPE == DB_SQLite || DATABASE_TYPE == 2)
-		#include <ChatAdditions_inc/_SQLite>
-	#elseif (DATABASE_TYPE == DB_GameCMS || DATABASE_TYPE == 3)
-		#include <ChatAdditions_inc/_GameCMS>
-	#endif
-#else
-	#error Please uncomment DATABASE_TYPE and select!
-#endif // DATABASE_TYPE
 
 public plugin_precache() {
 	register_plugin("[CA] Gag", CA_VERSION, "Sergey Shorokhov");
