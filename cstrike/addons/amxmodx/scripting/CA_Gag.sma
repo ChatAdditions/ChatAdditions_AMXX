@@ -117,16 +117,15 @@ public Gags_Thinker() {
 	static aPlayers[MAX_PLAYERS], iCount;
 	get_players_ex(aPlayers, iCount, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV));
 
-	static iSysTime; iSysTime = get_systime();
+	static currentTime; currentTime = get_systime();
 
 	for(new i; i < iCount; i++) {
 		new id = aPlayers[i];
 
-		// server_print("GAG TIME LEFT: %n (%i)", id, (g_aCurrentGags[id][_ExpireTime] - iSysTime));
-		new iExpireTime = g_aCurrentGags[id][_ExpireTime];
-		if(g_aCurrentGags[id][_bitFlags] != m_REMOVED && iExpireTime != GAG_REMOVED
-			&& (iExpireTime != GAG_FOREVER && iExpireTime < iSysTime)
-		) GagExpired(id);
+		new expireAt = g_aCurrentGags[id][_ExpireTime];
+		if(expireAt != 0 && expireAt < currentTime) {
+			GagExpired(id);
+		}
 	}
 }
 
@@ -262,7 +261,7 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 	}
 
 	if(item == MENU_EXIT || item < 0) {
-		ResetTargetData(id);
+		GagData_Reset(g_aGags_AdminEditor[id]);
 		Menu_Show_PlayersList(id);
 
 		return PLUGIN_HANDLED;
@@ -376,7 +375,6 @@ public Callback_GagProperties(id, menu, item) {
 
 	return (
 		IsConfirmItem && !Ready_To_Gag(id)
-		|| (DATABASE_TYPE == DB_NVault && item == menu_Reason && ca_gag_menu_type == _MenuType_Custom)
 		) ? ITEM_DISABLED : ITEM_ENABLED;
 }
 
@@ -390,7 +388,7 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	enum { sequential_Confirm = 3 };
 
 	if(item == MENU_EXIT || item < 0) {
-		ResetTargetData(id);
+		GagData_Reset(g_aGags_AdminEditor[id]);
 		Menu_Show_PlayersList(id);
 
 		return PLUGIN_HANDLED;
@@ -423,7 +421,10 @@ public Menu_Handler_GagProperties(id, menu, item) {
 				return PLUGIN_HANDLED;
 			}
 			case menu_Confirm: {
-				SaveGag(id, target);
+				new time = g_aGags_AdminEditor[id][_Time];
+				new flags = g_aGags_AdminEditor[id][_bitFlags];
+
+				SaveGag(id, target, time, flags);
 
 				return PLUGIN_HANDLED;
 			}
@@ -431,7 +432,10 @@ public Menu_Handler_GagProperties(id, menu, item) {
 	} else {
 		switch(item) {
 			case sequential_Confirm: {
-				SaveGag(id, target);
+				new time = g_aGags_AdminEditor[id][_Time];
+				new flags = g_aGags_AdminEditor[id][_bitFlags];
+
+				SaveGag(id, target, time, flags);
 
 				return PLUGIN_HANDLED;
 			}
@@ -794,52 +798,44 @@ static _ParseTimes(const _sTimes[] = "") {
 	g_iArraySize_GagTimes = ArraySize(g_aGagTimes);
 }
 
-static SaveGag(const id, const target) {
+static SaveGag(const id, const target, const time, const flags) {
 	GagData_Copy(g_aCurrentGags[target], g_aGags_AdminEditor[id]);
-
-	if(id == 0) {
-		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
-			LANG_PLAYER, "Player_Gagged_ByServer", target, GetStringTime_seconds(LANG_PLAYER, g_aCurrentGags[target][_Time]));
-
-		CA_Log(_Info, "Gag: \"SERVER\" add gag to \"%N\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
-        	target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
-			GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
-			g_aCurrentGags[target][_Reason] \
-    	)
-	} else {
-		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
-			LANG_PLAYER, "Player_Gagged", id, target, GetStringTime_seconds(LANG_PLAYER, g_aCurrentGags[target][_Time]));
-
-		CA_Log(_Info, "Gag: \"%N\" add gag to \"%N\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
-        	id, target, bits_to_flags(g_aCurrentGags[target][_bitFlags]), \
-			GetStringTime_seconds(LANG_SERVER, g_aCurrentGags[target][_Time]), \
-			g_aCurrentGags[target][_Reason] \
-    	)
-	}
-	if(g_aCurrentGags[target][_Reason][0])
-		client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", Get_GagStringReason(LANG_PLAYER, target));
-
-	if(g_aCurrentGags[target][_Time] == GAG_FOREVER)
-		g_aCurrentGags[target][_ExpireTime] = GAG_FOREVER;
-	else g_aCurrentGags[target][_ExpireTime] = get_systime() + g_aCurrentGags[target][_Time];
-  
 	GagData_Reset(g_aGags_AdminEditor[id]);
-	
+ 
+	new name[MAX_NAME_LENGTH]; get_user_name(target, name, charsmax(name));
+	new authID[MAX_AUTHID_LENGTH]; get_user_authid(target, authID, charsmax(authID));
+	new IP[MAX_IP_LENGTH]; get_user_ip(target, IP, charsmax(IP), .without_port = true);
+	new reason[256]; copy(reason, charsmax(reason), Get_GagStringReason(LANG_PLAYER, target));
+
+	new adminName[MAX_NAME_LENGTH]; get_user_name(id, adminName, charsmax(adminName));
+	new adminAuthID[MAX_AUTHID_LENGTH]; get_user_authid(id, adminAuthID, charsmax(adminAuthID));
+	new adminIP[MAX_IP_LENGTH]; get_user_ip(id, adminIP, charsmax(adminIP), .without_port = true);
+
+	new expireAt = time + get_systime();
+
+	CA_Storage_Save(
+		name, authID, IP, reason,
+		adminName, adminAuthID, adminIP,
+		expireAt, flags
+	);
+
+	copy(g_aCurrentGags[target][_AdminName], charsmax(g_aCurrentGags[][_AdminName]), adminName);
+	copy(g_aCurrentGags[target][_Reason], charsmax(g_aCurrentGags[][_Reason]), reason);
+	g_aCurrentGags[target][_ExpireTime] = expireAt;
+	g_aCurrentGags[target][_bitFlags] = flags;
+
 	client_cmd(target, "-voicerecord");
-
-	save_to_storage(g_aCurrentGags[target]);
-
-	return PLUGIN_CONTINUE;
 }
 
 static RemoveGag(const id, const target) {
 	if(g_aGags_AdminEditor[id][_bitFlags] != m_REMOVED) {
-		ResetTargetData(id);
-
-		g_aCurrentGags[target][_ExpireTime] = GAG_REMOVED;
-		remove_from_storage(g_aCurrentGags[target]);
-
+		GagData_Reset(g_aGags_AdminEditor[id]);
 		GagData_Reset(g_aCurrentGags[target]);
+
+		new authID[MAX_AUTHID_LENGTH]; get_user_authid(target, authID, charsmax(authID));
+		CA_Storage_Remove(authID);
+
+
 		client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
 			LANG_PLAYER, "Player_UnGagged", id, target);
 	} else {
@@ -852,24 +848,13 @@ static RemoveGag(const id, const target) {
 }
 
 static GagExpired(const id) {
-	g_aCurrentGags[id][_bitFlags] = m_REMOVED;
-
-	remove_from_storage(g_aCurrentGags[id]);
+	GagData_Reset(g_aCurrentGags[id]);
 
 	client_print_color(0, print_team_default, "%s %L", MSG_PREFIX, LANG_PLAYER, "Player_ExpiredGag", id);
 }
 
-static LoadGag(const target) {
-	new aGagData[gag_s]; {
-		GagData_GetPersonalData(0, target, aGagData);
-	}
 
-	load_from_storage(aGagData);
-}
 
-stock ResetTargetData(const id) {
-	GagData_Reset(g_aGags_AdminEditor[id]);
-}
 
 	// TODO!
 GetPostfix(const id, const target, const bHaveImmunity) {
@@ -885,10 +870,12 @@ GetPostfix(const id, const target, const bHaveImmunity) {
 }
 
 public client_putinserver(id) {
-	if(!g_bStorageInitialized)
+	if(is_user_bot(id) || is_user_hltv(id)) {
 		return;
+	}
 
-	LoadGag(id);
+	new authID[MAX_AUTHID_LENGTH]; get_user_authid(id, authID, charsmax(authID));
+	CA_Storage_Load(authID);
 }
 
 public client_disconnected(id) {
@@ -968,54 +955,45 @@ public native_ca_remove_user_gag(pPlugin, iParams) {
 	CHECK_NATIVE_PLAYER(id, false)
 	*/
 }
-
-public DB_Types: native_ca_get_storage_type(pPlugin, iParams) {
-	return DB_Types:DATABASE_TYPE;
-}
 /** <- API */
 
 
-// Storage
-Storage_Inited(Float: fTime) {
-	g_bStorageInitialized = true;
-	server_print("[%s] Storage initialized! (%.4f sec)", DB_Names[DATABASE_TYPE], fTime);
+/** Storage -> */
+public CA_Storage_Initialized( ) {
+	// todo
 }
+public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[],
+	const adminName[], const adminAuthID[], const adminIP[],
+	const createdAt, const expireAt, const flags) {
+	
+	new gagTime = expireAt - createdAt;
+	new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), GetStringTime_seconds(LANG_PLAYER, gagTime));
 
-Storage_PlayerSaved(const iUserID) {
-	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
-
-	server_print("[%s] Target [%s] SAVED!", DB_Names[DATABASE_TYPE],
-		is_user_connected(target) ?
-			fmt("%n (UsedID:%i)", target, iUserID) :
-			fmt("UsedID:%i", iUserID)
+	client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
+		LANG_PLAYER, "Player_Gagged", adminName, name, gagTimeStr
 	);
+
+	client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", reason);
+
+	CA_Log(_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+		adminName, name, bits_to_flags(flags), gagTimeStr, reason \
+	)	
 }
-
-Storage_PlayerLoaded(const iUserID, bool: bFound = false) {
-	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
-	GagData_GetPersonalData(0, target, g_aCurrentGags[target]);
-
-	if(!bFound)
+public CA_Storage_Loaded(const name[], const authID[], const IP[], const reason[],
+	const adminName[], const adminAuthID[], const adminIP[],
+	const createdAt, const expireAt, const flags) {
+	
+	new target = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), authID);
+	if(!target) {
 		return;
+	}
 
-#if defined DEBUG
-	server_print("[%s] Target [%s] Loaded! (gag found)", DB_Names[DATABASE_TYPE],
-		is_user_connected(target) ?
-			fmt("%n (UsedID:%i)", target, iUserID) :
-			fmt("UsedID:%i", iUserID)
-	);
-#endif
+	copy(g_aCurrentGags[target][_AdminName], charsmax(g_aCurrentGags[][_AdminName]), adminName);
+	copy(g_aCurrentGags[target][_Reason], charsmax(g_aCurrentGags[][_Reason]), reason);
+	g_aCurrentGags[target][_ExpireTime] = expireAt;
+	g_aCurrentGags[target][_bitFlags] = flags;
 }
-
-Storage_PlayerRemoved(const iUserID) {
-#pragma unused iUserID
-#if defined DEBUG
-	new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), iUserID);
-
-	server_print("[%s] Target [%s] removed!", DB_Names[DATABASE_TYPE],
-		is_user_connected(target) ?
-			fmt("%n (UsedID:%i)", target, iUserID) :
-			fmt("UsedID:%i", iUserID)
-	);
-#endif
+public CA_Storage_Removed( ) {
+	// todo
 }
+/** <- Storage */
