@@ -363,7 +363,7 @@ static Menu_Show_GagProperties(id) {
 
 public Callback_GagProperties(id, menu, item) {
 	enum { /* menu_Chat, menu_TeamChat, menu_VoiceChat, */
-			menu_Reason = 3, /* menu_Time, */ menu_Confirm = 5
+			/* menu_Reason = 3, */ /* menu_Time, */ menu_Confirm = 5
 		};
 
 	enum { sequential_Confirm = 3};
@@ -373,8 +373,10 @@ public Callback_GagProperties(id, menu, item) {
 		|| item == sequential_Confirm && ca_gag_menu_type == _MenuType_Sequential
 	);
 
+	new bool: isReadyToGag = (g_aGags_AdminEditor[id][_bitFlags] != m_REMOVED);
+
 	return (
-		IsConfirmItem && !Ready_To_Gag(id)
+		IsConfirmItem && !isReadyToGag
 		) ? ITEM_DISABLED : ITEM_ENABLED;
 }
 
@@ -446,11 +448,6 @@ public Menu_Handler_GagProperties(id, menu, item) {
 
 	return PLUGIN_HANDLED;
 }
-
-stock bool: Ready_To_Gag(id)  {	
-	return (g_aGags_AdminEditor[id][_bitFlags] != m_REMOVED ) ? true : false;
-}
-
 
 static Menu_Show_SelectReason(id) {
 	if(!is_user_connected(id))
@@ -819,7 +816,7 @@ static SaveGag(const id, const target, const time, const flags) {
 	copy(g_aCurrentGags[target][_AdminName], charsmax(g_aCurrentGags[][_AdminName]), adminName);
 	copy(g_aCurrentGags[target][_Reason], charsmax(g_aCurrentGags[][_Reason]), reason);
 	g_aCurrentGags[target][_ExpireTime] = expireAt;
-	g_aCurrentGags[target][_bitFlags] = flags;
+	g_aCurrentGags[target][_bitFlags] =  gag_flags_s: flags;
 
 	client_cmd(target, "-voicerecord");
 }
@@ -973,7 +970,7 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
 	client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", reason);
 
 	CA_Log(_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
-		adminName, name, bits_to_flags(flags), gagTimeStr, reason \
+		adminName, name, bits_to_flags(gag_flags_s: flags), gagTimeStr, reason \
 	)	
 }
 public CA_Storage_Loaded(const name[], const authID[], const IP[], const reason[],
@@ -988,7 +985,7 @@ public CA_Storage_Loaded(const name[], const authID[], const IP[], const reason[
 	copy(g_aCurrentGags[target][_AdminName], charsmax(g_aCurrentGags[][_AdminName]), adminName);
 	copy(g_aCurrentGags[target][_Reason], charsmax(g_aCurrentGags[][_Reason]), reason);
 	g_aCurrentGags[target][_ExpireTime] = expireAt;
-	g_aCurrentGags[target][_bitFlags] = flags;
+	g_aCurrentGags[target][_bitFlags] = gag_flags_s: flags;
 }
 public CA_Storage_Removed( ) {
 	// todo
