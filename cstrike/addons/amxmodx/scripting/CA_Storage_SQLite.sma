@@ -32,7 +32,9 @@ public plugin_init() {
   hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel");
   GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
 
-  SQL_SetAffinity("sqlite")
+  if(!SQL_SetAffinity("sqlite")) {
+    set_fail_state("Can't user 'SQLite'. Check modules.ini")
+  }
   g_tuple = SQL_MakeDbTuple("", "", "", SQL_DBNAME)
 
   Storage_Create()
