@@ -758,7 +758,7 @@ public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 
 static _LoadConfig() {
 	if(!g_aReasons) {
-		ArrayCreate(g_aReasons);
+		g_aReasons = ArrayCreate(gag_s);
 	} else if(ArraySize(g_aReasons) > 0) {
 		ArrayClear(g_aReasons);
 	}
