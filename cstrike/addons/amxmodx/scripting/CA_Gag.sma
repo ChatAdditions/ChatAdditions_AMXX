@@ -518,12 +518,10 @@ public Menu_Handler_SelectReason(id, menu, item) {
 	new aReason[gag_s];
 	ArrayGetArray(g_aReasons, iReason, aReason);
 
+	// Get predefined reason params
 	copy(g_aGags_AdminEditor[id][_Reason], charsmax(g_aGags_AdminEditor[][_Reason]), aReason[_Reason]);
-
-	// IF NEED OFC
+	g_aGags_AdminEditor[id][_bitFlags] = aReason[_bitFlags];
 	g_aGags_AdminEditor[id][_Time] = aReason[_Time];
-
-	// CA_Log("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason])
 
 	if(ca_gag_menu_type == _MenuType_Custom) {
 		Menu_Show_GagProperties(id);
