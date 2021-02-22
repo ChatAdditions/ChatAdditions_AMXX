@@ -1,3 +1,5 @@
 *.amxx
 .vscode/*
-publish/
+*publish/
+/.temp
+/.compiler
