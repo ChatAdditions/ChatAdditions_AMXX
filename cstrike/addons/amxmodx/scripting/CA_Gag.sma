@@ -46,6 +46,9 @@ public plugin_precache() {
 	register_dictionary("common.txt");
 	register_dictionary("time.txt");
 
+	g_aReasons = ArrayCreate(gag_s);
+	g_aGagTimes = ArrayCreate();
+
 	bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
 	hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel");
 	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
@@ -56,9 +59,6 @@ public plugin_precache() {
 	);
 
 	bind_pcvar_num(create_cvar("ca_gag_menu_type", "1"), ca_gag_menu_type);
-
-	g_aReasons = ArrayCreate(gag_s);
-	g_aGagTimes = ArrayCreate();
 
 	register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason");
 	register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates"); // debug
@@ -83,17 +83,15 @@ public plugin_init() {
 	new sLogLevel[MAX_LOGLEVEL_LEN];
 	get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel));
 	ca_log_level = ParseLogLevel(sLogLevel);
+	
+	_LoadConfig();
+	_ParseTimes();
 
 	CA_Log(_Info, "[CA]: Gag initialized!")
 }
 
 public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
 	ca_log_level = ParseLogLevel(new_value);
-}
-
-public OnConfigsExecuted() {
-	_LoadConfig();
-	_ParseTimes();
 }
 
 public plugin_natives() {
@@ -520,12 +518,10 @@ public Menu_Handler_SelectReason(id, menu, item) {
 	new aReason[gag_s];
 	ArrayGetArray(g_aReasons, iReason, aReason);
 
+	// Get predefined reason params
 	copy(g_aGags_AdminEditor[id][_Reason], charsmax(g_aGags_AdminEditor[][_Reason]), aReason[_Reason]);
-
-	// IF NEED OFC
+	g_aGags_AdminEditor[id][_bitFlags] = aReason[_bitFlags];
 	g_aGags_AdminEditor[id][_Time] = aReason[_Time];
-
-	// CA_Log("aReason[_Time]=%i, aReason[_Reason]=%s", aReason[_Time], aReason[_Reason])
 
 	if(ca_gag_menu_type == _MenuType_Custom) {
 		Menu_Show_GagProperties(id);
@@ -701,7 +697,7 @@ Get_GagStringReason(const id, const target) {
 public SrvCmd_AddReason() {
 	enum any: args_s { arg0, arg1, arg2, arg3 };
 
-	new szArgs[args_s][32];
+	new szArgs[args_s][256];
 	for(new iArg = arg0; iArg < sizeof szArgs; iArg++)
 		read_argv(iArg, szArgs[iArg], charsmax(szArgs[]));
 
@@ -721,7 +717,7 @@ public SrvCmd_AddReason() {
 	ArrayPushArray(g_aReasons, aReason);
 	g_iArraySize_Reasons = ArraySize(g_aReasons);
 
-	CA_Log(_Warnings, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
+	CA_Log(_Debug, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
 		g_iArraySize_Reasons, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
 	)
 }
@@ -735,7 +731,7 @@ public SrvCmd_ShowTemplates() {
 			new aReason[gag_s];
 			ArrayGetArray(g_aReasons, i, aReason);
 
-			CA_Log(_Warnings, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
+			CA_Log(_Info, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
 				i, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
 			)
 		}
@@ -761,7 +757,12 @@ public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 }
 
 static _LoadConfig() {
-	ArrayClear(g_aReasons);
+	if(!g_aReasons) {
+		ArrayCreate(g_aReasons);
+	} else if(ArraySize(g_aReasons) > 0) {
+		ArrayClear(g_aReasons);
+	}
+
 	new sConfigsDir[PLATFORM_MAX_PATH];
 	get_configsdir(sConfigsDir, charsmax(sConfigsDir));
 	server_cmd("exec %s/ChatAdditions/gag_reasons.cfg", sConfigsDir);
