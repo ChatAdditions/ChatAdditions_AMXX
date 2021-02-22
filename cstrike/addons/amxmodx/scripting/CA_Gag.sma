@@ -83,17 +83,15 @@ public plugin_init() {
 	new sLogLevel[MAX_LOGLEVEL_LEN];
 	get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel));
 	ca_log_level = ParseLogLevel(sLogLevel);
+	
+	_LoadConfig();
+	_ParseTimes();
 
 	CA_Log(_Info, "[CA]: Gag initialized!")
 }
 
 public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
 	ca_log_level = ParseLogLevel(new_value);
-}
-
-public OnConfigsExecuted() {
-	_LoadConfig();
-	_ParseTimes();
 }
 
 public plugin_natives() {
@@ -721,7 +719,7 @@ public SrvCmd_AddReason() {
 	ArrayPushArray(g_aReasons, aReason);
 	g_iArraySize_Reasons = ArraySize(g_aReasons);
 
-	CA_Log(_Warnings, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
+	CA_Log(_Debug, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
 		g_iArraySize_Reasons, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
 	)
 }
@@ -735,7 +733,7 @@ public SrvCmd_ShowTemplates() {
 			new aReason[gag_s];
 			ArrayGetArray(g_aReasons, i, aReason);
 
-			CA_Log(_Warnings, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
+			CA_Log(_Info, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
 				i, aReason[_Reason], bits_to_flags(aReason[_bitFlags]), aReason[_Time]\
 			)
 		}
