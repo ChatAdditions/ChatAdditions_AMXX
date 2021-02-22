@@ -46,6 +46,9 @@ public plugin_precache() {
 	register_dictionary("common.txt");
 	register_dictionary("time.txt");
 
+	g_aReasons = ArrayCreate(gag_s);
+	g_aGagTimes = ArrayCreate();
+
 	bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
 	hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel");
 	GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
@@ -56,9 +59,6 @@ public plugin_precache() {
 	);
 
 	bind_pcvar_num(create_cvar("ca_gag_menu_type", "1"), ca_gag_menu_type);
-
-	g_aReasons = ArrayCreate(gag_s);
-	g_aGagTimes = ArrayCreate();
 
 	register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason");
 	register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates"); // debug
@@ -759,7 +759,12 @@ public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
 }
 
 static _LoadConfig() {
-	ArrayClear(g_aReasons);
+	if(!g_aReasons) {
+		ArrayCreate(g_aReasons);
+	} else if(ArraySize(g_aReasons) > 0) {
+		ArrayClear(g_aReasons);
+	}
+
 	new sConfigsDir[PLATFORM_MAX_PATH];
 	get_configsdir(sConfigsDir, charsmax(sConfigsDir));
 	server_cmd("exec %s/ChatAdditions/gag_reasons.cfg", sConfigsDir);
