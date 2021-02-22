@@ -11,9 +11,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Build project
-        run: |
-          zip -r my-artifact cstrike
 
       - name: Parse semver string
         id: semver_parser
@@ -23,19 +20,17 @@ jobs:
           version_extractor_regex: '\/v(.*)$'
 
       - name: Update version in plugins
+        env:
+          PLUGIN_VERSION: "v${{ steps.semver_parser.outputs.fullversion }}"
         run: |
-          VERSION="v${{ steps.semver_parser.outputs.fullversion }}"
-          FILE_PATH="cstrike/addons/amxmodx/scripting/include/ChatAdditions.inc"
-          sed -i 's/%CA_VERSION%/${VERSION}/g' ${FILE_PATH}
+          cd cstrike/addons/amxmodx/scripting/include
+          sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
 
-      # - name: Use parsed semver
-      #   run: |
-      #     echo "v${{ steps.semver_parser.outputs.major }}"
-      #     echo "v${{ steps.semver_parser.outputs.minor }}"
-      #     echo "v${{ steps.semver_parser.outputs.patch }}"
-      #     echo "v${{ steps.semver_parser.outputs.prerelease }}"
-      #     echo "v${{ steps.semver_parser.outputs.build }}"
-      #     echo "v${{ steps.semver_parser.outputs.fullversion }}"
+          echo "asset_plugin_name=ChatAdditions-$PLUGIN_VERSION" >> $GITHUB_ENV
+
+      - name: Build project
+        run: |
+          zip -r my-artifact cstrike
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -45,5 +40,5 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./my-artifact.zip
-          asset_name: ChatAdditions.zip
+          asset_name: ${{ env.asset_plugin_name }}.zip
           asset_content_type: application/zip
