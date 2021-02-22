@@ -701,7 +701,7 @@ Get_GagStringReason(const id, const target) {
 public SrvCmd_AddReason() {
 	enum any: args_s { arg0, arg1, arg2, arg3 };
 
-	new szArgs[args_s][32];
+	new szArgs[args_s][256];
 	for(new iArg = arg0; iArg < sizeof szArgs; iArg++)
 		read_argv(iArg, szArgs[iArg], charsmax(szArgs[]));
 
