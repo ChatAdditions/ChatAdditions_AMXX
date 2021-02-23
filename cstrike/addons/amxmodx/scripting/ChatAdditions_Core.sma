@@ -58,14 +58,14 @@ public ClCmd_Hook_Say(id) {
 	static retVal;
 	ExecuteForward(g_pFwd_Client_Say, retVal, id);
 
-	return (retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED_MAIN : PLUGIN_CONTINUE;
+	return (retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
 public ClCmd_Hook_SayTeam(id) {
 	static retVal;
 	ExecuteForward(g_pFwd_Client_SayTeam, retVal, id);
 
-	return (retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED_MAIN : PLUGIN_CONTINUE;
+	return (retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
 public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
