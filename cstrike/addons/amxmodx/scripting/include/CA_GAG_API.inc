@@ -66,23 +66,23 @@ stock bits_to_flags(gag_flags_s: bits)
   return szFlags;
 }
 
-stock GagData_Reset(aGagData[gag_s])
+stock GagData_Reset(gagData[gag_s])
 {
-  aGagData[_Player] = 0;
-  aGagData[_AuthId][0] = EOS;
-  aGagData[_IP][0] = EOS;
-  aGagData[_Name][0] = EOS;
+  gagData[_Player] = 0;
+  gagData[_AuthId][0] = EOS;
+  gagData[_IP][0] = EOS;
+  gagData[_Name][0] = EOS;
 
-  aGagData[_AdminId] = 0;
-  aGagData[_AdminName][0] = EOS;
-  aGagData[_AdminAuthId][0] = EOS;
-  aGagData[_AdminIP][0] = EOS;
+  gagData[_AdminId] = 0;
+  gagData[_AdminName][0] = EOS;
+  gagData[_AdminAuthId][0] = EOS;
+  gagData[_AdminIP][0] = EOS;
 
-  aGagData[_Reason][0] = EOS;
-  aGagData[_Time] = 0;
-  aGagData[_ExpireTime] = 0;
+  gagData[_Reason][0] = EOS;
+  gagData[_Time] = 0;
+  gagData[_ExpireTime] = 0;
 
-  aGagData[_bitFlags] = m_REMOVED;
+  gagData[_bitFlags] = m_REMOVED;
 }
 
 stock GagData_Copy(to[gag_s], const from[gag_s]) {
@@ -103,7 +103,7 @@ stock GagData_Copy(to[gag_s], const from[gag_s]) {
   to[_bitFlags] = from[_bitFlags];
 }
 
-bool: GagData_Equal(const arr1[gag_s], const arr2[gag_s]) {
+bool: GagData_IsEqual(const arr1[gag_s], const arr2[gag_s]) {
   return (
     strcmp(arr1[_Reason], arr2[_Reason]) == 0
     /* || arr1[_Time] == arr2[_Time] */
@@ -111,21 +111,21 @@ bool: GagData_Equal(const arr1[gag_s], const arr2[gag_s]) {
   );
 }
 
-GagData_GetPersonalData(const id = 0, const target, aGagData[gag_s]) {
+GagData_GetPersonalData(const id = 0, const target, gagData[gag_s]) {
   // get's target data
-  aGagData[_Player] = target;
-  get_user_authid(target, aGagData[_AuthId], charsmax(aGagData[_AuthId]));
-  get_user_ip(target, aGagData[_IP], charsmax(aGagData[_IP]), .without_port = true);
-  get_user_name(target, aGagData[_Name], charsmax(aGagData[_Name]));
+  gagData[_Player] = target;
+  get_user_authid(target, gagData[_AuthId], charsmax(gagData[_AuthId]));
+  get_user_ip(target, gagData[_IP], charsmax(gagData[_IP]), .without_port = true);
+  get_user_name(target, gagData[_Name], charsmax(gagData[_Name]));
 
   if(id == 0)
     return;
 
   // get's admin data
-  aGagData[_AdminId] = id;
-  get_user_name(id, aGagData[_AdminName], charsmax(aGagData[_AdminName]));
-  get_user_authid(id, aGagData[_AdminAuthId], charsmax(aGagData[_AdminAuthId]));
-  get_user_ip(id, aGagData[_AdminIP], charsmax(aGagData[_AdminIP]), .without_port = true);
+  gagData[_AdminId] = id;
+  get_user_name(id, gagData[_AdminName], charsmax(gagData[_AdminName]));
+  get_user_authid(id, gagData[_AdminAuthId], charsmax(gagData[_AdminAuthId]));
+  get_user_ip(id, gagData[_AdminIP], charsmax(gagData[_AdminIP]), .without_port = true);
 }
 
 
@@ -136,7 +136,7 @@ GagData_GetPersonalData(const id = 0, const target, aGagData[gag_s]) {
  * Sets client's gag data.
  *
  * @param index         Client index
- * @param aGagData      Gag data with gag_s
+ * @param gagData      Gag data with gag_s
  *
  * @noreturn
  * @error               If the client index is not within the range of 1 to
@@ -184,10 +184,3 @@ native bool: ca_has_user_gag(index);
  */
 native ca_remove_user_gag(index);
 
-/**
- * Get api storage type.
- *
- * @return Storage type
- *
- */
-native DB_Types: ca_get_gag_storage_type();
