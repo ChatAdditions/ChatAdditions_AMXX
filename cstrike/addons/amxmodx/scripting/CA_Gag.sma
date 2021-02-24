@@ -149,7 +149,7 @@ static MenuShow_PlayersList(const id) {
     return
   }
 
-  new menu = menu_create(fmt("%L", id, "CA_Gag_TITLE"), "MenuHandler_PlayersList")
+  new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_PlayersList"), "MenuHandler_PlayersList")
 
   static callback
   if(!callback) {
@@ -206,7 +206,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
   if(target == 0) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     menu_destroy(menu)
@@ -242,10 +242,10 @@ static MenuShow_ConfirmRemove(const id) {
     return
   }
 
-  new menu = menu_create(fmt("%L", id, "GAG_Confirm"), "MenuHandler_ConfirmRemove")
+  new menu = menu_create(fmt("%L", id, "Gag_MenuItem_ReadyConfirm"), "MenuHandler_ConfirmRemove")
 
-  menu_additem(menu, fmt("%L", id, "CA_GAG_YES"))
-  menu_additem(menu, fmt("%L", id, "CA_GAG_NO"))
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Yes"))
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_NoAndEdit"))
 
   menu_addblank2(menu)
   menu_addblank2(menu)
@@ -275,7 +275,7 @@ public MenuHandler_ConfirmRemove(const id, const menu, const item) {
 
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     menu_destroy(menu)
@@ -319,13 +319,13 @@ static MenuShow_GagProperties(const id) {
 
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     return
   }
 
-  new menu = menu_create(fmt("%L", id, "CA_Gag_Properties", target), "MenuHandler_GagProperties")
+  new menu = menu_create(fmt("%L", id, "Gag_GagProperties", target), "MenuHandler_GagProperties")
 
   static callback
   if(!callback) {
@@ -336,34 +336,34 @@ static MenuShow_GagProperties(const id) {
   new bool: alreadyHasGag = (g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed)
   new bool: hasChanges = !GagData_IsEqual(g_currentGags[target], g_adminGagsEditor[id])
 
-  menu_additem(menu, fmt("%L [ %s ]", id, "CA_Gag_Say",
+  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSay",
     (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-")
   )
-  menu_additem(menu, fmt("%L [ %s ]", id, "CA_Gag_SayTeam",
+  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
     (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-")
   )
-  menu_additem(menu, fmt("%L [ %s ]", id, "CA_Gag_Voice",
+  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
     (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-")
   )
 
   if(ca_gag_menu_type == _MenuType_Custom) {
     menu_addblank(menu, false)
 
-    menu_additem(menu, fmt("%L [ \\y%s\\w ]", id, "Gag_Menu_Reason",
+    menu_additem(menu, fmt("%L [ \\y%s\\w ]", id, "Gag_MenuItem_Reason",
       Get_GagString_reason(id, target)), .callback = callback
     )
-    menu_additem(menu, fmt("%L [ \\y%s\\w ]", id, "CA_Gag_Time",
+    menu_additem(menu, fmt("%L [ \\y%s\\w ]", id, "Gag_MenuItem_Time",
       Get_TimeString_seconds(id, g_adminGagsEditor[id][gd_reason][r_time]))
     )
   }
 
   menu_addblank(menu, false)
 
-  menu_additem(menu, fmt("%L %s", id, "CA_Gag_Confirm",
+  menu_additem(menu, fmt("%L %s", id, "Gag_MenuItem_Confirm",
     (alreadyHasGag && hasChanges) ? "edit" : ""), .callback = callback
   )
 
-  menu_addtext(menu, fmt("\n%L", id, "Menu_WannaGag",
+  menu_addtext(menu, fmt("\n%L", id, "Gag_MenuItem_Resolution",
     Get_TimeString_seconds(id, g_adminGagsEditor[id][gd_reason][r_time]),
     Get_GagString_reason(id, target)), false
   )
@@ -432,7 +432,7 @@ public MenuHandler_GagProperties(const id, const menu, const item) {
 
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     menu_destroy(menu)
@@ -494,14 +494,14 @@ static MenuShow_SelectReason(const id) {
 
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     return PLUGIN_HANDLED
   }
 
-  new menu = menu_create(fmt("%L", id, "MENU_SelectReason"), "MenuHandler_SelectReason")
-  menu_additem(menu, fmt("%L\n", id, "EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
+  new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectReason"), "MenuHandler_SelectReason")
+  menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
 
   if(g_gagReasonsTemplates_size) {
     for(new i; i < g_gagReasonsTemplates_size; i++) {
@@ -514,7 +514,7 @@ static MenuShow_SelectReason(const id) {
       )
     }
   } else {
-    menu_addtext(menu, fmt("\\d		%L", id, "NoHaveReasonsTemplates"), .slot = false)
+    menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
   }
 
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
@@ -539,7 +539,7 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
 
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     menu_destroy(menu)
@@ -579,16 +579,16 @@ static MenuShow_SelectTime(const id) {
 
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     return PLUGIN_HANDLED
   }
 
-  new menu = menu_create(fmt("%L", id, "MENU_SelectTime"), "MenuHandler_SelectTime")
+  new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectTime"), "MenuHandler_SelectTime")
 
-  menu_additem(menu, fmt("%L", id, "SET_CustomTime"))
-  // menu_additem(menu, fmt("%L", id, "CA_Gag_Perpapent"))
+  menu_additem(menu, fmt("%L", id, "Gag_EnterTime"))
+  // menu_additem(menu, fmt("%L", id, "Gag_Permanent"))
   menu_addblank(menu, .slot = false)
 
   new selectedTime = g_adminGagsEditor[id][gd_reason][r_time]
@@ -602,7 +602,7 @@ static MenuShow_SelectTime(const id) {
       )
     }
   } else {
-    menu_addtext(menu, fmt("\\d		%L", id, "NoHaveTimeTemplates"), .slot = false)
+    menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
   }
 
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
@@ -627,7 +627,7 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
 
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     menu_destroy(menu)
@@ -671,7 +671,7 @@ public ClCmd_Gag(const id, const level, const cid) {
   }
 
   if(get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
-    client_print_color(id, print_team_default, "%s %L", MSG_PREFIX, id, "NotEnoughPlayers")
+    client_print_color(id, print_team_default, "%s %L", MSG_PREFIX, id, "Gag_NotEnoughPlayers")
     return PLUGIN_HANDLED
   }
 
@@ -682,7 +682,7 @@ public ClCmd_Gag(const id, const level, const cid) {
 public ClCmd_EnterGagReason(const id) {
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     return PLUGIN_HANDLED
@@ -698,7 +698,7 @@ public ClCmd_EnterGagReason(const id) {
 
   copy(g_adminGagsEditor[id][gd_reason][r_name], charsmax(g_adminGagsEditor[][r_name]), customReasonName)
 
-  client_print(id, print_chat, "%L '%s'", id, "CustomReason_Setted", g_adminGagsEditor[id][gd_reason][r_name])
+  client_print(id, print_chat, "%L '%s'", id, "Gag_YouSetManual_Reason", g_adminGagsEditor[id][gd_reason][r_name])
 
   MenuShow_SelectTime(id)
   return PLUGIN_HANDLED
@@ -711,7 +711,7 @@ public ClCmd_EnterGagTime(id) {
 
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
     return PLUGIN_HANDLED
@@ -730,7 +730,7 @@ public ClCmd_EnterGagTime(id) {
 
   g_adminGagsEditor[id][gd_reason][r_time] = time
 
-  client_print(id, print_chat, "%L '%s'", id, "CustomTime_Setted", Get_TimeString_seconds(id, time))
+  client_print(id, print_chat, "%L '%s'", id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
 
   MenuShow_GagProperties(id)
   return PLUGIN_HANDLED
@@ -824,10 +824,10 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
   new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, gagTime))
 
   client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
-    LANG_PLAYER, "Player_Gagged", adminName, name, gagTimeStr
+    LANG_PLAYER, "Gag_AdminGagPlayer", adminName, name, gagTimeStr
   )
 
-  client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "CA_Gag_Reason", reason)
+  client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "Gag_ChatMsg_Reason", reason)
 
   CA_Log(_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
     adminName, name, bits_to_flags(gag_flags_s: flags), gagTimeStr, reason \
@@ -903,7 +903,7 @@ static Get_TimeString_seconds(const id, const seconds) {
   get_time_length(id, seconds, timeunit_seconds, timeStr, charsmax(timeStr))
 
   if(timeStr[0] == EOS) {
-    formatex(timeStr, charsmax(timeStr), "%L", id, "CA_Gag_NotSet")
+    formatex(timeStr, charsmax(timeStr), "%L", id, "Gag_NotSet")
   }
 
   return timeStr
@@ -919,7 +919,7 @@ static Get_GagString_reason(const id, const target) {
   }
 
   if(buffer[0] == EOS) {
-    formatex(buffer, charsmax(buffer), "%L", id, "CA_Gag_NotSet")
+    formatex(buffer, charsmax(buffer), "%L", id, "Gag_NotSet")
   }
 
   return buffer
@@ -929,9 +929,9 @@ static Get_PlayerPostfix(const id, const target, const hasImmunity) {
   new postfix[32]
 
   if(hasImmunity) {
-    formatex(postfix, charsmax(postfix), " [\\r%L\\d]", id, "Immunity")
+    formatex(postfix, charsmax(postfix), " [\\r%L\\d]", id, "Gag_Immunity")
   } else if(g_currentGags[target][gd_reason][r_flags]) {
-    formatex(postfix, charsmax(postfix), " [\\y%L\\w]", id, "Gag")
+    formatex(postfix, charsmax(postfix), " [\\y%L\\w]", id, "Gag_Gagged")
   }
 
   return postfix
@@ -971,9 +971,9 @@ static Gag_Remove(const id, const target) {
     CA_Storage_Remove(authID)
 
     client_print_color(0, print_team_default, "%s %L", MSG_PREFIX,
-      LANG_PLAYER, "Player_UnGagged", id, target)
+      LANG_PLAYER, "Gag_AdminUngagPlayer", id, target)
   } else {
-    client_print(id, print_chat, "%s %L", MSG_PREFIX, id, "Player_AlreadyRemovedGag", target)
+    client_print(id, print_chat, "%s %L", MSG_PREFIX, id, "Gag_PlayerAlreadyRemoved", target)
   }
 
   MenuShow_PlayersList(id)
@@ -984,5 +984,5 @@ static Gag_Remove(const id, const target) {
 static Gag_Expired(const id) {
   GagData_Reset(g_currentGags[id])
 
-  client_print_color(0, print_team_default, "%s %L", MSG_PREFIX, LANG_PLAYER, "Player_ExpiredGag", id)
+  client_print_color(0, print_team_default, "%s %L", MSG_PREFIX, LANG_PLAYER, "Gag_PlayerExpiredGag", id)
 }
