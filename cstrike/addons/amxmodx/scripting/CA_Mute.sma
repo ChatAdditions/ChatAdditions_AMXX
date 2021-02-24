@@ -76,7 +76,7 @@ static MenuShow_PlayersList(const id) {
   if(!is_user_connected(id))
     return
 
-  new menu = menu_create(fmt("%L", id, "CA_Mute_TITLE"), "MenuHandler_PlayersList")
+  new menu = menu_create(fmt("%L", id, "Mute_MenuTitle"), "MenuHandler_PlayersList")
 
   static callback
   if(!callback)
@@ -88,7 +88,7 @@ static MenuShow_PlayersList(const id) {
   if(count < 2) {
     menu_additem(menu, fmt("\\r %L", id, "Mute_NotEnoughPlayers"), fmt("%i", ITEM_NOT_ENOUTH_PLAYERS), .callback = callback)
   } else {
-    menu_additem(menu, fmt("\\y %L %s", id, "CA_Mute_MuteALL", g_globalMute[id] ? "\\w[ \\r+\\w ]" : ""), fmt("%i", ITEM_MUTE_ALL))
+    menu_additem(menu, fmt("\\y %L %s", id, "Mute_MuteAll", g_globalMute[id] ? "\\w[ \\r+\\w ]" : ""), fmt("%i", ITEM_MUTE_ALL))
     menu_addblank(menu, .slot = false)
 
     new name[128]
@@ -106,7 +106,7 @@ static MenuShow_PlayersList(const id) {
       }
 
       if(g_globalMute[target] || g_playersMute[target][id]) {
-        strcat(name, fmt(" \\d(\\y%L\\d)", id, "Menu_Muted_you"), charsmax(name))
+        strcat(name, fmt(" \\d(\\y%L\\d)", id, "Mute_PlayerMutedYou"), charsmax(name))
       }
 
       menu_additem(menu, name, fmt("%i", get_user_userid(target)), .callback = callback)
@@ -146,7 +146,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   new Float: gametime = get_gametime()
   if(g_nextUse[id] > gametime) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Menu_UseToOften")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Mute_UseTooOften")
 
     menu_destroy(menu)
     MenuShow_PlayersList(id)
@@ -160,7 +160,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     g_globalMute[id] ^= true
 
     client_print_color(0, print_team_default, "%s \3%n\1 %L ", MSG_PREFIX,
-      id, LANG_PLAYER, g_globalMute[id] ? "Player_Muted_All" : "Player_UnMuted_All"
+      id, LANG_PLAYER, g_globalMute[id] ? "Mute_PlayerNowMutedAll" : "Mute_PlayerNowUnmutedAll"
     )
 
     CA_Log(_Info, "Mute: \"%N\" %smuted everyone", id, g_globalMute[id] ? "" : "Un")
@@ -172,7 +172,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
   if(player == 0) {
-    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Player_NotConnected")
+    client_print_color(id, print_team_red, "%s %L", MSG_PREFIX, id, "Mute_PlayerNotConnected")
 
     menu_destroy(menu)
     MenuShow_PlayersList(id)
@@ -181,11 +181,11 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   g_playersMute[id][player] ^= true
   client_print_color(id, print_team_default, "%s %L \3%n\1", MSG_PREFIX,
-    id, g_playersMute[id][player] ? "CA_Mute_Muted" : "CA_Mute_UnMuted", player
+    id, g_playersMute[id][player] ? "Mute_YouMutePlayer" : "Mute_YouUnmutePlayer", player
   )
 
   client_print_color(player, print_team_default, "%s \3%n\1 %L ", MSG_PREFIX,
-    id, player, g_playersMute[id][player] ? "Player_Muted_you" : "Player_UnMuted_you"
+    id, player, g_playersMute[id][player] ? "Mute_PlayerNowMutedYou" : "Mute_PlayerNowUnmutedYou"
   )
 
   CA_Log(_Info, "Mute: '%N' %smuted '%N'", id, g_playersMute[id][player] ? "" : "Un", player)
