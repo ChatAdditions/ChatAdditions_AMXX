@@ -88,7 +88,9 @@ stock GagData_Copy(to[gagData_s], const from[gagData_s]) {
   copy(to[gd_adminAuthID], charsmax(to[gd_adminAuthID]), from[gd_adminAuthID]);
   copy(to[gd_adminIP], charsmax(to[gd_adminIP]), from[gd_adminIP]);
 
-  to[gd_reason] = from[gd_reason]
+  copy(to[gd_reason][r_name], charsmax(to[r_name]), from[gd_reason][r_name]) 
+  to[gd_reason][r_time] = from[gd_reason][r_time] 
+  to[gd_reason][r_flags] = from[gd_reason][r_flags]
 
   to[gd_expireAt] = from[gd_expireAt];
 }

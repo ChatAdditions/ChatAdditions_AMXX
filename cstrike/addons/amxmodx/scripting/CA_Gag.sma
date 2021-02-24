@@ -279,11 +279,11 @@ public MenuHandler_ConfirmRemove(const id, const menu, const item) {
   // Edit player gag properties
   if(item == menu_EditGagProperties) {
     new gagData[gagData_s]; {
+      // Copy already used gag data
+      GagData_Copy(gagData, g_currentGags[target])
+
       // Get updated player data like IP, nickname etc.
       GagData_GetPersonalData(id, target, gagData)
-
-      // Copy already used gag data
-      gagData[gd_reason] = g_currentGags[target][gd_reason]
     }
     GagData_Copy(g_adminGagsEditor[id], gagData)
 
