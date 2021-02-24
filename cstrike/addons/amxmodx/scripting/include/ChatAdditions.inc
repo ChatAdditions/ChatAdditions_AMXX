@@ -89,11 +89,11 @@ stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, const sDir[] = "ChatA
 }
 
 #define register_trigger_clcmd(%0,%1) \
-    for (new i = 0; i < sizeof(BASE_CHAT_TRIGGERS); i++) \
+    for (new iter = 0; iter < sizeof(BASE_CHAT_TRIGGERS); iter++) \
     { \
-        register_clcmd(fmt("%s%s", BASE_CHAT_TRIGGERS[i], %0), %1); \
-        register_clcmd(fmt("say %s%s", BASE_CHAT_TRIGGERS[i], %0), %1); \
-        register_clcmd(fmt("say_team %s%s", BASE_CHAT_TRIGGERS[i], %0), %1); \
+        register_clcmd(fmt("%s%s", BASE_CHAT_TRIGGERS[iter], %0), %1); \
+        register_clcmd(fmt("say %s%s", BASE_CHAT_TRIGGERS[iter], %0), %1); \
+        register_clcmd(fmt("say_team %s%s", BASE_CHAT_TRIGGERS[iter], %0), %1); \
     }
 
 new stock const BASE_CHAT_TRIGGERS[][] = { "", "/", "\", "!", "." };

@@ -19,6 +19,12 @@ enum any: gag_flags_s ( <<=1 ) {
 
 const MAX_REASON_LEN = 128;
 
+enum reason_s {
+  r_name[MAX_REASON_LEN],
+  r_time,
+  gag_flags_s: r_flags
+}
+
 enum any: gagData_s {
   gd_target,
   gd_name[MAX_NAME_LENGTH],
@@ -30,11 +36,8 @@ enum any: gagData_s {
   gd_adminAuthID[MAX_AUTHID_LENGTH],
   gd_adminIP[MAX_IP_LENGTH],
 
-  gd_reason[MAX_REASON_LEN],
-  gd_time,
-  gd_expireAt,
-
-  gag_flags_s: gd_flags
+  gd_reason[reason_s],
+  gd_expireAt
 }
 
 stock flags_to_bit(const flagsStr[]) {
@@ -67,11 +70,11 @@ stock GagData_Reset(gagData[gagData_s]) {
   gagData[gd_adminAuthID][0] = EOS;
   gagData[gd_adminIP][0] = EOS;
 
-  gagData[gd_reason][0] = EOS;
-  gagData[gd_time] = 0;
-  gagData[gd_expireAt] = 0;
+  gagData[gd_reason][r_name][0] = EOS;
+  gagData[gd_reason][r_time] = 0;
+  gagData[gd_reason][r_flags] = m_REMOVED;
 
-  gagData[gd_flags] = m_REMOVED;
+  gagData[gd_expireAt] = 0;
 }
 
 stock GagData_Copy(to[gagData_s], const from[gagData_s]) {
@@ -85,18 +88,16 @@ stock GagData_Copy(to[gagData_s], const from[gagData_s]) {
   copy(to[gd_adminAuthID], charsmax(to[gd_adminAuthID]), from[gd_adminAuthID]);
   copy(to[gd_adminIP], charsmax(to[gd_adminIP]), from[gd_adminIP]);
 
-  copy(to[gd_reason], charsmax(to[gd_reason]), from[gd_reason]);
-  to[gd_expireAt] = from[gd_expireAt];
-  to[gd_time] = from[gd_time];
+  to[gd_reason] = from[gd_reason]
 
-  to[gd_flags] = from[gd_flags];
+  to[gd_expireAt] = from[gd_expireAt];
 }
 
 bool: GagData_IsEqual(const arr1[gagData_s], const arr2[gagData_s]) {
   return (
-    strcmp(arr1[gd_reason], arr2[gd_reason]) == 0
-    /* || arr1[gd_time] == arr2[gd_time] */
-    || arr1[gd_flags] == arr2[gd_flags]
+    strcmp(arr1[gd_reason][r_name], arr2[gd_reason][r_name]) == 0
+    /* || [gd_reason][r_time] == arr2[gd_reason][r_time] */
+    || arr1[gd_reason][r_flags] == arr2[gd_reason][r_flags]
   );
 }
 
