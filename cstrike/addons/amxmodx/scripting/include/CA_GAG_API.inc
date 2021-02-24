@@ -1,193 +1,133 @@
-/** Copyright © 2020 Sergey Shorokhov
+/** Copyright © 2021 Sergey Shorokhov
  *
  * Chat Additions: Gag [API] include file.
  *
 */
 
 #if defined _CA_GAG_API_included
-	#endinput
+  #endinput
 #endif
 
 #define _CA_GAG_API_included
 
-#pragma reqlib ChatAdditions_GAG_API
-#if !defined AMXMODX_NOAUTOLOAD
-	#pragma loadlib ChatAdditions_GAG_API
-#endif
-
-
-#pragma semicolon 1
-#pragma dynamic 524288
-
-enum any: gag_flags_s ( <<=1 )
-{
-	m_REMOVED = 0,
-	m_Say = 1,		// a
-	m_SayTeam,		// b
-	m_Voice			// c
+enum any: gag_flags_s ( <<=1 ) {
+  gagFlag_Removed = 0,
+  gagFlag_Say = 1,  // a
+  gagFlag_SayTeam,  // b
+  gagFlag_Voice     // c
 }
 
 const MAX_REASON_LEN = 128;
 
-enum any: gag_s (+=1)
-{
-	_Player,
-	_AuthId[32],
-	_IP[32],
-	_Name[MAX_NAME_LENGTH],
-
-	_AdminId,
-	_AdminName[MAX_NAME_LENGTH],
-	_AdminAuthId[32],
-	_AdminIP[32],
-
-	_Reason[MAX_REASON_LEN],
-	_Time,
-	_ExpireTime,
-
-	gag_flags_s: _bitFlags
+enum reason_s {
+  r_name[MAX_REASON_LEN],
+  r_time,
+  gag_flags_s: r_flags
 }
 
-stock flags_to_bit(szFlags[])
-{
-	new gag_flags_s: bits = m_REMOVED;
-	if(containi(szFlags, "a") != -1) bits |= m_Say;
-	if(containi(szFlags, "b") != -1) bits |= m_SayTeam;
-	if(containi(szFlags, "c") != -1) bits |= m_Voice;
+enum gagData_s {
+  gd_target,
+  gd_name[MAX_NAME_LENGTH],
+  gd_authID[MAX_AUTHID_LENGTH],
+  gd_IP[MAX_IP_LENGTH],
 
-	return bits;
+  gd_admin,
+  gd_adminName[MAX_NAME_LENGTH],
+  gd_adminAuthID[MAX_AUTHID_LENGTH],
+  gd_adminIP[MAX_IP_LENGTH],
+
+  gd_reason[reason_s],
+  gd_expireAt
 }
 
-stock bits_to_flags(gag_flags_s: bits)
-{
-	new szFlags[4];
-	if(bits & m_Say) add(szFlags, charsmax(szFlags), "a");
-	if(bits & m_SayTeam) add(szFlags, charsmax(szFlags), "b");
-	if(bits & m_Voice) add(szFlags, charsmax(szFlags), "c");
+stock gag_flags_s: flags_to_bit(const flagsStr[]) {
+  new gag_flags_s: bits = gagFlag_Removed;
 
-	return szFlags;
+  if(containi(flagsStr, "a") != -1) bits |= gagFlag_Say;
+  if(containi(flagsStr, "b") != -1) bits |= gagFlag_SayTeam;
+  if(containi(flagsStr, "c") != -1) bits |= gagFlag_Voice;
+
+  return bits;
 }
 
-stock GagData_Reset(aGagData[gag_s])
-{
-	aGagData[_Player] = 0;
-	aGagData[_AuthId][0] = EOS;
-	aGagData[_IP][0] = EOS;
-	aGagData[_Name][0] = EOS;
-	
-	aGagData[_AdminId] = 0;
-	aGagData[_AdminName][0] = EOS;
-	aGagData[_AdminAuthId][0] = EOS;
-	aGagData[_AdminIP][0] = EOS;
+stock bits_to_flags(const gag_flags_s: bits) {
+  new flagsStr[4];
+  if(bits & gagFlag_Say)      add(flagsStr, charsmax(flagsStr), "a");
+  if(bits & gagFlag_SayTeam)  add(flagsStr, charsmax(flagsStr), "b");
+  if(bits & gagFlag_Voice)    add(flagsStr, charsmax(flagsStr), "c");
 
-	aGagData[_Reason][0] = EOS;
-	aGagData[_Time] = 0;
-	aGagData[_ExpireTime] = 0;
-
-	aGagData[_bitFlags] = m_REMOVED;
+  return flagsStr;
 }
 
-stock GagData_Copy(to[gag_s], const from[gag_s]) {
-	to[_Player] = from[_Player];
-	copy(to[_AuthId], charsmax(to[_AuthId]), from[_AuthId]);
-	copy(to[_IP], charsmax(to[_IP]), from[_IP]);
-	copy(to[_Name], charsmax(to[_Name]), from[_Name]);
-	
-	to[_AdminId] = from[_AdminId];
-	copy(to[_AdminName], charsmax(to[_AdminName]), from[_AdminName]);
-	copy(to[_AdminAuthId], charsmax(to[_AdminAuthId]), from[_AdminAuthId]);
-	copy(to[_AdminIP], charsmax(to[_AdminIP]), from[_AdminIP]);
+stock GagData_Reset(gagData[gagData_s]) {
+  gagData[gd_target] = 0;
+  gagData[gd_name][0] = EOS;
+  gagData[gd_authID][0] = EOS;
+  gagData[gd_IP][0] = EOS;
 
-	copy(to[_Reason], charsmax(to[_Reason]), from[_Reason]);
-	to[_ExpireTime] = from[_ExpireTime];
-	to[_Time] = from[_Time];
+  gagData[gd_admin] = 0;
+  gagData[gd_adminName][0] = EOS;
+  gagData[gd_adminAuthID][0] = EOS;
+  gagData[gd_adminIP][0] = EOS;
 
-	to[_bitFlags] = from[_bitFlags];
+  gagData[gd_reason][r_name][0] = EOS;
+  gagData[gd_reason][r_time] = 0;
+  gagData[gd_reason][r_flags] = gagFlag_Removed;
+
+  gagData[gd_expireAt] = 0;
 }
 
-bool: GagData_Equal(const arr1[gag_s], const arr2[gag_s]) {
-	return (
-		strcmp(arr1[_Reason], arr2[_Reason]) == 0
-		/* || arr1[_Time] == arr2[_Time] */
-		|| arr1[_bitFlags] == arr2[_bitFlags]
-	);
+stock GagData_Copy(to[gagData_s], const from[gagData_s]) {
+  to[gd_target] = from[gd_target];
+  copy(to[gd_name], charsmax(to[gd_name]), from[gd_name]);
+  copy(to[gd_authID], charsmax(to[gd_authID]), from[gd_authID]);
+  copy(to[gd_IP], charsmax(to[gd_IP]), from[gd_IP]);
+
+  to[gd_admin] = from[gd_admin];
+  copy(to[gd_adminName], charsmax(to[gd_adminName]), from[gd_adminName]);
+  copy(to[gd_adminAuthID], charsmax(to[gd_adminAuthID]), from[gd_adminAuthID]);
+  copy(to[gd_adminIP], charsmax(to[gd_adminIP]), from[gd_adminIP]);
+
+  copy(to[gd_reason][r_name], charsmax(to[r_name]), from[gd_reason][r_name])
+  to[gd_reason][r_time] = from[gd_reason][r_time]
+  to[gd_reason][r_flags] = from[gd_reason][r_flags]
+
+  to[gd_expireAt] = from[gd_expireAt];
 }
 
-GagData_GetPersonalData(const id = 0, const target, aGagData[gag_s]) {
-	// get's target data
-	aGagData[_Player] = target;
-	get_user_authid(target, aGagData[_AuthId], charsmax(aGagData[_AuthId]));
-	get_user_ip(target, aGagData[_IP], charsmax(aGagData[_IP]), .without_port = true);
-	get_user_name(target, aGagData[_Name], charsmax(aGagData[_Name]));
+stock bool: GagData_IsEqual(const arr1[gagData_s], const arr2[gagData_s]) {
+  if(arr1[gd_reason][r_time] != arr2[gd_reason][r_time]) {
+    return false;
+  }
 
-	if(id == 0)
-		return;
+  if(arr1[gd_reason][r_flags] != arr2[gd_reason][r_flags]) {
+    return false;
+  }
 
-	// get's admin data
-	aGagData[_AdminId] = id;
-	get_user_name(id, aGagData[_AdminName], charsmax(aGagData[_AdminName]));
-	get_user_authid(id, aGagData[_AdminAuthId], charsmax(aGagData[_AdminAuthId]));
-	get_user_ip(id, aGagData[_AdminIP], charsmax(aGagData[_AdminIP]), .without_port = true);
+  if(strcmp(arr1[gd_reason][r_name], arr2[gd_reason][r_name]) != 0) {
+    return false;
+  }
+
+  return true;
 }
 
-// Debug functions
-#if defined DEBUG
-#include <fakemeta>
-#define SERVER_PRINT(%1) engfunc(EngFunc_ServerPrint, %1)
+stock GagData_GetPersonalData(const admin = 0, const target, buffer[gagData_s]) {
+  // get's target data
+  buffer[gd_target] = target;
+  get_user_name(target, buffer[gd_name], charsmax(buffer[gd_name]));
+  get_user_authid(target, buffer[gd_authID], charsmax(buffer[gd_authID]));
+  get_user_ip(target, buffer[gd_IP], charsmax(buffer[gd_IP]), .without_port = true);
 
-stock Print_Console(szBuffer[]) {
-	for(new i; i < strlen(szBuffer); i+=255) {
-		SERVER_PRINT(fmt("%-255s", szBuffer[i]));
-	}
-	SERVER_PRINT("\n");
+  if(admin == 0)
+    return;
+
+  // get's admin data
+  buffer[gd_admin] = admin;
+  get_user_name(admin, buffer[gd_adminName], charsmax(buffer[gd_adminName]));
+  get_user_authid(admin, buffer[gd_adminAuthID], charsmax(buffer[gd_adminAuthID]));
+  get_user_ip(admin, buffer[gd_adminIP], charsmax(buffer[gd_adminIP]), .without_port = true);
 }
 
-#pragma ctrlchar '\'
-stock DEBUG__Dump_GagData(from[], const aGagData[gag_s]) {
-	new szBuffer[5028];
-	formatex(szBuffer, charsmax(szBuffer), "[call %s] DEBUG__Dump_GagData() -> \n\
-		\t Player = '%i'\n\
-		\t AuthId = '%s'\n\
-		\t IP = '%s'\n\
-		\t Name = '%s'\n\
-\
-		\t AdminId = '%i'\n\
-		\t AdminName = '%s'\n\
-		\t AdminAuthId = '%s'\n\
-		\t AdminIP = '%s'\n\
-\
-		\t Reason = '%s'\n\
-		\t Time = '%i'\n\
-		\t ExpireTime = '%i'\n\
-		\t Flags = '%s'\n\
-		", from,
-		aGagData[_Player], aGagData[_AuthId], aGagData[_IP], aGagData[_Name],
-		aGagData[_AdminId], aGagData[_AdminName], aGagData[_AdminAuthId],
-		aGagData[_AdminIP], aGagData[_Reason], aGagData[_Time], aGagData[_ExpireTime], bits_to_flags(aGagData[_bitFlags])
-	);
-
-	Print_Console(szBuffer);
-}
-
-stock DEBUG__Dump_GagFlags(const aGagData[gag_s]) {
-	if(!aGagData[_bitFlags]) {
-		Print_Console(" DEBUG_Dump_GagFlags() -> No have any flags.");
-		return;
-	}
-
-	new szBuffer[5028];
-	formatex(szBuffer, charsmax(szBuffer), "	DEBUG_Dump_GagFlags() -> #FOUND\n\
-			\t Flags='%i'\n\
-			\t Reason='%s'\n\
-			\t Time='%i'",
-			aGagData[_bitFlags], aGagData[_Reason], aGagData[_Reason]
-		);
-	
-	Print_Console(szBuffer);
-}
-
-#pragma ctrlchar '^'
-#endif
 
 
 
@@ -196,14 +136,14 @@ stock DEBUG__Dump_GagFlags(const aGagData[gag_s]) {
  * Sets client's gag data.
  *
  * @param index         Client index
- * @param aGagData      Gag data with gag_s
+ * @param gagData      Gag data with gagData_s
  *
  * @noreturn
  * @error               If the client index is not within the range of 1 to
  *                      MaxClients, or the client is not connected, an error
  *                      will be thrown.
  */
-native ca_set_user_gag(index, const reason[], const time, const gag_flags_s: flags = (m_Say | m_SayTeam | m_Voice));
+native ca_set_user_gag(index, const reason[], const time, const gag_flags_s: flags = (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
 
 /**
  * Get client's gag data.
@@ -244,10 +184,3 @@ native bool: ca_has_user_gag(index);
  */
 native ca_remove_user_gag(index);
 
-/**
- * Get api storage type.
- *
- * @return Storage type
- * 
- */
-native DB_Types: ca_get_gag_storage_type();

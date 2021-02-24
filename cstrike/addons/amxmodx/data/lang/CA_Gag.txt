@@ -1,88 +1,78 @@
 [ru]
-CA_Gag_TITLE = Заткнуть игрока
-CA_Gag_Properties = Параметры затычки игрока: [ \r%n\w ]
-MENU_SelectReason = Выберите причину для затычки:
-EnterReason = Ввести причину ->\n
-MENU_SelectTime = Выберите время для затычки:
-SET_CustomTime = Указать время ->
-CA_GAG_YES = \yДа\w
-CA_GAG_NO = \rНет \w(\yРедактировать\w)
-GAG_Confirm = Подтвердите удаление:
+Gag_MenuTitle_PlayersList = Заткнуть игрока
+Gag_MenuTitle_SelectReason = Выберите причину для затычки:
+Gag_MenuTitle_SelectTime = Выберите время для затычки:
+Gag_MenuItem_Yes = \yДа\w
+Gag_MenuItem_NoAndEdit = \rНет \w(\yРедактировать\w)
+Gag_MenuItem_ReadyConfirm = Подтвердите удаление:
+Gag_MenuItem_PropSay = Чат:
+Gag_MenuItem_PropSayTeam = Командный чат:
+Gag_MenuItem_PropVoice = Голосовое общение:
+Gag_MenuItem_Time = Время:
+Gag_MenuItem_Confirm = Подтвердить!
+Gag_MenuItem_Reason = Причина:
+Gag_MenuItem_Resolution = Время: \y%s\w (причина: \y%s\w)
 
-Immunity = Иммунитет
-Gag = *МОЛЧУН*
+Gag_GagProperties = Параметры затычки игрока: [ \r%n\w ]
+Gag_EnterReason = Ввести причину ->\n
+Gag_EnterTime = Указать время ->
 
-CA_Gag_Say = Чат:
-CA_Gag_SayTeam = Командный чат:
-CA_Gag_Voice = Голосовое общение:
-CA_Gag_Reason = ^4Причина:^1
-CA_Gag_Time = Время:
-CA_Gag_Confirm = Подтвердить!
-CA_Gag_NotSet = Не задано
-CA_Gag_Perpapent = *НАВСЕГДА*
+Gag_Immunity = Иммунитет
+Gag_Gagged = *МОЛЧУН*
 
-Player_Gagged = ^3Админ ^4%s ^3заткнул игрока ^4%s^1 (^3%s^1)
-Player_UnGagged = ^3Админ ^4%n ^3снял затычку с игрока ^4%n^1.
-Player_NotConnected = ^3Игрок не доступен!^1
-Player_AlreadyRemovedGag = ^3Игрок ^4%n^1 уже удалён!
-Player_ExpiredGag = ^3У игрока ^4%n^1 истекло время затычки.
+Gag_ChatMsg_Reason = ^4Причина:^1
+Gag_NotSet = Не задано
+Gag_Permanent = *НАВСЕГДА*
 
-NotEnoughPlayers = ^3Недостаточно игроков, чтобы открыть меню Gag'ов!
-NoHaveReasonsTemplates = ^3Нет шаблонов выбора причин.
-NoHaveTimeTemplates = ^3Нет шаблонов выбора времени.
+Gag_AdminGagPlayer = ^3Админ ^4%s ^3заткнул игрока ^4%s^1 (^3%s^1)
+Gag_AdminUngagPlayer = ^3Админ ^4%n ^3снял затычку с игрока ^4%n^1.
+Gag_PlayerNotConnected = ^3Игрок не доступен!^1
+Gag_PlayerAlreadyRemoved = ^3Игрок ^4%n^1 уже удалён!
+Gag_PlayerExpiredGag = ^3У игрока ^4%n^1 истекло время затычки.
 
-CustomTime_Setted = ^3Вы установили своё время:
-CustomReason_Setted = ^3Вы установили причину затычки:
+Gag_NotEnoughPlayers = ^3Недостаточно игроков, чтобы открыть меню!
+Gag_NoTemplatesAvailable_Reasons = ^3Нет шаблонов выбора причин.
+Gag_NoTemplatesAvailable_Times = ^3Нет шаблонов выбора времени.
 
-Gag_Menu_Next = Следующая
-Gag_Menu_Back = Назад
-Gag_Menu_Exit = Выход
-Gag_Menu_Reason = Причина:
-Gag_Menu_Cancel = Отмена
+Gag_YouSetManual_Time = ^3Вы установили своё время:
+Gag_YouSetManual_Reason = ^3Вы установили причину затычки:
 
-Menu_WannaGag = Время: \y%s\w (причина: \y%s\w)
 
 [en]
-CA_Gag_TITLE = Gag player
-CA_Gag_Properties = Gag parameters: [ \r%n\w ]
-MENU_SelectReason = Choose gag reason:
-EnterReason = Enter gag reason ->\n
-MENU_SelectTime = Choose gag time:
-SET_CustomTime = Enter gag time ->
-CA_GAG_YES = \yYes\w
-CA_GAG_NO = \rNo \w(\yEdit\w)
-GAG_Confirm = Confirm remove gag:
+Gag_MenuTitle_PlayersList = Gag_Gagged player
+Gag_MenuTitle_SelectReason = Choose gag reason:
+Gag_MenuTitle_SelectTime = Choose gag time:
+Gag_MenuItem_Yes = \yYes\w
+Gag_MenuItem_NoAndEdit = \rNo \w(\yEdit\w)
+Gag_MenuItem_ReadyConfirm = Confirm remove gag:
+Gag_MenuItem_PropSay = Chat:
+Gag_MenuItem_PropSayTeam = Team chat:
+Gag_MenuItem_PropVoice = Voice chat:
+Gag_MenuItem_Time = Time:
+Gag_MenuItem_Confirm = Confirm!
+Gag_MenuItem_Reason = Reason:
+Gag_MenuItem_Resolution =  Time: \y%s\w (reason: \y%s\w)
 
-Immunity = Immunity
-Gag = *GAG*
+Gag_GagProperties = Gag_Gagged parameters: [ \r%n\w ]
+Gag_EnterReason = Enter gag reason ->\n
+Gag_EnterTime = Enter gag time ->
 
-CA_Gag_Say = Chat:
-CA_Gag_SayTeam = Team chat:
-CA_Gag_Voice = Voice chat:
-CA_Gag_Reason = ^4Reason:^1
-CA_Gag_Time = Time:
-CA_Gag_Confirm = Confirm!
-CA_Gag_NotSet = Not selected
-CA_Gag_Perpapent = *PERMAMENT*
+Gag_Immunity = Gag_Immunity
+Gag_Gagged = *GAG*
 
-Player_Gagged = ^3Admin ^4%s ^3gag player ^4%s^1 (^3%s^1)
-Player_UnGagged = ^3Admin ^4%n ^3remove gag from player ^4%n^1.
-Player_NotConnected = ^3Player not connected!
-Player_AlreadyRemovedGag = ^3Player ^4%n^1 already removed!
-Player_ExpiredGag = ^3Player ^4%n^1 has expired gag.
+Gag_ChatMsg_Reason = ^4Reason:^1
+Gag_NotSet = Not selected
+Gag_Permanent = *PERMANENT*
 
-NotEnoughPlayers = ^3Not enough players to open gag menu!
+Gag_AdminGagPlayer = ^3Admin ^4%s ^3gag player ^4%s^1 (^3%s^1)
+Gag_AdminUngagPlayer = ^3Admin ^4%n ^3remove gag from player ^4%n^1.
+Gag_PlayerNotConnected = ^3Player not connected!
+Gag_PlayerAlreadyRemoved = ^3Player ^4%n^1 already removed!
+Gag_PlayerExpiredGag = ^3Player ^4%n^1 has expired gag.
 
-NoHaveReasonsTemplates = No have reasons templates.
-NoHaveTimeTemplates = No have time templates.
+Gag_NotEnoughPlayers = ^3Not enough players to open menu!
+Gag_NoTemplatesAvailable_Reasons = No have reasons templates.
+Gag_NoTemplatesAvailable_Times = No have time templates.
 
-CustomTime_Setted = ^3You set custom time:
-CustomReason_Setted = ^3You set custom reason:
-
-Gag_Menu_Next = Next
-Gag_Menu_Back = Back
-Gag_Menu_Exit = Exit
-Gag_Menu_Cancel = Cancel
-Gag_Menu_Reason = Reason:
-
-Menu_WannaGag =  Time: \y%s\w (reason: \y%s\w)
+Gag_YouSetManual_Time = ^3You set custom time:
+Gag_YouSetManual_Reason = ^3You set custom reason:

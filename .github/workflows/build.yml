@@ -13,7 +13,6 @@ jobs:
     strategy:
       matrix:
         amxmodx: ["1.9"]
-        parameters: ["", "DEBUG=1"]
 
       fail-fast: false
     steps:
@@ -30,15 +29,11 @@ jobs:
           cd addons/amxmodx && rm scripting/*.sma && rm plugins/*.amxx
 
       - name: Compile plugins AMXX Version
-        env:
-          DEBUG: ${{ matrix.parameters }}
         run: |
           cp -Rf ./cstrike/addons/amxmodx/* ./addons/amxmodx/
           cd addons/amxmodx/scripting
-          chmod +x amxxpc32.so
-          chmod +x compile.sh
-          chmod +x amxxpc
+          chmod +x amxxpc32.so && chmod +x compile.sh && chmod +x amxxpc
           for sourcefile in *.sma; do\
             echo -n "Compiling $sourcefile ...";\
-            ./amxxpc -d3 $sourcefile $DEBUG -o../plugins/$(echo $sourcefile | sed -e 's/\.sma$/.amxx/') || exit 1;\
+            ./amxxpc -d3 $sourcefile -o../plugins/$(echo $sourcefile | sed -e 's/\.sma$/.amxx/') || exit 1;\
           done

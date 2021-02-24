@@ -1,45 +1,39 @@
 [ru]
-CA_Mute_TITLE = Заглушить игрока: 
-CA_Mute_MuteALL = Заглушить всех
-CA_Mute_Next = Следующая
-CA_Mute_Back = Назад
-CA_Mute_Exit = Выход
+Mute_MenuTitle = Заглушить игрока: 
+Mute_MuteAll = Заглушить всех
 
-CA_Mute_Muted = Вы НЕ слышите игрока
-CA_Mute_UnMuted = Вы снова слышите игрока
+Mute_YouMutePlayer = Вы НЕ слышите игрока
+Mute_YouUnmutePlayer = Вы снова слышите игрока
 
 Mute_NotEnoughPlayers = Не достаточно игроков!
-Player_NotConnected = ^3Игрок не подключен!
+Mute_PlayerNotConnected = ^3Игрок не подключен!
 
-Menu_Muted_you = Не слышит вас
+Mute_PlayerMutedYou = Не слышит вас
 
-Player_Muted_you = теперь НЕ слышит вас.
-Player_UnMuted_you = вновь слышит вас.
+Mute_PlayerNowMutedYou = теперь НЕ слышит вас.
+Mute_PlayerNowUnmutedYou = вновь слышит вас.
 
-Menu_UseToOften = ^3Вы используете слишком часто!
+Mute_UseTooOften = ^3Вы используете слишком часто!
 
-Player_Muted_All = теперь НЕ слышит никого!
-Player_UnMuted_All = снова слышит всех.
+Mute_PlayerNowMutedAll = теперь НЕ слышит никого!
+Mute_PlayerNowUnmutedAll = снова слышит всех.
 
 [en]
-CA_Mute_TITLE = Players menu for mute:
-CA_Mute_MuteALL = Mute all
-CA_Mute_Next = Next
-CA_Mute_Back = Back
-CA_Mute_Exit = Exit
+Mute_MenuTitle = Players mute menu:
+Mute_MuteAll = Mute all
 
-CA_Mute_Muted = Now you can 't hear the player
-CA_Mute_UnMuted = You hear the player again
+Mute_YouMutePlayer = Now you can't hear the player
+Mute_YouUnmutePlayer = You hear the player again
 
 Mute_NotEnoughPlayers = Not enough players!
-Player_NotConnected = ^3Player not connected!
+Mute_PlayerNotConnected = ^3Player not connected!
 
-Menu_Muted_you = Muted you
+Mute_PlayerMutedYou = Muted you
 
-Player_Muted_you = CAN'T hear you now.
-Player_UnMuted_you = can hear you now.
+Mute_PlayerNowMutedYou = CAN'T hear you now.
+Mute_PlayerNowUnmutedYou = can hear you now.
 
-Menu_UseToOften = ^3You use very often!
+Mute_UseTooOften = ^3You use very often!
 
-Player_Muted_All = CAN'T hear anybody now!
-Player_UnMuted_All = can hear anybody now.
+Mute_PlayerNowMutedAll = CAN'T hear anybody now!
+Mute_PlayerNowUnmutedAll = can hear anybody now.
