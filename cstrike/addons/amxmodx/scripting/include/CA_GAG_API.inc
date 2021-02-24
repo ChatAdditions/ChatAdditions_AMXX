@@ -5,14 +5,14 @@
 */
 
 #if defined _CA_GAG_API_included
-	#endinput
+  #endinput
 #endif
 
 #define _CA_GAG_API_included
 
 #pragma reqlib ChatAdditions_GAG_API
 #if !defined AMXMODX_NOAUTOLOAD
-	#pragma loadlib ChatAdditions_GAG_API
+  #pragma loadlib ChatAdditions_GAG_API
 #endif
 
 
@@ -21,113 +21,113 @@
 
 enum any: gag_flags_s ( <<=1 )
 {
-	m_REMOVED = 0,
-	m_Say = 1,		// a
-	m_SayTeam,		// b
-	m_Voice			// c
+  m_REMOVED = 0,
+  m_Say = 1,		// a
+  m_SayTeam,		// b
+  m_Voice			// c
 }
 
 const MAX_REASON_LEN = 128;
 
 enum any: gag_s (+=1)
 {
-	_Player,
-	_AuthId[32],
-	_IP[32],
-	_Name[MAX_NAME_LENGTH],
+  _Player,
+  _AuthId[32],
+  _IP[32],
+  _Name[MAX_NAME_LENGTH],
 
-	_AdminId,
-	_AdminName[MAX_NAME_LENGTH],
-	_AdminAuthId[32],
-	_AdminIP[32],
+  _AdminId,
+  _AdminName[MAX_NAME_LENGTH],
+  _AdminAuthId[32],
+  _AdminIP[32],
 
-	_Reason[MAX_REASON_LEN],
-	_Time,
-	_ExpireTime,
+  _Reason[MAX_REASON_LEN],
+  _Time,
+  _ExpireTime,
 
-	gag_flags_s: _bitFlags
+  gag_flags_s: _bitFlags
 }
 
 stock flags_to_bit(szFlags[])
 {
-	new gag_flags_s: bits = m_REMOVED;
-	if(containi(szFlags, "a") != -1) bits |= m_Say;
-	if(containi(szFlags, "b") != -1) bits |= m_SayTeam;
-	if(containi(szFlags, "c") != -1) bits |= m_Voice;
+  new gag_flags_s: bits = m_REMOVED;
+  if(containi(szFlags, "a") != -1) bits |= m_Say;
+  if(containi(szFlags, "b") != -1) bits |= m_SayTeam;
+  if(containi(szFlags, "c") != -1) bits |= m_Voice;
 
-	return bits;
+  return bits;
 }
 
 stock bits_to_flags(gag_flags_s: bits)
 {
-	new szFlags[4];
-	if(bits & m_Say) add(szFlags, charsmax(szFlags), "a");
-	if(bits & m_SayTeam) add(szFlags, charsmax(szFlags), "b");
-	if(bits & m_Voice) add(szFlags, charsmax(szFlags), "c");
+  new szFlags[4];
+  if(bits & m_Say) add(szFlags, charsmax(szFlags), "a");
+  if(bits & m_SayTeam) add(szFlags, charsmax(szFlags), "b");
+  if(bits & m_Voice) add(szFlags, charsmax(szFlags), "c");
 
-	return szFlags;
+  return szFlags;
 }
 
 stock GagData_Reset(aGagData[gag_s])
 {
-	aGagData[_Player] = 0;
-	aGagData[_AuthId][0] = EOS;
-	aGagData[_IP][0] = EOS;
-	aGagData[_Name][0] = EOS;
+  aGagData[_Player] = 0;
+  aGagData[_AuthId][0] = EOS;
+  aGagData[_IP][0] = EOS;
+  aGagData[_Name][0] = EOS;
 
-	aGagData[_AdminId] = 0;
-	aGagData[_AdminName][0] = EOS;
-	aGagData[_AdminAuthId][0] = EOS;
-	aGagData[_AdminIP][0] = EOS;
+  aGagData[_AdminId] = 0;
+  aGagData[_AdminName][0] = EOS;
+  aGagData[_AdminAuthId][0] = EOS;
+  aGagData[_AdminIP][0] = EOS;
 
-	aGagData[_Reason][0] = EOS;
-	aGagData[_Time] = 0;
-	aGagData[_ExpireTime] = 0;
+  aGagData[_Reason][0] = EOS;
+  aGagData[_Time] = 0;
+  aGagData[_ExpireTime] = 0;
 
-	aGagData[_bitFlags] = m_REMOVED;
+  aGagData[_bitFlags] = m_REMOVED;
 }
 
 stock GagData_Copy(to[gag_s], const from[gag_s]) {
-	to[_Player] = from[_Player];
-	copy(to[_AuthId], charsmax(to[_AuthId]), from[_AuthId]);
-	copy(to[_IP], charsmax(to[_IP]), from[_IP]);
-	copy(to[_Name], charsmax(to[_Name]), from[_Name]);
+  to[_Player] = from[_Player];
+  copy(to[_AuthId], charsmax(to[_AuthId]), from[_AuthId]);
+  copy(to[_IP], charsmax(to[_IP]), from[_IP]);
+  copy(to[_Name], charsmax(to[_Name]), from[_Name]);
 
-	to[_AdminId] = from[_AdminId];
-	copy(to[_AdminName], charsmax(to[_AdminName]), from[_AdminName]);
-	copy(to[_AdminAuthId], charsmax(to[_AdminAuthId]), from[_AdminAuthId]);
-	copy(to[_AdminIP], charsmax(to[_AdminIP]), from[_AdminIP]);
+  to[_AdminId] = from[_AdminId];
+  copy(to[_AdminName], charsmax(to[_AdminName]), from[_AdminName]);
+  copy(to[_AdminAuthId], charsmax(to[_AdminAuthId]), from[_AdminAuthId]);
+  copy(to[_AdminIP], charsmax(to[_AdminIP]), from[_AdminIP]);
 
-	copy(to[_Reason], charsmax(to[_Reason]), from[_Reason]);
-	to[_ExpireTime] = from[_ExpireTime];
-	to[_Time] = from[_Time];
+  copy(to[_Reason], charsmax(to[_Reason]), from[_Reason]);
+  to[_ExpireTime] = from[_ExpireTime];
+  to[_Time] = from[_Time];
 
-	to[_bitFlags] = from[_bitFlags];
+  to[_bitFlags] = from[_bitFlags];
 }
 
 bool: GagData_Equal(const arr1[gag_s], const arr2[gag_s]) {
-	return (
-		strcmp(arr1[_Reason], arr2[_Reason]) == 0
-		/* || arr1[_Time] == arr2[_Time] */
-		|| arr1[_bitFlags] == arr2[_bitFlags]
-	);
+  return (
+    strcmp(arr1[_Reason], arr2[_Reason]) == 0
+    /* || arr1[_Time] == arr2[_Time] */
+    || arr1[_bitFlags] == arr2[_bitFlags]
+  );
 }
 
 GagData_GetPersonalData(const id = 0, const target, aGagData[gag_s]) {
-	// get's target data
-	aGagData[_Player] = target;
-	get_user_authid(target, aGagData[_AuthId], charsmax(aGagData[_AuthId]));
-	get_user_ip(target, aGagData[_IP], charsmax(aGagData[_IP]), .without_port = true);
-	get_user_name(target, aGagData[_Name], charsmax(aGagData[_Name]));
+  // get's target data
+  aGagData[_Player] = target;
+  get_user_authid(target, aGagData[_AuthId], charsmax(aGagData[_AuthId]));
+  get_user_ip(target, aGagData[_IP], charsmax(aGagData[_IP]), .without_port = true);
+  get_user_name(target, aGagData[_Name], charsmax(aGagData[_Name]));
 
-	if(id == 0)
-		return;
+  if(id == 0)
+    return;
 
-	// get's admin data
-	aGagData[_AdminId] = id;
-	get_user_name(id, aGagData[_AdminName], charsmax(aGagData[_AdminName]));
-	get_user_authid(id, aGagData[_AdminAuthId], charsmax(aGagData[_AdminAuthId]));
-	get_user_ip(id, aGagData[_AdminIP], charsmax(aGagData[_AdminIP]), .without_port = true);
+  // get's admin data
+  aGagData[_AdminId] = id;
+  get_user_name(id, aGagData[_AdminName], charsmax(aGagData[_AdminName]));
+  get_user_authid(id, aGagData[_AdminAuthId], charsmax(aGagData[_AdminAuthId]));
+  get_user_ip(id, aGagData[_AdminIP], charsmax(aGagData[_AdminIP]), .without_port = true);
 }
 
 
