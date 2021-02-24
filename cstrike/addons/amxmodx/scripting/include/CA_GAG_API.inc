@@ -15,8 +15,6 @@
   #pragma loadlib ChatAdditions_GAG_API
 #endif
 
-
-#pragma semicolon 1
 #pragma dynamic 524288
 
 enum any: gag_flags_s ( <<=1 )
