@@ -79,8 +79,9 @@ static MenuShow_PlayersList(const id) {
   new menu = menu_create(fmt("%L", id, "Mute_MenuTitle"), "MenuHandler_PlayersList")
 
   static callback
-  if(!callback)
+  if(!callback) {
     callback = menu_makecallback("MenuCallback_PlayersList")
+  }
 
   new players[MAX_PLAYERS], count
   get_players_ex(players, count, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV))
