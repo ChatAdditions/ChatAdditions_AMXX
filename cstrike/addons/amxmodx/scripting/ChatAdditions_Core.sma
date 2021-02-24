@@ -65,13 +65,13 @@ public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
 public ClCmd_Say(const id) {
   ExecuteForward(g_fwdClientSay, g_retVal, id)
 
-  return (g_retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED_MAIN : PLUGIN_CONTINUE
+	return (retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE
 }
 
 public ClCmd_SayTeam(const id) {
   ExecuteForward(g_fwdClientSayTeam, g_retVal, id)
 
-  return (g_retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED_MAIN : PLUGIN_CONTINUE
+return (retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE
 }
 
 public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
