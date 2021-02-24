@@ -11,10 +11,10 @@
 #define _CA_GAG_API_included
 
 enum any: gag_flags_s ( <<=1 ) {
-  m_REMOVED = 0,
-  m_Say = 1,  // a
-  m_SayTeam,  // b
-  m_Voice     // c
+  gagFlag_Removed = 0,
+  gagFlag_Say = 1,  // a
+  gagFlag_SayTeam,  // b
+  gagFlag_Voice     // c
 }
 
 const MAX_REASON_LEN = 128;
@@ -25,7 +25,7 @@ enum reason_s {
   gag_flags_s: r_flags
 }
 
-enum any: gagData_s {
+enum gagData_s {
   gd_target,
   gd_name[MAX_NAME_LENGTH],
   gd_authID[MAX_AUTHID_LENGTH],
@@ -40,21 +40,21 @@ enum any: gagData_s {
   gd_expireAt
 }
 
-stock flags_to_bit(const flagsStr[]) {
-  new gag_flags_s: bits = m_REMOVED;
+stock gag_flags_s: flags_to_bit(const flagsStr[]) {
+  new gag_flags_s: bits = gagFlag_Removed;
 
-  if(containi(flagsStr, "a") != -1) bits |= m_Say;
-  if(containi(flagsStr, "b") != -1) bits |= m_SayTeam;
-  if(containi(flagsStr, "c") != -1) bits |= m_Voice;
+  if(containi(flagsStr, "a") != -1) bits |= gagFlag_Say;
+  if(containi(flagsStr, "b") != -1) bits |= gagFlag_SayTeam;
+  if(containi(flagsStr, "c") != -1) bits |= gagFlag_Voice;
 
   return bits;
 }
 
 stock bits_to_flags(const gag_flags_s: bits) {
   new flagsStr[4];
-  if(bits & m_Say) add(flagsStr, charsmax(flagsStr), "a");
-  if(bits & m_SayTeam) add(flagsStr, charsmax(flagsStr), "b");
-  if(bits & m_Voice) add(flagsStr, charsmax(flagsStr), "c");
+  if(bits & gagFlag_Say)      add(flagsStr, charsmax(flagsStr), "a");
+  if(bits & gagFlag_SayTeam)  add(flagsStr, charsmax(flagsStr), "b");
+  if(bits & gagFlag_Voice)    add(flagsStr, charsmax(flagsStr), "c");
 
   return flagsStr;
 }
@@ -72,7 +72,7 @@ stock GagData_Reset(gagData[gagData_s]) {
 
   gagData[gd_reason][r_name][0] = EOS;
   gagData[gd_reason][r_time] = 0;
-  gagData[gd_reason][r_flags] = m_REMOVED;
+  gagData[gd_reason][r_flags] = gagFlag_Removed;
 
   gagData[gd_expireAt] = 0;
 }
@@ -88,19 +88,27 @@ stock GagData_Copy(to[gagData_s], const from[gagData_s]) {
   copy(to[gd_adminAuthID], charsmax(to[gd_adminAuthID]), from[gd_adminAuthID]);
   copy(to[gd_adminIP], charsmax(to[gd_adminIP]), from[gd_adminIP]);
 
-  copy(to[gd_reason][r_name], charsmax(to[r_name]), from[gd_reason][r_name]) 
-  to[gd_reason][r_time] = from[gd_reason][r_time] 
+  copy(to[gd_reason][r_name], charsmax(to[r_name]), from[gd_reason][r_name])
+  to[gd_reason][r_time] = from[gd_reason][r_time]
   to[gd_reason][r_flags] = from[gd_reason][r_flags]
 
   to[gd_expireAt] = from[gd_expireAt];
 }
 
-bool: GagData_IsEqual(const arr1[gagData_s], const arr2[gagData_s]) {
-  return (
-    strcmp(arr1[gd_reason][r_name], arr2[gd_reason][r_name]) == 0
-    /* || [gd_reason][r_time] == arr2[gd_reason][r_time] */
-    || arr1[gd_reason][r_flags] == arr2[gd_reason][r_flags]
-  );
+stock bool: GagData_IsEqual(const arr1[gagData_s], const arr2[gagData_s]) {
+  if(arr1[gd_reason][r_time] != arr2[gd_reason][r_time]) {
+    return false;
+  }
+
+  if(arr1[gd_reason][r_flags] != arr2[gd_reason][r_flags]) {
+    return false;
+  }
+
+  if(strcmp(arr1[gd_reason][r_name], arr2[gd_reason][r_name]) != 0) {
+    return false;
+  }
+
+  return true;
 }
 
 stock GagData_GetPersonalData(const admin = 0, const target, buffer[gagData_s]) {
@@ -135,7 +143,7 @@ stock GagData_GetPersonalData(const admin = 0, const target, buffer[gagData_s]) 
  *                      MaxClients, or the client is not connected, an error
  *                      will be thrown.
  */
-native ca_set_user_gag(index, const reason[], const time, const gag_flags_s: flags = (m_Say | m_SayTeam | m_Voice));
+native ca_set_user_gag(index, const reason[], const time, const gag_flags_s: flags = (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
 
 /**
  * Get client's gag data.
