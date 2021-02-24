@@ -74,7 +74,7 @@ stock GagData_Reset(aGagData[gag_s])
 	aGagData[_AuthId][0] = EOS;
 	aGagData[_IP][0] = EOS;
 	aGagData[_Name][0] = EOS;
-	
+
 	aGagData[_AdminId] = 0;
 	aGagData[_AdminName][0] = EOS;
 	aGagData[_AdminAuthId][0] = EOS;
@@ -92,7 +92,7 @@ stock GagData_Copy(to[gag_s], const from[gag_s]) {
 	copy(to[_AuthId], charsmax(to[_AuthId]), from[_AuthId]);
 	copy(to[_IP], charsmax(to[_IP]), from[_IP]);
 	copy(to[_Name], charsmax(to[_Name]), from[_Name]);
-	
+
 	to[_AdminId] = from[_AdminId];
 	copy(to[_AdminName], charsmax(to[_AdminName]), from[_AdminName]);
 	copy(to[_AdminAuthId], charsmax(to[_AdminAuthId]), from[_AdminAuthId]);
@@ -130,64 +130,6 @@ GagData_GetPersonalData(const id = 0, const target, aGagData[gag_s]) {
 	get_user_ip(id, aGagData[_AdminIP], charsmax(aGagData[_AdminIP]), .without_port = true);
 }
 
-// Debug functions
-#if defined DEBUG
-#include <fakemeta>
-#define SERVER_PRINT(%1) engfunc(EngFunc_ServerPrint, %1)
-
-stock Print_Console(szBuffer[]) {
-	for(new i; i < strlen(szBuffer); i+=255) {
-		SERVER_PRINT(fmt("%-255s", szBuffer[i]));
-	}
-	SERVER_PRINT("\n");
-}
-
-#pragma ctrlchar '\'
-stock DEBUG__Dump_GagData(from[], const aGagData[gag_s]) {
-	new szBuffer[5028];
-	formatex(szBuffer, charsmax(szBuffer), "[call %s] DEBUG__Dump_GagData() -> \n\
-		\t Player = '%i'\n\
-		\t AuthId = '%s'\n\
-		\t IP = '%s'\n\
-		\t Name = '%s'\n\
-\
-		\t AdminId = '%i'\n\
-		\t AdminName = '%s'\n\
-		\t AdminAuthId = '%s'\n\
-		\t AdminIP = '%s'\n\
-\
-		\t Reason = '%s'\n\
-		\t Time = '%i'\n\
-		\t ExpireTime = '%i'\n\
-		\t Flags = '%s'\n\
-		", from,
-		aGagData[_Player], aGagData[_AuthId], aGagData[_IP], aGagData[_Name],
-		aGagData[_AdminId], aGagData[_AdminName], aGagData[_AdminAuthId],
-		aGagData[_AdminIP], aGagData[_Reason], aGagData[_Time], aGagData[_ExpireTime], bits_to_flags(aGagData[_bitFlags])
-	);
-
-	Print_Console(szBuffer);
-}
-
-stock DEBUG__Dump_GagFlags(const aGagData[gag_s]) {
-	if(!aGagData[_bitFlags]) {
-		Print_Console(" DEBUG_Dump_GagFlags() -> No have any flags.");
-		return;
-	}
-
-	new szBuffer[5028];
-	formatex(szBuffer, charsmax(szBuffer), "	DEBUG_Dump_GagFlags() -> #FOUND\n\
-			\t Flags='%i'\n\
-			\t Reason='%s'\n\
-			\t Time='%i'",
-			aGagData[_bitFlags], aGagData[_Reason], aGagData[_Reason]
-		);
-	
-	Print_Console(szBuffer);
-}
-
-#pragma ctrlchar '^'
-#endif
 
 
 
@@ -248,6 +190,6 @@ native ca_remove_user_gag(index);
  * Get api storage type.
  *
  * @return Storage type
- * 
+ *
  */
 native DB_Types: ca_get_gag_storage_type();

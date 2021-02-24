@@ -1,6 +1,3 @@
-
-// #define DEBUG
-
 #include <amxmodx>
 #include <amxmisc>
 #include <time>
@@ -127,10 +124,8 @@ public Gags_Thinker() {
 }
 
 public ClCmd_Gag(id, level, cid) {
-	#if !defined DEBUG
 	if(!cmd_access(id, level, cid, 1))
 		return PLUGIN_HANDLED
-	#endif
 
 	if(get_playersnum() < 2) {
 		client_print_color(id, print_team_default, "%s %L", MSG_PREFIX, id, "NotEnoughPlayers")
@@ -279,8 +274,6 @@ public Menu_Handler_ConfirmRemove(id, menu, item) {
 				aGagData[_bitFlags] = g_aCurrentGags[target][_bitFlags]
 			}
 			GagData_Copy(g_aGags_AdminEditor[id], aGagData)
-
-			// DEBUG__Dump_GagData("Menu_Handler_ConfirmRemove", g_aGags_AdminEditor[id])
 
 			Menu_Show_GagProperties(id)
 
