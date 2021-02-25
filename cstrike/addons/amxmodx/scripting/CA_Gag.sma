@@ -60,7 +60,7 @@ public plugin_init() {
     ca_gag_menu_type
   )
 
-  bind_pcvar_string(create_cvar("ca_gag_prefix", "GAG",
+  bind_pcvar_string(create_cvar("ca_gag_prefix", "[GAG]",
       .description = "Chat prefix for plugin actions"
     ),
     ca_gag_prefix, charsmax(ca_gag_prefix)

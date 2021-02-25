@@ -39,7 +39,7 @@ public plugin_init() {
     ca_mute_use_delay
   )
 
-  bind_pcvar_string(create_cvar("ca_mute_prefix", "MUTE",
+  bind_pcvar_string(create_cvar("ca_mute_prefix", "[MUTE]",
       .description = "Chat prefix for plugin actions"
     ),
     ca_mute_prefix, charsmax(ca_mute_prefix)
@@ -49,7 +49,7 @@ public plugin_init() {
   for(new i; i < sizeof(CMDS_Mute); i++) {
     register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Mute")
   }
-  
+
   AutoExecConfig(.name = "CA_Mute")
 
   CA_Log(logLevel_Debug, "[CA]: Mute initialized!")
