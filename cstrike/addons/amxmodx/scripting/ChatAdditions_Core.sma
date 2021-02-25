@@ -14,6 +14,8 @@ new logType_s: ca_log_type,
   logLevel_s: ca_log_level = logLevel_Debug,
   g_logsFile[PLATFORM_MAX_PATH]
 
+new const LOG_FOLDER[] = "ChatAdditions"
+
 new g_fwdClientSay,
   g_fwdClientSayTeam,
   g_fwdClientVoice,
@@ -29,10 +31,22 @@ public stock const PluginDescription[] = "A core plugin for control different ty
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
 
-  GetLogsFilePath(g_logsFile)
+  GetLogsFilePath(g_logsFile, .dir = LOG_FOLDER)
 
-  bind_pcvar_num(create_cvar("ca_log_type", "1"), ca_log_type)
-  bind_pcvar_num(create_cvar("ca_log_level", "3"), ca_log_level)
+  bind_pcvar_num(create_cvar("ca_log_type", "1",
+      .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = log to plugins folder (logs/%s/L*.log)", LOG_FOLDER),
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = float(_LogToDir)
+    ),
+    ca_log_type
+  )
+  bind_pcvar_num(create_cvar("ca_log_level", "3",
+      .description = "Log level\n 0 = disable logs\n 1 = add info messages logs\n 2 = add warinigs info\n 3 = add debug messages",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = float(logLevel_Debug)
+    ),
+    ca_log_level
+  )
 
   register_clcmd("say", "ClCmd_Say")
   register_clcmd("say_team", "ClCmd_SayTeam")
@@ -41,6 +55,8 @@ public plugin_init() {
   g_fwdClientSay = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL)
   g_fwdClientSayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL)
   g_fwdClientVoice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
+
+  AutoExecConfig(.name = "ChatAdditions")
 
   CA_Log(logLevel_Debug, "Chat Additions: Core initialized!")
 }
