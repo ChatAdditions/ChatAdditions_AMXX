@@ -5,11 +5,14 @@
 
 #pragma ctrlchar '\'
 
-new const LOG_DIR_NAME[] = "CA_Core"
-new g_sLogsFile[PLATFORM_MAX_PATH]
+enum logType_s {
+	_Default,
+	_LogToDir
+}
 
-new ca_log_type,
-  LogLevel_s: ca_log_level = _Info
+new logType_s: ca_log_type,
+  logLevel_s: ca_log_level = _Debug,
+  g_logsFile[PLATFORM_MAX_PATH]
 
 new g_fwdClientSay,
   g_fwdClientSayTeam,
@@ -26,9 +29,10 @@ public stock const PluginDescription[] = "A core plugin for control different ty
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
 
+  GetLogsFilePath(g_logsFile)
+
   bind_pcvar_num(create_cvar("ca_log_type", "1"), ca_log_type)
-  hook_cvar_change(create_cvar("ca_log_level", "abc"), "Hook_CVar_LogLevel")
-  GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME)
+  bind_pcvar_num(create_cvar("ca_log_level", "3"), ca_log_level)
 
   register_clcmd("say", "ClCmd_Say")
   register_clcmd("say_team", "ClCmd_SayTeam")
@@ -37,6 +41,8 @@ public plugin_init() {
   g_fwdClientSay = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL)
   g_fwdClientSayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL)
   g_fwdClientVoice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
+
+  CA_Log(_Debug, "Chat Additions: Core initialized!")
 }
 
 public plugin_end() {
@@ -47,18 +53,8 @@ public plugin_end() {
 
 public plugin_natives() {
   register_library("ChatAdditions_Core")
-}
 
-public plugin_cfg() {
-  new sLogLevel[MAX_LOGLEVEL_LEN]
-  get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel))
-  ca_log_level = ParseLogLevel(sLogLevel)
-
-  CA_Log(_Info, "Chat Additions Core initialized!")
-}
-
-public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
-  ca_log_level = ParseLogLevel(new_value)
+  register_native("CA_Log", "native_CA_Log")
 }
 
 
@@ -88,4 +84,35 @@ public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
   }
 
   return HC_CONTINUE
+}
+
+public native_CA_Log(const plugin_id, const argc) {
+  enum { arg_level = 1, arg_msg, arg_format }
+
+  new logLevel_s: level = logLevel_s: get_param(arg_level)
+  if(ca_log_level < level) {
+    return
+  }
+
+  new msg[2048]; vdformat(msg, charsmax(msg), arg_msg, arg_format);
+
+  switch(ca_log_type) {
+    case _LogToDir: log_to_file(g_logsFile, msg)
+    case _Default: log_amx(msg)
+  }
+}
+
+
+static GetLogsFilePath(buffer[], len = PLATFORM_MAX_PATH, const dir[] = "ChatAdditions") {
+	get_localinfo("amxx_logs", buffer, len)
+	strcat(buffer, fmt("/%s", dir), len)
+
+	if(!dir_exists(buffer) && mkdir(buffer) == -1) {
+		set_fail_state("[Core API] Can't create folder! (%s)", buffer)
+	}
+
+	new year, month, day
+	date(year, month, day)
+
+	strcat(buffer, fmt("/L%i%02i%02i.log", year, month, day), len)
 }

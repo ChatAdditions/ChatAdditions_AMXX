@@ -39,53 +39,11 @@ enum
 	}
 
 
-const MAX_LOGLEVEL_LEN = 10;
-enum LogLevel_s ( <<=1 ) {
+enum logLevel_s {
 	_Off = 0,
 	_Info = 1,
 	_Warnings,
 	_Debug
-}
-
-stock LogLevel_s: ParseLogLevel(const sLogLevel[]) {
-	new LogLevel_s: logFlags = _Off;
-	for(new i; i < strlen(sLogLevel); i++) {
-		switch(sLogLevel[i]) {
-			case 'a': logFlags += _Info;
-			case 'b': logFlags += _Warnings;
-			case 'c': logFlags += _Debug;
-		}
-	}
-
-	return LogLevel_s: logFlags;
-}
-
-enum _:LogType_s {
-	_Default,
-	_LogToDir
-}
-
-#define CA_Log(%0,%1) {\
-	if(ca_log_level & %0) {\
-		if(ca_log_type == _LogToDir) {\
-    	    log_to_file(g_sLogsFile, %1);\
-    	} else {\
-    	    log_amx(%1);\
-    	}\
-	}\
-}
-
-stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, const sDir[] = "ChatAdditions") {
-	get_localinfo("amxx_logs", sBuffer, iLen);
-	strcat(sBuffer, fmt("/%s", sDir), iLen);
-
-	if(!dir_exists(sBuffer) && mkdir(sBuffer) == -1) {
-		set_fail_state("[Core API] Can't create folder! (%s)", sBuffer);
-	}
-
-	new iYear, iMonth, iDay;
-	date(iYear, iMonth, iDay);
-	strcat(sBuffer, fmt("/L%i%02i%02i.log", iYear, iMonth, iDay), iLen);
 }
 
 #define register_trigger_clcmd(%0,%1) \
@@ -98,6 +56,16 @@ stock GetLogsFilePath(sBuffer[], iLen = PLATFORM_MAX_PATH, const sDir[] = "ChatA
 
 new stock const BASE_CHAT_TRIGGERS[][] = { "", "/", "\", "!", "." };
 
+
+/**
+ *
+ *
+ * @param
+ *
+ * @return
+ */
+
+native CA_Log(logLevel_s: level, const message[], any:...);
 
 /**
  * Called when player say to chat.

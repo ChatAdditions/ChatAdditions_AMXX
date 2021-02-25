@@ -15,10 +15,6 @@ const MAX_REASON_LENGTH = 256;
 
 new Handle: g_tuple = Empty_Handle
 
-new const LOG_DIR_NAME[] = "CA_Storage";
-new g_sLogsFile[PLATFORM_MAX_PATH];
-new ca_log_type, LogLevel_s: ca_log_level = _Debug
-
 public stock const PluginName[] = "ChatAdditions: SQLite storage"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
@@ -27,11 +23,6 @@ public stock const PluginDescription[] = "SQLite storage provider for ChatAdditi
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
-
-  bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type);
-  hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel");
-  GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME);
-
   if(!SQL_SetAffinity("sqlite")) {
     set_fail_state("Can't user 'SQLite'. Check modules.ini")
   }
@@ -43,13 +34,10 @@ public plugin_end() {
   SQL_FreeHandle(g_tuple)
 }
 public plugin_natives() {
-  RegisterNatives();
+  RegisterNatives()
 }
 public plugin_cfg() {
-  RegisterForwards();
-}
-public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
-	ca_log_level = ParseLogLevel(new_value);
+  RegisterForwards()
 }
 
 Storage_Create() {

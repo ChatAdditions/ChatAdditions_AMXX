@@ -35,12 +35,6 @@ enum {
   ITEM_ENTER_GAG_REASON = -1
 }
 
-new const LOG_DIR_NAME[] = "CA_Gag"
-new g_sLogsFile[PLATFORM_MAX_PATH]
-
-new ca_log_type,
-  LogLevel_s: ca_log_level = _Info
-
 public stock const PluginName[] = "CA: Gag"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
@@ -56,15 +50,6 @@ public plugin_init() {
 
   g_gagReasonsTemplates = ArrayCreate(reason_s)
   g_gagTimeTemplates = ArrayCreate()
-
-  bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type)
-  hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel")
-  GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME)
-
-  hook_cvar_change(
-    create_cvar("ca_gag_times", "1, 5, 30, 60, 1440, 10080"),
-    "Hook_CVar_Times"
-  )
 
   bind_pcvar_num(create_cvar("ca_gag_menu_type", "1"), ca_gag_menu_type)
 
@@ -84,18 +69,10 @@ public plugin_init() {
 }
 
 public plugin_cfg() {
-  new sLogLevel[MAX_LOGLEVEL_LEN]
-  get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel))
-  ca_log_level = ParseLogLevel(sLogLevel)
-
   LoadConfig()
   ParseTimes()
 
-  CA_Log(_Info, "[CA]: Gag initialized!")
-}
-
-public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
-  ca_log_level = ParseLogLevel(new_value)
+  CA_Log(_Debug, "[CA]: Gag initialized!")
 }
 
 public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
@@ -814,7 +791,7 @@ public CA_Client_Say(id) {
  * @section Storage handling
  */
 public CA_Storage_Initialized( ) {
-  // TODO
+  CA_Log(_Debug, "[CA]: Gag > storage initialized!")
 }
 public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[],
   const adminName[], const adminAuthID[], const adminIP[],
