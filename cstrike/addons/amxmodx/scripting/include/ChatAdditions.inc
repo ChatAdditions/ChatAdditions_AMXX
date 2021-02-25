@@ -57,6 +57,61 @@ enum logLevel_s {
 new stock const BASE_CHAT_TRIGGERS[][] = { "", "/", "\", "!", "." };
 
 
+stock parseTime(const value[]) {
+  const _SECONDS_IN_MINUTE = 60;
+  const _SECONDS_IN_HOUR = 3600;
+  const _SECONDS_IN_DAY = 86400;
+  const _SECONDS_IN_WEEK = 604800;
+  const _SECONDS_IN_MONTH = _SECONDS_IN_DAY * 31;
+  const _SECONDS_IN_YEAR = _SECONDS_IN_MONTH * 12;
+
+  new t, k;
+  for (new i; value[i] != EOS; i++) {
+    switch (value[i]) {
+      case '0'..'9': {
+        t = (t * 10) + (value[i] - '0');
+      }
+
+      case 'i': {
+        k += t * _SECONDS_IN_MINUTE;
+        t = 0;
+      }
+
+      case 'h': {
+        k += t * _SECONDS_IN_HOUR;
+        t = 0;
+      }
+
+      case 'd': {
+        k += t * _SECONDS_IN_DAY;
+        t = 0;
+      }
+
+      case 'w': {
+        k += t * _SECONDS_IN_WEEK;
+        t = 0;
+      }
+
+      case 'm': {
+        k += t * _SECONDS_IN_MONTH;
+        t = 0;
+      }
+
+      case 'y': {
+        k += t * _SECONDS_IN_YEAR;
+        t = 0;
+      }
+
+      default: {
+        break;
+      }
+    }
+  }
+
+  return k + t;
+}
+
+
 /**
  * Log a message for every ChatAdditions module.
  *
