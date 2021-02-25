@@ -35,12 +35,6 @@ enum {
   ITEM_ENTER_GAG_REASON = -1
 }
 
-new const LOG_DIR_NAME[] = "CA_Gag"
-new g_sLogsFile[PLATFORM_MAX_PATH]
-
-new ca_log_type,
-  LogLevel_s: ca_log_level = _Info
-
 public stock const PluginName[] = "CA: Gag"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
@@ -56,15 +50,6 @@ public plugin_init() {
 
   g_gagReasonsTemplates = ArrayCreate(reason_s)
   g_gagTimeTemplates = ArrayCreate()
-
-  bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type)
-  hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel")
-  GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME)
-
-  hook_cvar_change(
-    create_cvar("ca_gag_times", "1, 5, 30, 60, 1440, 10080"),
-    "Hook_CVar_Times"
-  )
 
   bind_pcvar_num(create_cvar("ca_gag_menu_type", "1"), ca_gag_menu_type)
 
@@ -84,23 +69,15 @@ public plugin_init() {
 }
 
 public plugin_cfg() {
-  new sLogLevel[MAX_LOGLEVEL_LEN]
-  get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel))
-  ca_log_level = ParseLogLevel(sLogLevel)
-
   LoadConfig()
   ParseTimes()
 
-  CA_Log(_Info, "[CA]: Gag initialized!")
-}
-
-public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
-  ca_log_level = ParseLogLevel(new_value)
+  CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 }
 
 public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
   if(!strlen(new_value)) {
-    CA_Log(_Warnings, "[WARN] not found times! ca_gag_add_time ='%s'", new_value)
+    CA_Log(logLevel_Warning, "[WARN] not found times! ca_gag_add_time ='%s'", new_value)
     return
   }
 
@@ -746,7 +723,7 @@ public SrvCmd_AddReason() {
 
   new argsCount = read_argc()
   if(argsCount < 2){
-    CA_Log(_Warnings, "\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
+    server_print("\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
     return
   }
 
@@ -758,14 +735,14 @@ public SrvCmd_AddReason() {
   ArrayPushArray(g_gagReasonsTemplates, reason)
   g_gagReasonsTemplates_size = ArraySize(g_gagReasonsTemplates)
 
-  CA_Log(_Debug, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
+  CA_Log(logLevel_Debug, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
     g_gagReasonsTemplates_size, reason[r_name], bits_to_flags(reason[r_flags]), reason[r_time]\
   )
 }
 
 public SrvCmd_ShowTemplates() {
   if(!g_gagReasonsTemplates_size) {
-    CA_Log(_Warnings, "\t NO REASONS FOUNDED!")
+    CA_Log(logLevel_Warning, "\t NO REASONS FOUNDED!")
     return PLUGIN_HANDLED
   }
 
@@ -773,7 +750,7 @@ public SrvCmd_ShowTemplates() {
     new reason[reason_s]
     ArrayGetArray(g_gagReasonsTemplates, i, reason)
 
-    CA_Log(_Info, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
+    server_print("\t Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
       i + 1, reason[r_name], bits_to_flags(reason[r_flags]), reason[r_time]\
     )
   }
@@ -785,7 +762,7 @@ public SrvCmd_ReloadConfig() {
   LoadConfig()
   ParseTimes()
 
-  CA_Log(_Info, "Config re-loaded!")
+  CA_Log(logLevel_Info, "Config re-loaded!")
 }
 /*
  * @endsection user cmds handling
@@ -814,7 +791,7 @@ public CA_Client_Say(id) {
  * @section Storage handling
  */
 public CA_Storage_Initialized( ) {
-  // TODO
+  CA_Log(logLevel_Debug, "[CA]: Gag > storage initialized!")
 }
 public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[],
   const adminName[], const adminAuthID[], const adminIP[],
@@ -829,7 +806,7 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
 
   client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "Gag_ChatMsg_Reason", reason)
 
-  CA_Log(_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+  CA_Log(logLevel_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
     adminName, name, bits_to_flags(gag_flags_s: flags), gagTimeStr, reason \
   )
 }

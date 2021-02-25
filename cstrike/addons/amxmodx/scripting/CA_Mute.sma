@@ -13,12 +13,6 @@ new bool: g_globalMute[MAX_PLAYERS + 1]
 new Float: g_nextUse[MAX_PLAYERS + 1]
 new Float: ca_mute_use_delay
 
-new const LOG_DIR_NAME[] = "CA_Mute"
-new g_sLogsFile[PLATFORM_MAX_PATH]
-
-new ca_log_type,
-  LogLevel_s: ca_log_level = _Info
-
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
   ITEM_NOT_ENOUTH_PLAYERS = -2,
@@ -37,10 +31,6 @@ public plugin_init() {
   register_dictionary("CA_Mute.txt")
   register_dictionary("common.txt")
 
-  bind_pcvar_num(get_cvar_pointer("ca_log_type"), ca_log_type)
-  hook_cvar_change(get_cvar_pointer("ca_log_level"), "Hook_CVar_LogLevel")
-  GetLogsFilePath(g_sLogsFile, .sDir = LOG_DIR_NAME)
-
   bind_pcvar_float(create_cvar("ca_mute_use_delay", "3.0",
     .description = "How often can players use menu.",
     .has_min = true, .min_val = 0.0,
@@ -51,18 +41,8 @@ public plugin_init() {
   for(new i; i < sizeof(CMDS_Mute); i++) {
     register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Mute")
   }
-}
 
-public plugin_cfg() {
-  new sLogLevel[MAX_LOGLEVEL_LEN]
-  get_cvar_string("ca_log_level", sLogLevel, charsmax(sLogLevel))
-  ca_log_level = ParseLogLevel(sLogLevel)
-
-  CA_Log(_Info, "[CA]: Mute initialized!")
-}
-
-public Hook_CVar_LogLevel(pcvar, const old_value[], const new_value[]) {
-  ca_log_level = ParseLogLevel(new_value)
+  CA_Log(logLevel_Debug, "[CA]: Mute initialized!")
 }
 
 
@@ -164,7 +144,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
       id, LANG_PLAYER, g_globalMute[id] ? "Mute_PlayerNowMutedAll" : "Mute_PlayerNowUnmutedAll"
     )
 
-    CA_Log(_Info, "Mute: \"%N\" %smuted everyone", id, g_globalMute[id] ? "" : "Un")
+    CA_Log(logLevel_Info, "Mute: \"%N\" %smuted everyone", id, g_globalMute[id] ? "" : "Un")
 
     menu_destroy(menu)
     MenuShow_PlayersList(id)
@@ -189,7 +169,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     id, player, g_playersMute[id][player] ? "Mute_PlayerNowMutedYou" : "Mute_PlayerNowUnmutedYou"
   )
 
-  CA_Log(_Info, "Mute: '%N' %smuted '%N'", id, g_playersMute[id][player] ? "" : "Un", player)
+  CA_Log(logLevel_Info, "Mute: '%N' %smuted '%N'", id, g_playersMute[id][player] ? "" : "Un", player)
 
   menu_destroy(menu)
   MenuShow_PlayersList(id)
