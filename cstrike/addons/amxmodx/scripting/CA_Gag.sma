@@ -66,8 +66,10 @@ public plugin_init() {
     ca_gag_prefix, charsmax(ca_gag_prefix)
   )
 
-  bind_pcvar_string(create_cvar("ca_gag_times", "1, 5, 10, 30, 60, 1440, 10080",
-      .description = "Gag time values for choose\n NOTE: Changes will be applied only after reloading the map or by command `ca_gag_reload_config`"
+  bind_pcvar_string(create_cvar("ca_gag_times", "1i, 5i, 10i, 30i, 1h, 1d, 1w, 1m",
+      .description = "Gag time values for choose\n \
+        format: 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week\n \
+        NOTE: Changes will be applied only after reloading the map or by command `ca_gag_reload_config`"
     ),
     ca_gag_times, charsmax(ca_gag_times)
   )
@@ -579,7 +581,7 @@ static MenuShow_SelectTime(const id) {
 
   if(g_gagTimeTemplates_size) {
     for(new i; i < g_gagTimeTemplates_size; i++) {
-      new time = ArrayGetCell(g_gagTimeTemplates, i) * SECONDS_IN_MINUTE
+      new time = ArrayGetCell(g_gagTimeTemplates, i)
       menu_additem(menu, fmt("%s%s", (selectedTime == time) ? "\\r" : "",
         Get_TimeString_seconds(id, time)),
         fmt("%i", time)
@@ -736,14 +738,18 @@ public SrvCmd_AddReason() {
 
   new reason[reason_s]
   copy(reason[r_name], charsmax(reason[r_name]), args[arg_reason])
-  reason[r_time] = (strtol(args[arg_time]) * SECONDS_IN_MINUTE)
+
+  trim(args[arg_time])
+  new seconds = parseTime(args[arg_time])
+
+  reason[r_time] = seconds
   reason[r_flags] = gag_flags_s: flags_to_bit(args[arg_flags])
 
   ArrayPushArray(g_gagReasonsTemplates, reason)
   g_gagReasonsTemplates_size = ArraySize(g_gagReasonsTemplates)
 
-  CA_Log(logLevel_Debug, "ADD: Reason template[#%i]: '%s' (time='%i s.', flags='%s')",\
-    g_gagReasonsTemplates_size, reason[r_name], reason[r_time], bits_to_flags(reason[r_flags])\
+  CA_Log(logLevel_Debug, "ADD: Reason template[#%i]: '%s' (time='%s', flags='%s')",\
+    g_gagReasonsTemplates_size, reason[r_name], args[arg_time], bits_to_flags(reason[r_flags])\
   )
 }
 
@@ -757,8 +763,10 @@ public SrvCmd_ShowTemplates() {
     new reason[reason_s]
     ArrayGetArray(g_gagReasonsTemplates, i, reason)
 
-    server_print("\t Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
-      i + 1, reason[r_name], bits_to_flags(reason[r_flags]), reason[r_time]\
+    new timeStr[32]; get_time_length(LANG_SERVER, reason[r_time], timeunit_seconds, timeStr, charsmax(timeStr))
+
+    server_print("\t Reason[#%i]: '%s' (Flags:'%s', Time:'%s')",\
+      i + 1, reason[r_name], bits_to_flags(reason[r_flags]), timeStr\
     )
   }
 
@@ -872,11 +880,12 @@ static ParseTimes() {
     ArrayClear(g_gagTimeTemplates)
 
     for(new i; i < count; i++) {
-      new time = strtol(times[i])
-      new timeStr[32]; get_time_length(LANG_SERVER, time, timeunit_minutes, timeStr, charsmax(timeStr))
+      trim(times[i])
+      new time = parseTime(times[i])
+      new timeStr[32]; get_time_length(LANG_SERVER, time, timeunit_seconds, timeStr, charsmax(timeStr))
 
-      CA_Log(logLevel_Debug, "ADD: Time template[#%i]: %i (%s)",\
-        i + 1, time, timeStr
+      CA_Log(logLevel_Debug, "ADD: Time template[#%i]: %s",\
+        i + 1, timeStr
       )
 
       ArrayPushCell(g_gagTimeTemplates, time)
