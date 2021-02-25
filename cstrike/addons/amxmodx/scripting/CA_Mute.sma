@@ -42,7 +42,7 @@ public plugin_init() {
     register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Mute")
   }
 
-  CA_Log(_Debug, "[CA]: Mute initialized!")
+  CA_Log(logLevel_Debug, "[CA]: Mute initialized!")
 }
 
 
@@ -144,7 +144,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
       id, LANG_PLAYER, g_globalMute[id] ? "Mute_PlayerNowMutedAll" : "Mute_PlayerNowUnmutedAll"
     )
 
-    CA_Log(_Info, "Mute: \"%N\" %smuted everyone", id, g_globalMute[id] ? "" : "Un")
+    CA_Log(logLevel_Info, "Mute: \"%N\" %smuted everyone", id, g_globalMute[id] ? "" : "Un")
 
     menu_destroy(menu)
     MenuShow_PlayersList(id)
@@ -169,7 +169,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     id, player, g_playersMute[id][player] ? "Mute_PlayerNowMutedYou" : "Mute_PlayerNowUnmutedYou"
   )
 
-  CA_Log(_Info, "Mute: '%N' %smuted '%N'", id, g_playersMute[id][player] ? "" : "Un", player)
+  CA_Log(logLevel_Info, "Mute: '%N' %smuted '%N'", id, g_playersMute[id][player] ? "" : "Un", player)
 
   menu_destroy(menu)
   MenuShow_PlayersList(id)

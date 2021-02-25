@@ -66,7 +66,7 @@ public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], 
     return
   }
 
-  CA_Log(_Debug, "Table '%s' created! (queryTime: '%.3f' sec)", SQL_TBL_GAGS, queuetime)
+  CA_Log(logLevel_Debug, "Table '%s' created! (queryTime: '%.3f' sec)", SQL_TBL_GAGS, queuetime)
 
   ExecuteForward(g_fwd_StorageInitialized, g_ret)
 }
@@ -134,7 +134,7 @@ public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Flo
   new expireAt = SQL_ReadResult(query, res_expire_at)
   new flags = SQL_ReadResult(query, res_flags)
 
-  CA_Log(_Debug, "Player gag saved {'%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i} (queryTime: '%.3f' sec)", \
+  CA_Log(logLevel_Debug, "Player gag saved {'%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i} (queryTime: '%.3f' sec)", \
     name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags,\
     queuetime \
   )
@@ -185,7 +185,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
   new expireAt = SQL_ReadResult(query, res_expire_at)
   new flags = SQL_ReadResult(query, res_flags)
 
-  CA_Log(_Debug, "Player gag loaded {'%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i} (queryTime: '%.3f' sec)", \
+  CA_Log(logLevel_Debug, "Player gag loaded {'%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i} (queryTime: '%.3f' sec)", \
     name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags,\
     queuetime \
   )
@@ -210,7 +210,7 @@ public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, F
     return
   }
 
-  CA_Log(_Debug, "Player gag removed { } (queryTime: '%.3f' sec)", \
+  CA_Log(logLevel_Debug, "Player gag removed { } (queryTime: '%.3f' sec)", \
     queuetime \
   )
 

@@ -40,10 +40,10 @@ enum
 
 
 enum logLevel_s {
-	_Off = 0,
-	_Info = 1,
-	_Warnings,
-	_Debug
+	logLevel_Off = 0,
+	logLevel_Info = 1,
+	logLevel_Warning,
+	logLevel_Debug
 }
 
 #define register_trigger_clcmd(%0,%1) \
@@ -58,14 +58,16 @@ new stock const BASE_CHAT_TRIGGERS[][] = { "", "/", "\", "!", "." };
 
 
 /**
+ * Log a message for every ChatAdditions module.
  *
+ * @param level     Log level, see logLevel_* destination constants in ChatAdditions.inc
+ * @param message   Formatting rules.
+ * @param ...       Variable number of formatting parameters
  *
- * @param
- *
- * @return
+ * @return          True if a message logged, false otherwise.
  */
 
-native CA_Log(logLevel_s: level, const message[], any:...);
+native bool: CA_Log(logLevel_s: level, const message[], any:...);
 
 /**
  * Called when player say to chat.

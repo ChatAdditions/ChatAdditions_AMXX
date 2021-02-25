@@ -11,7 +11,7 @@ enum logType_s {
 }
 
 new logType_s: ca_log_type,
-  logLevel_s: ca_log_level = _Debug,
+  logLevel_s: ca_log_level = logLevel_Debug,
   g_logsFile[PLATFORM_MAX_PATH]
 
 new g_fwdClientSay,
@@ -42,7 +42,7 @@ public plugin_init() {
   g_fwdClientSayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL)
   g_fwdClientVoice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
 
-  CA_Log(_Debug, "Chat Additions: Core initialized!")
+  CA_Log(logLevel_Debug, "Chat Additions: Core initialized!")
 }
 
 public plugin_end() {
@@ -86,12 +86,12 @@ public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
   return HC_CONTINUE
 }
 
-public native_CA_Log(const plugin_id, const argc) {
+public bool: native_CA_Log(const plugin_id, const argc) {
   enum { arg_level = 1, arg_msg, arg_format }
 
   new logLevel_s: level = logLevel_s: get_param(arg_level)
   if(ca_log_level < level) {
-    return
+    return false
   }
 
   new msg[2048]; vdformat(msg, charsmax(msg), arg_msg, arg_format);
@@ -100,6 +100,8 @@ public native_CA_Log(const plugin_id, const argc) {
     case _LogToDir: log_to_file(g_logsFile, msg)
     case _Default: log_amx(msg)
   }
+
+  return true
 }
 
 

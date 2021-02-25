@@ -72,12 +72,12 @@ public plugin_cfg() {
   LoadConfig()
   ParseTimes()
 
-  CA_Log(_Debug, "[CA]: Gag initialized!")
+  CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 }
 
 public Hook_CVar_Times(pcvar, const old_value[], const new_value[]) {
   if(!strlen(new_value)) {
-    CA_Log(_Warnings, "[WARN] not found times! ca_gag_add_time ='%s'", new_value)
+    CA_Log(logLevel_Warning, "[WARN] not found times! ca_gag_add_time ='%s'", new_value)
     return
   }
 
@@ -723,7 +723,7 @@ public SrvCmd_AddReason() {
 
   new argsCount = read_argc()
   if(argsCount < 2){
-    CA_Log(_Warnings, "\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
+    CA_Log(logLevel_Warning, "\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
     return
   }
 
@@ -735,14 +735,14 @@ public SrvCmd_AddReason() {
   ArrayPushArray(g_gagReasonsTemplates, reason)
   g_gagReasonsTemplates_size = ArraySize(g_gagReasonsTemplates)
 
-  CA_Log(_Debug, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
+  CA_Log(logLevel_Debug, "ADD: Reason[#%i]: '%s' (Flags:'%s', Time:'%i s.')",\
     g_gagReasonsTemplates_size, reason[r_name], bits_to_flags(reason[r_flags]), reason[r_time]\
   )
 }
 
 public SrvCmd_ShowTemplates() {
   if(!g_gagReasonsTemplates_size) {
-    CA_Log(_Warnings, "\t NO REASONS FOUNDED!")
+    CA_Log(logLevel_Warning, "\t NO REASONS FOUNDED!")
     return PLUGIN_HANDLED
   }
 
@@ -750,7 +750,7 @@ public SrvCmd_ShowTemplates() {
     new reason[reason_s]
     ArrayGetArray(g_gagReasonsTemplates, i, reason)
 
-    CA_Log(_Info, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
+    CA_Log(logLevel_Info, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
       i + 1, reason[r_name], bits_to_flags(reason[r_flags]), reason[r_time]\
     )
   }
@@ -762,7 +762,7 @@ public SrvCmd_ReloadConfig() {
   LoadConfig()
   ParseTimes()
 
-  CA_Log(_Info, "Config re-loaded!")
+  CA_Log(logLevel_Info, "Config re-loaded!")
 }
 /*
  * @endsection user cmds handling
@@ -791,7 +791,7 @@ public CA_Client_Say(id) {
  * @section Storage handling
  */
 public CA_Storage_Initialized( ) {
-  CA_Log(_Debug, "[CA]: Gag > storage initialized!")
+  CA_Log(logLevel_Debug, "[CA]: Gag > storage initialized!")
 }
 public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[],
   const adminName[], const adminAuthID[], const adminIP[],
@@ -806,7 +806,7 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
 
   client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "Gag_ChatMsg_Reason", reason)
 
-  CA_Log(_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+  CA_Log(logLevel_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
     adminName, name, bits_to_flags(gag_flags_s: flags), gagTimeStr, reason \
   )
 }
