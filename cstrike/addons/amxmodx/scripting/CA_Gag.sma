@@ -723,7 +723,7 @@ public SrvCmd_AddReason() {
 
   new argsCount = read_argc()
   if(argsCount < 2){
-    CA_Log(logLevel_Warning, "\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
+    server_print("\tUsage: ca_gag_add_reason <reason> [flags] [time in minutes]")
     return
   }
 
@@ -750,7 +750,7 @@ public SrvCmd_ShowTemplates() {
     new reason[reason_s]
     ArrayGetArray(g_gagReasonsTemplates, i, reason)
 
-    CA_Log(logLevel_Info, "Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
+    server_print("\t Reason[#%i]: '%s' (Flags:'%s', Time:'%i')",\
       i + 1, reason[r_name], bits_to_flags(reason[r_flags]), reason[r_time]\
     )
   }
