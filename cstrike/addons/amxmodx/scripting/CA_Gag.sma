@@ -229,7 +229,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     GagData_Copy(g_adminGagsEditor[id], g_currentGags[target])
     g_adminGagsEditor[id][gd_target] = target
 
-    MenuShow_ConfirmRemove(id)
+    MenuShow_ShowGag(id)
     menu_destroy(menu)
     return PLUGIN_HANDLED
   }
@@ -248,23 +248,55 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 }
 
 // Confirm remove gag menu
-static MenuShow_ConfirmRemove(const id) {
+static MenuShow_ShowGag(const id) {
   if(!is_user_connected(id)) {
     return
   }
 
-  new menu = menu_create(fmt("%L", id, "Gag_MenuItem_ReadyConfirm"), "MenuHandler_ConfirmRemove")
+  new menu = menu_create(fmt("%L", id, "Gag_MenuItem_ShowGag", g_adminGagsEditor[id][gd_name]), "MenuHandler_ShowGag")
 
-  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Yes"))
-  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_NoAndEdit"))
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_RemoveGag"))
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_EditGag"))
 
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-  menu_addblank2(menu)
+  new target = g_adminGagsEditor[id][gd_target]
+
+  menu_addtext(menu, fmt("\n  \\d%L \\w%s", id, "Gag_MenuItem_Admin",
+      g_adminGagsEditor[id][gd_adminName]
+    )
+  )
+  menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Reason",
+      Get_GagString_reason(id, target)
+    )
+  )
+  menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Type",
+      Get_GagFlags_Names(gagFlags_s: g_adminGagsEditor[id][gd_reason][r_flags])
+    )
+  )
+
+  menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Length",
+      Get_TimeString_seconds(id, g_adminGagsEditor[id][gd_reason][r_time])
+    )
+  )
+
+
+  new hoursLeft = (g_adminGagsEditor[id][gd_expireAt] - get_systime()) / SECONDS_IN_HOUR
+  if(hoursLeft > 5) {
+    new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_adminGagsEditor[id][gd_expireAt])
+    menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Expire",
+        timeStr
+      )
+    )
+  } else {
+    new expireLeft = g_adminGagsEditor[id][gd_expireAt] - get_systime()
+    new expireLeftStr[128]; get_time_length(id, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
+    menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Left",
+        expireLeftStr
+      )
+    )
+  }
+
+  menu_addblank(menu)
+  menu_addblank(menu)
 
   menu_setprop(menu, MPROP_PERPAGE, 0)
   menu_setprop(menu, MPROP_EXIT, MEXIT_FORCE)
@@ -273,7 +305,7 @@ static MenuShow_ConfirmRemove(const id) {
   menu_display(id, menu)
 }
 
-public MenuHandler_ConfirmRemove(const id, const menu, const item) {
+public MenuHandler_ShowGag(const id, const menu, const item) {
   enum { menu_ComfirmRemove, menu_EditGagProperties }
 
   if(item == MENU_EXIT || item < 0) {
@@ -980,6 +1012,17 @@ static bool: IsTargetHasImmunity(const id, const target) {
   }
 
   return false
+}
+
+static Get_GagFlags_Names(const gagFlags_s: flags) {
+  new buffer[64]
+
+  // TODO: ML this
+  if(flags & gagFlag_Say)      add(buffer, charsmax(buffer), "Chat, ");
+  if(flags & gagFlag_SayTeam)  add(buffer, charsmax(buffer), "Team chat, ");
+  if(flags & gagFlag_Voice)    add(buffer, charsmax(buffer), "Voice");
+
+  return buffer
 }
 
 
