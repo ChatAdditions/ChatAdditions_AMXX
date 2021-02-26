@@ -133,7 +133,7 @@ stock show_activity_ex(const actorId, const actorName[], const message[], any: .
       continue;
     }
 
-    new bool: isAdmin = is_user_admin(i);
+    new bool: isAdmin = bool: is_user_admin(i);
     SetGlobalTransTarget(i);
     vformat(buffer, charsmax(buffer), message, arg_format);
 
