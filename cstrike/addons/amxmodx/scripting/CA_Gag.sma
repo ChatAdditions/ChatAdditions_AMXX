@@ -11,9 +11,6 @@
 
 
   /* ----- START SETTINGS----- */
-#define FLAGS_ACCESS    ( ADMIN_KICK )
-#define FLAGS_IMMUNITY  ( ADMIN_IMMUNITY )
-
 const Float: GAG_THINKER_FREQ = 3.0
   /* ----- END OF SETTINGS----- */
 
@@ -29,7 +26,10 @@ enum GagMenuType_s {
 };
 new GagMenuType_s: ca_gag_menu_type,
   ca_gag_prefix[32],
-  ca_gag_times[64]
+  ca_gag_times[64],
+  ca_gag_immunity_flags[16],
+  ca_gag_access_flags[16],
+  ca_gag_access_flags_high[16]
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
@@ -68,10 +68,35 @@ public plugin_init() {
 
   bind_pcvar_string(create_cvar("ca_gag_times", "1i, 5i, 10i, 30i, 1h, 1d, 1w, 1m",
       .description = "Gag time values for choose\n \
-        format: 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week\n \
-        NOTE: Changes will be applied only after reloading the map or by command `ca_gag_reload_config`"
+        format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week\n \
+        NOTE: Changes will be applied only after reloading the map (or command `ca_gag_reload_config`)"
     ),
     ca_gag_times, charsmax(ca_gag_times)
+  )
+
+  bind_pcvar_string(create_cvar("ca_gag_immunity_flags", "a",
+      .description = "User immunity flag\n users with this flag can't be gagged\n \
+        NOTE: `ca_gag_access_flags_high` can gag this users"
+    ),
+    ca_gag_immunity_flags, charsmax(ca_gag_immunity_flags)
+  )
+
+  bind_pcvar_string(create_cvar("ca_gag_access_flags", "c",
+      .description = "Admin flag\n \
+        users with this flag can gag users with flag `z`, but can't with flag `ca_gag_immunity_flags`\n \
+        users with this flag can't be gagged by same flags users (immunity)\n \
+        NOTE: `ca_gag_access_flags_high` can gag this users"
+    ),
+    ca_gag_access_flags, charsmax(ca_gag_access_flags)
+  )
+
+  bind_pcvar_string(create_cvar("ca_gag_access_flags_high", "l",
+      .description = "High admin flag\n \
+        users with this flag can everyone\n \
+        users with this flag can't be gagged\n \
+        NOTE: `ca_gag_access_flags_high` can gag this users"
+    ),
+    ca_gag_access_flags_high, charsmax(ca_gag_access_flags_high)
   )
 
   register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason")
@@ -80,15 +105,15 @@ public plugin_init() {
 
   set_task_ex(GAG_THINKER_FREQ, "Gags_Thinker", .flags = SetTask_Repeat)
 
-  new const CMDS_Mute[][] = { "gag" }
-  for(new i; i < sizeof(CMDS_Mute); i++) {
-    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", FLAGS_ACCESS)
-  }
-
   register_clcmd("enter_GagReason", "ClCmd_EnterGagReason")
   register_clcmd("enter_GagTime", "ClCmd_EnterGagTime")
 
   LoadConfig()
+
+  new const CMDS_Mute[][] = { "gag" }
+  for(new i; i < sizeof(CMDS_Mute); i++) {
+    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", read_flags(ca_gag_access_flags) | read_flags(ca_gag_access_flags_high))
+  }
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 }
@@ -151,7 +176,7 @@ static MenuShow_PlayersList(const id) {
       continue
     }
 
-    new bool: hasImmunity = bool: (get_user_flags(target) & FLAGS_IMMUNITY)
+    new bool: hasImmunity = IsTargetHasImmunity(id, target)
     menu_additem(menu, fmt("%n %s", target, Get_PlayerPostfix(id, target, hasImmunity)), fmt("%i", get_user_userid(players[i])), .callback = callback)
   }
 
@@ -172,7 +197,7 @@ public MenuCallback_PlayersList(const id, const menu, const item) {
     return ITEM_DISABLED
   }
 
-  new bool: hasImmunity = bool: (get_user_flags(target) & FLAGS_IMMUNITY)
+  new bool: hasImmunity = IsTargetHasImmunity(id, target)
   if(hasImmunity) {
     return ITEM_DISABLED
   }
@@ -929,6 +954,32 @@ static Get_PlayerPostfix(const id, const target, const hasImmunity) {
   }
 
   return postfix
+}
+
+static bool: IsTargetHasImmunity(const id, const target) {
+  new accessFlagsImmunity = read_flags(ca_gag_immunity_flags)
+  new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
+  new accessFlags = read_flags(ca_gag_access_flags)
+
+  new flags = get_user_flags(id)
+  new targetFlags = get_user_flags(target)
+
+  // main admin can gag everyone
+  if(flags & accessFlagsHigh) {
+    return false
+  }
+
+  // main admin can't be gagged by admins
+  if(targetFlags & accessFlagsHigh) {
+    return true
+  }
+
+  // target has immunity or admin flags
+  if(targetFlags & (accessFlags|accessFlagsImmunity)) {
+    return true
+  }
+
+  return false
 }
 
 
