@@ -13,7 +13,7 @@ Gag_MenuItem_Confirm = Подтвердить!
 Gag_MenuItem_Reason = Причина:
 Gag_MenuItem_Resolution = Время: \y%s\w (причина: \y%s\w)
 
-Gag_GagProperties = Параметры заглушки игрока: [ \r%n\w ]
+Gag_GagProperties = Параметры заглушки игрока: [ \r%n\y ]
 Gag_EnterReason = Ввести причину ->\n
 Gag_EnterTime = Указать время ->
 
@@ -39,7 +39,7 @@ Gag_YouSetManual_Reason = ^3Вы установили причину заглу�
 
 
 [en]
-Gag_MenuTitle_PlayersList = Gag_Gagged player
+Gag_MenuTitle_PlayersList = Gag player
 Gag_MenuTitle_SelectReason = Choose gag reason:
 Gag_MenuTitle_SelectTime = Choose gag time:
 Gag_MenuItem_Yes = \yYes\w
@@ -53,7 +53,7 @@ Gag_MenuItem_Confirm = Confirm!
 Gag_MenuItem_Reason = Reason:
 Gag_MenuItem_Resolution =  Time: \y%s\w (reason: \y%s\w)
 
-Gag_GagProperties = Gag_Gagged parameters: [ \r%n\w ]
+Gag_GagProperties = Gag parameters: [ \r%n\y ]
 Gag_EnterReason = Enter gag reason ->\n
 Gag_EnterTime = Enter gag time ->
 
