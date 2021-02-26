@@ -29,7 +29,8 @@ new GagMenuType_s: ca_gag_menu_type,
   ca_gag_times[64],
   ca_gag_immunity_flags[16],
   ca_gag_access_flags[16],
-  ca_gag_access_flags_high[16]
+  ca_gag_access_flags_high[16],
+  ca_gag_remove_only_own_gag
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
@@ -97,6 +98,15 @@ public plugin_init() {
         NOTE: `ca_gag_access_flags_high` can gag this users"
     ),
     ca_gag_access_flags_high, charsmax(ca_gag_access_flags_high)
+  )
+
+  bind_pcvar_num(create_cvar("ca_gag_remove_only_own_gag", "1",
+      .description = "Remove gag access control\n \
+        1 = remove only own gags\n \
+        0 = no restrictions\n \
+        NOTE: `ca_gag_access_flags_high` can remove every gag"
+    ),
+    ca_gag_remove_only_own_gag
   )
 
   register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason")
@@ -247,7 +257,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   return PLUGIN_HANDLED
 }
 
-// Confirm remove gag menu
+// Show gag menu
 static MenuShow_ShowGag(const id) {
   if(!is_user_connected(id)) {
     return
@@ -255,17 +265,20 @@ static MenuShow_ShowGag(const id) {
 
   new menu = menu_create(fmt("%L", id, "Gag_MenuItem_ShowGag", g_adminGagsEditor[id][gd_name]), "MenuHandler_ShowGag")
 
-  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_RemoveGag"))
-  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_EditGag"))
+  static callback
+  if(!callback) {
+    callback = menu_makecallback("MenuCallback_ShowGag")
+  }
 
-  new target = g_adminGagsEditor[id][gd_target]
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_RemoveGag"), .info = g_adminGagsEditor[id][gd_adminAuthID], .callback = callback)
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_EditGag"), .info = g_adminGagsEditor[id][gd_adminAuthID], .callback = callback)
 
   menu_addtext(menu, fmt("\n  \\d%L \\w%s", id, "Gag_MenuItem_Admin",
       g_adminGagsEditor[id][gd_adminName]
     )
   )
   menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Reason",
-      Get_GagString_reason(id, target)
+      Get_GagString_reason(id, g_adminGagsEditor[id][gd_target])
     )
   )
   menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Type",
@@ -303,6 +316,27 @@ static MenuShow_ShowGag(const id) {
   menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
 
   menu_display(id, menu)
+}
+
+public MenuCallback_ShowGag(const id, const menu, const item) {
+  if(!ca_gag_remove_only_own_gag) {
+    return ITEM_ENABLED
+  }
+
+  new flags = get_user_flags(id)
+  if(flags & read_flags(ca_gag_access_flags_high)) {
+    return ITEM_ENABLED
+  }
+
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  new authID[MAX_AUTHID_LENGTH]; get_user_authid(id, authID, charsmax(authID))
+  new bool: isOwnGag = (strcmp(authID, g_itemInfo) == 0)
+
+  if(isOwnGag) {
+    return ITEM_ENABLED
+  }
+
+  return ITEM_DISABLED
 }
 
 public MenuHandler_ShowGag(const id, const menu, const item) {
