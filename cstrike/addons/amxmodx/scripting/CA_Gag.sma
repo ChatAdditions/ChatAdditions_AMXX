@@ -814,11 +814,8 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
   new gagTime = expireAt - createdAt
   new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, gagTime))
 
-  client_print_color(0, print_team_default, "%s %L", ca_gag_prefix,
-    LANG_PLAYER, "Gag_AdminGagPlayer", adminName, name, gagTimeStr
-  )
-
-  client_print_color(0, print_team_default, "%L '\3%s\1'", LANG_PLAYER, "Gag_ChatMsg_Reason", reason)
+  new admin = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), adminAuthID)
+  show_activity_ex(admin, adminName, "%l", "Gag_AdminGagPlayer", name, reason, gagTimeStr)
 
   CA_Log(logLevel_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
     adminName, name, bits_to_flags(gag_flags_s: flags), gagTimeStr, reason \
@@ -961,14 +958,13 @@ static Gag_Save(const id, const target, const time, const flags) {
 
 static Gag_Remove(const id, const target) {
   if(g_adminGagsEditor[id][gd_reason][r_flags] != gagFlag_Removed) {
+    show_activity_ex(id, g_currentGags[target][gd_adminName], "%l", "Gag_AdminUngagPlayer", g_currentGags[target][gd_name])
+
     GagData_Reset(g_adminGagsEditor[id])
     GagData_Reset(g_currentGags[target])
 
     new authID[MAX_AUTHID_LENGTH]; get_user_authid(target, authID, charsmax(authID))
     CA_Storage_Remove(authID)
-
-    client_print_color(0, print_team_default, "%s %L", ca_gag_prefix,
-      LANG_PLAYER, "Gag_AdminUngagPlayer", id, target)
   } else {
     client_print(id, print_chat, "%s %L", ca_gag_prefix, id, "Gag_PlayerAlreadyRemoved", target)
   }

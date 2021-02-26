@@ -111,6 +111,57 @@ stock parseTime(const value[]) {
   return k + t;
 }
 
+stock show_activity_ex(const actorId, const actorName[], const message[], any: ...) {
+  enum { arg_format = 4 }
+
+  static _amx_show_activity;
+  if(!_amx_show_activity) {
+    _amx_show_activity = get_cvar_pointer("amx_show_activity");
+    if(!_amx_show_activity) {
+      _amx_show_activity = create_cvar("amx_show_activity", "2");
+    }
+  }
+
+  new prefix[] = "PLAYER";
+  if(is_user_admin(actorId)) {
+    copy(prefix, charsmax(prefix), "ADMIN");
+  }
+
+  static buffer[512];
+  for(new i = 1; i <= MaxClients; i++) {
+    if(!is_user_connected(i) && !is_user_bot(i)) {
+      continue;
+    }
+
+    new bool: isAdmin = is_user_admin(i);
+    SetGlobalTransTarget(i);
+    vformat(buffer, charsmax(buffer), message, arg_format);
+
+    switch(get_pcvar_num(_amx_show_activity)) {
+      case 1: { // Hide name for all
+        client_print(i, print_chat, "%L %s", i, prefix, buffer);
+      }
+      case 2: { // Show name to all
+        client_print(i, print_chat, "%L %s: %s", i, prefix, actorName, buffer);
+      }
+      case 3: { // show name only to admins, hide name from normal users
+        client_print(i, print_chat, "%L %s: %s", i, prefix, isAdmin ? actorName : "", buffer);
+      }
+      case 4: { // show name only to admins, show nothing to normal users
+        if(isAdmin) {
+          client_print(i, print_chat, "%L %s: %s", i, prefix, actorName, buffer);
+        }
+      }
+      case 5: { // show only to admins without actor name
+        if(isAdmin) {
+          client_print(i, print_chat, "%L: %s", i, prefix, buffer);
+        }
+      }
+    }
+  }
+}
+
+
 
 /**
  * Log a message for every ChatAdditions module.
