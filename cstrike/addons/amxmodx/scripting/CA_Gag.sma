@@ -921,7 +921,15 @@ public CA_Storage_Loaded(const name[], const authID[], const IP[], const reason[
     return
   }
 
+  new targetName[MAX_NAME_LENGTH]; get_user_name(target, targetName, charsmax(targetName))
+
+  copy(g_currentGags[target][gd_name], charsmax(g_currentGags[][gd_name]), targetName)
+  copy(g_currentGags[target][gd_authID], charsmax(g_currentGags[][gd_authID]), authID)
+  copy(g_currentGags[target][gd_IP], charsmax(g_currentGags[][gd_IP]), IP)
+
   copy(g_currentGags[target][gd_adminName], charsmax(g_currentGags[][gd_adminName]), adminName)
+  copy(g_currentGags[target][gd_adminAuthID], charsmax(g_currentGags[][gd_adminAuthID]), adminAuthID)
+  copy(g_currentGags[target][gd_adminIP], charsmax(g_currentGags[][gd_adminIP]), adminIP)
 
   copy(g_currentGags[target][gd_reason][r_name], charsmax(g_currentGags[][r_name]), reason)
   g_currentGags[target][gd_reason][r_time] = expireAt - createdAt
