@@ -410,8 +410,6 @@ static MenuShow_GagProperties(const id) {
   }
 
   new gag_flags_s: gagFlags = g_adminGagsEditor[id][gd_reason][r_flags]
-  new bool: alreadyHasGag = (g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed)
-  new bool: hasChanges = !GagData_IsEqual(g_currentGags[target], g_adminGagsEditor[id])
 
   menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSay",
     (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-")
@@ -436,9 +434,7 @@ static MenuShow_GagProperties(const id) {
 
   menu_addblank(menu, false)
 
-  menu_additem(menu, fmt("%L %s", id, "Gag_MenuItem_Confirm",
-    (alreadyHasGag && hasChanges) ? "edit" : ""), .callback = callback
-  )
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), .callback = callback)
 
   menu_addtext(menu, fmt("\n%L", id, "Gag_MenuItem_Resolution",
     Get_TimeString_seconds(id, g_adminGagsEditor[id][gd_reason][r_time]),
@@ -537,8 +533,9 @@ public MenuHandler_GagProperties(const id, const menu, const item) {
       case menu_Confirm: {
         new time = g_adminGagsEditor[id][gd_reason][r_time]
         new flags = g_adminGagsEditor[id][gd_reason][r_flags]
+        new expireAt = g_adminGagsEditor[id][gd_expireAt]
 
-        Gag_Save(id, target, time, flags)
+        Gag_Save(id, target, time, flags, expireAt)
 
         menu_destroy(menu)
         return PLUGIN_HANDLED
@@ -549,8 +546,9 @@ public MenuHandler_GagProperties(const id, const menu, const item) {
       case sequential_Confirm: {
         new time = g_adminGagsEditor[id][gd_reason][r_time]
         new flags = g_adminGagsEditor[id][gd_reason][r_flags]
+        new expireAt = g_adminGagsEditor[id][gd_expireAt]
 
-        Gag_Save(id, target, time, flags)
+        Gag_Save(id, target, time, flags, expireAt)
 
         menu_destroy(menu)
         return PLUGIN_HANDLED
@@ -1068,7 +1066,7 @@ static Get_GagFlags_Names(const gagFlags_s: flags) {
 }
 
 
-static Gag_Save(const id, const target, const time, const flags) {
+static Gag_Save(const id, const target, const time, const flags, const expireAt = 0) {
   GagData_Copy(g_currentGags[target], g_adminGagsEditor[id])
   GagData_Reset(g_adminGagsEditor[id])
 
@@ -1078,7 +1076,7 @@ static Gag_Save(const id, const target, const time, const flags) {
     gag[gd_reason][r_time] = time
     gag[gd_reason][r_flags] = gag_flags_s: flags
 
-    gag[gd_expireAt] = time + get_systime()
+    gag[gd_expireAt] = (expireAt != 0) ? (expireAt) : (time + get_systime())
   }
 
   CA_Storage_Save(
