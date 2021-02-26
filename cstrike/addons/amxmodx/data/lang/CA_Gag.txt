@@ -1,7 +1,7 @@
 [ru]
-Gag_MenuTitle_PlayersList = Заткнуть игрока
-Gag_MenuTitle_SelectReason = Выберите причину для затычки:
-Gag_MenuTitle_SelectTime = Выберите время для затычки:
+Gag_MenuTitle_PlayersList = Заглушить игрока
+Gag_MenuTitle_SelectReason = Выберите причину для заглушки:
+Gag_MenuTitle_SelectTime = Выберите время для заглушки:
 Gag_MenuItem_Yes = \yДа\w
 Gag_MenuItem_NoAndEdit = \rНет \w(\yРедактировать\w)
 Gag_MenuItem_ReadyConfirm = Подтвердите удаление:
@@ -13,7 +13,7 @@ Gag_MenuItem_Confirm = Подтвердить!
 Gag_MenuItem_Reason = Причина:
 Gag_MenuItem_Resolution = Время: \y%s\w (причина: \y%s\w)
 
-Gag_GagProperties = Параметры затычки игрока: [ \r%n\w ]
+Gag_GagProperties = Параметры заглушки игрока: [ \r%n\w ]
 Gag_EnterReason = Ввести причину ->\n
 Gag_EnterTime = Указать время ->
 
@@ -28,14 +28,14 @@ Gag_AdminGagPlayer = ^3Админ ^4%s ^3заткнул игрока ^4%s^1 (^3%
 Gag_AdminUngagPlayer = ^3Админ ^4%n ^3снял затычку с игрока ^4%n^1.
 Gag_PlayerNotConnected = ^3Игрок не доступен!^1
 Gag_PlayerAlreadyRemoved = ^3Игрок ^4%n^1 уже удалён!
-Gag_PlayerExpiredGag = ^3У игрока ^4%n^1 истекло время затычки.
+Gag_PlayerExpiredGag = ^3У игрока ^4%n^1 истекло время заглушки.
 
 Gag_NotEnoughPlayers = ^3Недостаточно игроков, чтобы открыть меню!
 Gag_NoTemplatesAvailable_Reasons = ^3Нет шаблонов выбора причин.
 Gag_NoTemplatesAvailable_Times = ^3Нет шаблонов выбора времени.
 
 Gag_YouSetManual_Time = ^3Вы установили своё время:
-Gag_YouSetManual_Reason = ^3Вы установили причину затычки:
+Gag_YouSetManual_Reason = ^3Вы установили причину заглушки:
 
 
 [en]
