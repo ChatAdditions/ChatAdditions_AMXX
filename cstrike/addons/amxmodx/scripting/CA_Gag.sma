@@ -915,7 +915,14 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
   new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, gagTime))
 
   new admin = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), adminAuthID)
-  show_activity_ex(admin, adminName, "%l", "Gag_AdminGagPlayer", name, reason, gagTimeStr)
+
+  // TODO: Rework this
+  show_activity_ex(admin, adminName, "%l", "Gag_AdminGagPlayer", name)
+  client_print(0, print_chat, "%l %s, %l %s (%s)",
+    "Gag_MenuItem_Reason", reason,
+    "Gag_MenuItem_Time", gagTimeStr,
+    Get_GagFlags_Names(gagFlags_s: flags)
+  )
 
   CA_Log(logLevel_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
     adminName, name, bits_to_flags(gag_flags_s: flags), gagTimeStr, reason \

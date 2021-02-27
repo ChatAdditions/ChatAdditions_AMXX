@@ -29,7 +29,7 @@ Gag_ChatMsg_Reason = ^4Причина:^1
 Gag_NotSet = Не задано
 Gag_Permanent = *НАВСЕГДА*
 
-Gag_AdminGagPlayer = заглушил игрока %s (%s на %s)
+Gag_AdminGagPlayer = заглушил игрока %s
 Gag_AdminUngagPlayer = снял заглушку с игрока %s
 Gag_PlayerNotConnected = ^3Игрок не доступен!^1
 Gag_PlayerAlreadyRemoved = ^3Игрок ^4%n^1 уже удалён!^1
@@ -75,7 +75,7 @@ Gag_ChatMsg_Reason = ^4Reason:^1
 Gag_NotSet = Not selected
 Gag_Permanent = *PERMANENT*
 
-Gag_AdminGagPlayer = gag player %s (%s on %s)
+Gag_AdminGagPlayer = gag player %s
 Gag_AdminUngagPlayer = remove gag from player %s
 Gag_PlayerNotConnected = ^3Player not connected!
 Gag_PlayerAlreadyRemoved = ^3Player ^4%n^1 already removed!^1
