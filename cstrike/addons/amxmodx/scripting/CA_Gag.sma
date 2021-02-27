@@ -773,7 +773,7 @@ public ClCmd_EnterGagReason(const id) {
 
   copy(g_adminGagsEditor[id][gd_reason][r_name], charsmax(g_adminGagsEditor[][r_name]), customReasonName)
 
-  client_print(id, print_chat, "%L '%s'", id, "Gag_YouSetManual_Reason", g_adminGagsEditor[id][gd_reason][r_name])
+  client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Reason", g_adminGagsEditor[id][gd_reason][r_name])
 
   MenuShow_SelectTime(id)
   return PLUGIN_HANDLED
@@ -797,7 +797,7 @@ public ClCmd_EnterGagTime(const id) {
 
   new time = strtol(timeStr)
   if(time <= 0) {
-    client_print_color(id, print_team_red, "%s Not valid time (%s)!", ca_gag_prefix, timeStr)
+    client_print_color(id, print_team_red, "%s %L (%s)!", ca_gag_prefix, id, "Gag_NotValidTimeEntered", timeStr)
 
     MenuShow_SelectTime(id)
     return PLUGIN_HANDLED
@@ -805,7 +805,7 @@ public ClCmd_EnterGagTime(const id) {
 
   g_adminGagsEditor[id][gd_reason][r_time] = time
 
-  client_print(id, print_chat, "%L '%s'", id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
+  client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
 
   MenuShow_GagProperties(id)
   return PLUGIN_HANDLED
@@ -1100,7 +1100,7 @@ static Gag_Remove(const id, const target) {
     new authID[MAX_AUTHID_LENGTH]; get_user_authid(target, authID, charsmax(authID))
     CA_Storage_Remove(authID)
   } else {
-    client_print(id, print_chat, "%s %L", ca_gag_prefix, id, "Gag_PlayerAlreadyRemoved", target)
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerAlreadyRemoved", target)
   }
 
   MenuShow_PlayersList(id)

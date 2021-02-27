@@ -32,15 +32,16 @@ Gag_Permanent = *НАВСЕГДА*
 Gag_AdminGagPlayer = заглушил игрока %s (%s на %s)
 Gag_AdminUngagPlayer = снял заглушку с игрока %s
 Gag_PlayerNotConnected = ^3Игрок не доступен!^1
-Gag_PlayerAlreadyRemoved = ^3Игрок ^4%n^1 уже удалён!
+Gag_PlayerAlreadyRemoved = ^3Игрок ^4%n^1 уже удалён!^1
 Gag_PlayerExpiredGag = ^3У игрока ^4%n^1 истекло время заглушки.
 
 Gag_NotEnoughPlayers = ^3Недостаточно игроков, чтобы открыть меню!
 Gag_NoTemplatesAvailable_Reasons = ^3Нет шаблонов выбора причин.
 Gag_NoTemplatesAvailable_Times = ^3Нет шаблонов выбора времени.
 
-Gag_YouSetManual_Time = ^3Вы установили своё время:
-Gag_YouSetManual_Reason = ^3Вы установили причину заглушки:
+Gag_YouSetManual_Time = ^3Вы установили своё время:^1
+Gag_YouSetManual_Reason = ^3Вы установили причину заглушки:^1
+Gag_NotValidTimeEntered = ^3Время указано не верно:^1
 
 
 [en]
@@ -77,12 +78,13 @@ Gag_Permanent = *PERMANENT*
 Gag_AdminGagPlayer = gag player %s (%s on %s)
 Gag_AdminUngagPlayer = remove gag from player %s
 Gag_PlayerNotConnected = ^3Player not connected!
-Gag_PlayerAlreadyRemoved = ^3Player ^4%n^1 already removed!
+Gag_PlayerAlreadyRemoved = ^3Player ^4%n^1 already removed!^1
 Gag_PlayerExpiredGag = ^3Player ^4%n^1 has expired gag.
 
 Gag_NotEnoughPlayers = ^3Not enough players to open menu!
 Gag_NoTemplatesAvailable_Reasons = No have reasons templates.
 Gag_NoTemplatesAvailable_Times = No have time templates.
 
-Gag_YouSetManual_Time = ^3You set custom time:
-Gag_YouSetManual_Reason = ^3You set custom reason:
+Gag_YouSetManual_Time = ^3You set custom time:^1
+Gag_YouSetManual_Reason = ^3You set custom reason:^1
+Gag_NotValidTimeEntered = ^3Entered time not valid:^1
