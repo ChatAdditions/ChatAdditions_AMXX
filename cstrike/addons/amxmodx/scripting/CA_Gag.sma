@@ -779,7 +779,7 @@ public ClCmd_EnterGagReason(const id) {
   return PLUGIN_HANDLED
 }
 
-public ClCmd_EnterGagTime(id) {
+public ClCmd_EnterGagTime(const id) {
   if(!is_user_connected(id)) {
     return PLUGIN_HANDLED
   }
@@ -796,7 +796,7 @@ public ClCmd_EnterGagTime(id) {
   read_argv(1, timeStr, charsmax(timeStr))
 
   new time = strtol(timeStr)
-  if(time == 0) {
+  if(time <= 0) {
     client_print_color(id, print_team_red, "%s Not valid time (%s)!", ca_gag_prefix, timeStr)
 
     MenuShow_SelectTime(id)
