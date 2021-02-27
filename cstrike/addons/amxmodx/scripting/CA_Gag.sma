@@ -814,6 +814,7 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
     return PLUGIN_HANDLED
   }
 
+  time *= SECONDS_IN_MINUTE
   g_adminGagsEditor[id][gd_reason][r_time] = time
 
   client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
