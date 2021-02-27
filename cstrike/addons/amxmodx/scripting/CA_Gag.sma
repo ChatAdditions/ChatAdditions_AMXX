@@ -115,14 +115,16 @@ public plugin_init() {
 
   set_task_ex(GAG_THINKER_FREQ, "Gags_Thinker", .flags = SetTask_Repeat)
 
-  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason")
-  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime")
-
   LoadConfig()
+
+  new accessFlags = read_flags(ca_gag_access_flags) | read_flags(ca_gag_access_flags_high)
+
+  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlags)
+  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlags)
 
   new const CMDS_Mute[][] = { "gag" }
   for(new i; i < sizeof(CMDS_Mute); i++) {
-    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", read_flags(ca_gag_access_flags) | read_flags(ca_gag_access_flags_high))
+    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", accessFlags)
   }
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
@@ -754,7 +756,11 @@ public ClCmd_Gag(const id, const level, const cid) {
   return PLUGIN_HANDLED
 }
 
-public ClCmd_EnterGagReason(const id) {
+public ClCmd_EnterGagReason(const id, const level, const cid) {
+  if(!cmd_access(id, level, cid, 1)) {
+    return PLUGIN_HANDLED
+  }
+
   new target = g_adminGagsEditor[id][gd_target]
   if(!is_user_connected(target)) {
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
@@ -779,7 +785,11 @@ public ClCmd_EnterGagReason(const id) {
   return PLUGIN_HANDLED
 }
 
-public ClCmd_EnterGagTime(const id) {
+public ClCmd_EnterGagTime(const id, const level, const cid) {
+  if(!cmd_access(id, level, cid, 1)) {
+    return PLUGIN_HANDLED
+  }
+
   if(!is_user_connected(id)) {
     return PLUGIN_HANDLED
   }
