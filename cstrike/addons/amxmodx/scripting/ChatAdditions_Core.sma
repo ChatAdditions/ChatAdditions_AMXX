@@ -51,8 +51,8 @@ public plugin_init() {
     ca_log_level
   )
 
-  register_clcmd("say", "ClCmd_Say")
-  register_clcmd("say_team", "ClCmd_SayTeam")
+  register_clcmd("say", "ClCmd_Say", ADMIN_ALL)
+  register_clcmd("say_team", "ClCmd_SayTeam", ADMIN_ALL)
   RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer, "CSGameRules_CanPlayerHearPlayer", .post = false)
 
   g_fwdClientSay = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL)

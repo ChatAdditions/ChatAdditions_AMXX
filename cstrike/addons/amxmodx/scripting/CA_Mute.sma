@@ -48,7 +48,7 @@ public plugin_init() {
 
   new const CMDS_Mute[][] = { "mute" }
   for(new i; i < sizeof(CMDS_Mute); i++) {
-    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Mute", ADMIN_USER)
+    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Mute", ADMIN_ALL)
   }
 
   AutoExecConfig(.name = "CA_Mute")
