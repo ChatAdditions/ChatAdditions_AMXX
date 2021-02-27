@@ -8,6 +8,7 @@
 
 #pragma ctrlchar '\'
 #pragma dynamic 524288
+#pragma tabsize 2
 
 
   /* ----- START SETTINGS----- */

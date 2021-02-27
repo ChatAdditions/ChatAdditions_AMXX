@@ -4,6 +4,8 @@
 #include <ChatAdditions>
 
 #pragma ctrlchar '\'
+#pragma tabsize 2
+
 
 enum logType_s {
 	_Default,

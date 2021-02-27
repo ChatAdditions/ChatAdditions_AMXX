@@ -6,6 +6,7 @@
 
 #pragma ctrlchar '\'
 #pragma dynamic 131072
+#pragma tabsize 2
 
 new const SQL_DBNAME[] = "ChatAdditions"
 new const SQL_TBL_GAGS[] = "players_gags"
