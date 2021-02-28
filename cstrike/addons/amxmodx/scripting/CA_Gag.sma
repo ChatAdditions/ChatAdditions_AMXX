@@ -35,7 +35,8 @@ new GagMenuType_s: ca_gag_menu_type,
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
-  ITEM_ENTER_GAG_REASON = -1
+  ITEM_ENTER_GAG_REASON = -1,
+  ITEM_ENTER_GAG_TIME = -2
 }
 
 public stock const PluginName[] = "CA: Gag"
@@ -118,14 +119,15 @@ public plugin_init() {
 
   LoadConfig()
 
-  new accessFlags = read_flags(ca_gag_access_flags) | read_flags(ca_gag_access_flags_high)
+  new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
+  new accessFlags = read_flags(ca_gag_access_flags)
 
-  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlags)
-  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlags)
+  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlagsHigh)
+  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlagsHigh)
 
   new const CMDS_Mute[][] = { "gag" }
   for(new i; i < sizeof(CMDS_Mute); i++) {
-    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", accessFlags)
+    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", (accessFlags | accessFlagsHigh))
   }
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
@@ -579,7 +581,10 @@ static MenuShow_SelectReason(const id) {
   }
 
   new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectReason"), "MenuHandler_SelectReason")
-  menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
+
+  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
+    menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
+  }
 
   if(g_gagReasonsTemplates_size) {
     for(new i; i < g_gagReasonsTemplates_size; i++) {
@@ -665,19 +670,18 @@ static MenuShow_SelectTime(const id) {
 
   new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectTime"), "MenuHandler_SelectTime")
 
-  menu_additem(menu, fmt("%L", id, "Gag_EnterTime"))
-  // menu_additem(menu, fmt("%L", id, "Gag_Permanent"))
-  menu_addblank(menu, .slot = false)
+  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
+    menu_additem(menu, fmt("%L", id, "Gag_EnterTime"), fmt("%i", ITEM_ENTER_GAG_REASON))
+    menu_addblank(menu, .slot = false)
+  }
 
-  new selectedTime = g_adminGagsEditor[id][gd_reason][r_time]
+  // menu_additem(menu, fmt("%L", id, "Gag_Permanent"))
 
   if(g_gagTimeTemplates_size) {
     for(new i; i < g_gagTimeTemplates_size; i++) {
       new time = ArrayGetCell(g_gagTimeTemplates, i)
-      menu_additem(menu, fmt("%s%s", (selectedTime == time) ? "\\r" : "",
-        Get_TimeString_seconds(id, time)),
-        fmt("%i", time)
-      )
+
+      menu_additem(menu, fmt("%s", Get_TimeString_seconds(id, time)), fmt("%i", i))
     }
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
@@ -712,13 +716,15 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
     return PLUGIN_HANDLED
   }
 
-  switch(item) {
-    case menu_CustomTime: {
-      client_cmd(id, "messagemode enter_GagTime")
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
 
-      menu_destroy(menu)
-      return PLUGIN_HANDLED
-    }
+  new timeID = strtol(g_itemInfo)
+  if(timeID == ITEM_ENTER_GAG_TIME) {
+    client_cmd(id, "messagemode enter_GagTime")
+
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
     /* case menu_Permament: {
       g_adminGagsEditor[id][gd_time] = GAG_FOREVER
 
@@ -726,10 +732,9 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
       menu_destroy(menu)
       return PLUGIN_HANDLED
     } */
-  }
 
-  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
-  g_adminGagsEditor[id][gd_reason][r_time] = strtol(g_itemInfo)
+  new time = ArrayGetCell(g_gagTimeTemplates, timeID)
+  g_adminGagsEditor[id][gd_reason][r_time] = time
 
   MenuShow_GagProperties(id)
   menu_destroy(menu)
