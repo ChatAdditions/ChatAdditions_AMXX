@@ -323,7 +323,6 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
     client_cmd(id, "messagemode enter_GagReason")
 
     menu_destroy(menu)
-    MenuShow_SelectReason(id)
     return PLUGIN_HANDLED
   }
 
