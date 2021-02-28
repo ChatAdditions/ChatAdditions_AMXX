@@ -680,10 +680,8 @@ static MenuShow_SelectTime(const id) {
   if(g_gagTimeTemplates_size) {
     for(new i; i < g_gagTimeTemplates_size; i++) {
       new time = ArrayGetCell(g_gagTimeTemplates, i)
-      menu_additem(menu, fmt("%s%s", (selectedTime == time) ? "\\r" : "",
-        Get_TimeString_seconds(id, time)),
-        fmt("%i", time)
-      )
+
+      menu_additem(menu, fmt("%s", Get_TimeString_seconds(id, time)), fmt("%i", i))
     }
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
