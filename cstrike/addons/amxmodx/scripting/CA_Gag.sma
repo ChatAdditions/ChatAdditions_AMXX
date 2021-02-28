@@ -118,14 +118,15 @@ public plugin_init() {
 
   LoadConfig()
 
-  new accessFlags = read_flags(ca_gag_access_flags) | read_flags(ca_gag_access_flags_high)
+  new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
+  new accessFlags = read_flags(ca_gag_access_flags)
 
-  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlags)
-  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlags)
+  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlagsHigh)
+  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlagsHigh)
 
   new const CMDS_Mute[][] = { "gag" }
   for(new i; i < sizeof(CMDS_Mute); i++) {
-    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", accessFlags)
+    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", (accessFlags | accessFlagsHigh))
   }
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
@@ -579,7 +580,10 @@ static MenuShow_SelectReason(const id) {
   }
 
   new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectReason"), "MenuHandler_SelectReason")
-  menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
+
+  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
+    menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
+  }
 
   if(g_gagReasonsTemplates_size) {
     for(new i; i < g_gagReasonsTemplates_size; i++) {
