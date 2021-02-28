@@ -18,7 +18,7 @@ Gag_MenuItem_Length = Длительность:
 Gag_MenuItem_Expire = Истекает:
 Gag_MenuItem_Left = Осталось:
 
-Gag_GagProperties = Параметры заглушки игрока: [ \r%n\y ]
+Gag_SelectFlags = Параметры заглушки игрока: [ \r%n\y ]
 Gag_EnterReason = Ввести причину ->\n
 Gag_EnterTime = Указать время ->
 
@@ -64,7 +64,7 @@ Gag_MenuItem_Length = Length:
 Gag_MenuItem_Expire = Expire at:
 Gag_MenuItem_Left = Left:
 
-Gag_GagProperties = Gag parameters: [ \r%n\y ]
+Gag_SelectFlags = Gag parameters: [ \r%n\y ]
 Gag_EnterReason = Enter gag reason ->\n
 Gag_EnterTime = Enter gag time ->
 
