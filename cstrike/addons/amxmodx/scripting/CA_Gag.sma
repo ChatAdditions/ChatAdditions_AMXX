@@ -21,12 +21,7 @@ static g_adminGagsEditor[MAX_PLAYERS + 1][gagData_s]
 static Array: g_gagReasonsTemplates, g_gagReasonsTemplates_size
 static Array: g_gagTimeTemplates, g_gagTimeTemplates_size
 
-enum GagMenuType_s {
-  _MenuType_Custom,
-  _MenuType_Sequential
-};
-new GagMenuType_s: ca_gag_menu_type,
-  ca_gag_prefix[32],
+new ca_gag_prefix[32],
   ca_gag_times[64],
   ca_gag_immunity_flags[16],
   ca_gag_access_flags[16],
@@ -36,7 +31,8 @@ new GagMenuType_s: ca_gag_menu_type,
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
   ITEM_ENTER_GAG_REASON = -1,
-  ITEM_ENTER_GAG_TIME = -2
+  ITEM_ENTER_GAG_TIME = -2,
+  ITEM_CONFIRM = -3
 }
 
 public stock const PluginName[] = "CA: Gag"
@@ -54,14 +50,6 @@ public plugin_init() {
 
   g_gagReasonsTemplates = ArrayCreate(reason_s)
   g_gagTimeTemplates = ArrayCreate()
-
-  bind_pcvar_num(create_cvar("ca_gag_menu_type", "1",
-      .description = "Gag menu type\n 0 = show only one menu with gag properties\n 1 = sequential menu with control every step",
-      .has_min = true, .min_val = 0.0,
-      .has_max = true, .max_val = float(_: _MenuType_Sequential)
-    ),
-    ca_gag_menu_type
-  )
 
   bind_pcvar_string(create_cvar("ca_gag_prefix", "[GAG]",
       .description = "Chat prefix for plugin actions"
@@ -252,12 +240,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   // Setup gag for target player
   GagData_GetPersonalData(id, target, g_adminGagsEditor[id])
 
-  // Select the next menu by CVar settings
-  switch(ca_gag_menu_type) {
-    case _MenuType_Custom: MenuShow_GagProperties(id)
-    case _MenuType_Sequential: MenuShow_SelectReason(id)
-  }
-
+  MenuShow_SelectReason(id)
   menu_destroy(menu)
   return PLUGIN_HANDLED
 }
@@ -383,7 +366,7 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
     }
     GagData_Copy(g_adminGagsEditor[id], gagData)
 
-    MenuShow_GagProperties(id)
+    MenuShow_SelectFlags(id)
     menu_destroy(menu)
     return PLUGIN_HANDLED
   }
@@ -394,7 +377,7 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
 }
 
 // Gag Properties menu
-static MenuShow_GagProperties(const id) {
+static MenuShow_SelectFlags(const id) {
   if(!is_user_connected(id)) {
     return
   }
@@ -407,50 +390,39 @@ static MenuShow_GagProperties(const id) {
     return
   }
 
-  new menu = menu_create(fmt("%L", id, "Gag_GagProperties", target), "MenuHandler_GagProperties")
+  new menu = menu_create(fmt("%L", id, "Gag_SelectFlags", target), "MenuHandler_SelectFlags")
 
   static callback
   if(!callback) {
-    callback = menu_makecallback("MenuCallback_GagProperties")
+    callback = menu_makecallback("MenuCallback_SelectFlags")
   }
 
   new gag_flags_s: gagFlags = g_adminGagsEditor[id][gd_reason][r_flags]
 
   menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSay",
-    (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-")
+    (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-"),
+    fmt("%i", gagFlag_Say)
   )
   menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
-    (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-")
+    (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
+    fmt("%i", gagFlag_SayTeam)
   )
   menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
-    (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-")
+    (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"),
+    fmt("%i", gagFlag_Voice)
   )
-
-  if(ca_gag_menu_type == _MenuType_Custom) {
-    menu_addblank(menu, false)
-
-    menu_additem(menu, fmt("%L [ \\y%s\\w ]", id, "Gag_MenuItem_Reason",
-      Get_GagString_reason(id, target)), .callback = callback
-    )
-    menu_additem(menu, fmt("%L [ \\y%s\\w ]", id, "Gag_MenuItem_Time",
-      Get_TimeString_seconds(id, g_adminGagsEditor[id][gd_reason][r_time]))
-    )
-  }
 
   menu_addblank(menu, false)
 
-  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), .callback = callback)
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), fmt("%i", ITEM_CONFIRM), .callback = callback)
 
   menu_addtext(menu, fmt("\n%L", id, "Gag_MenuItem_Resolution",
     Get_TimeString_seconds(id, g_adminGagsEditor[id][gd_reason][r_time]),
     Get_GagString_reason(id, target)), false
   )
 
-  if(ca_gag_menu_type == _MenuType_Sequential) {
-    menu_addblank2(menu)
-    menu_addblank2(menu)
-  }
-
+  menu_addblank2(menu)
+  menu_addblank2(menu)
   menu_addblank2(menu)
   menu_addblank2(menu)
   menu_addblank2(menu)
@@ -462,25 +434,17 @@ static MenuShow_GagProperties(const id) {
   menu_display(id, menu)
 }
 
-public MenuCallback_GagProperties(const id, const menu, const item) {
-  enum { /* menu_Chat, menu_TeamChat, menu_VoiceChat, */
-      /* menu_Reason = 3, */ /* menu_Time, */ menu_Confirm = 5
-  }
-
-  enum { sequential_Confirm = 3 }
+public MenuCallback_SelectFlags(const id, const menu, const item) {
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  new itemIndex = strtol(g_itemInfo)
 
   new bool: isReadyToGag = (g_adminGagsEditor[id][gd_reason][r_flags] != gagFlag_Removed)
-
-  new bool: isConfirmItem = (
-    item == menu_Confirm && ca_gag_menu_type == _MenuType_Custom
-    || item == sequential_Confirm && ca_gag_menu_type == _MenuType_Sequential
-  )
 
   new target = g_adminGagsEditor[id][gd_target]
   new bool: alreadyHasGag = (g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed)
   new bool: hasChanges = !GagData_IsEqual(g_currentGags[target], g_adminGagsEditor[id])
 
-  if(isConfirmItem) {
+  if((itemIndex == ITEM_CONFIRM)) {
     if(!isReadyToGag) {
       return ITEM_DISABLED
     }
@@ -493,13 +457,7 @@ public MenuCallback_GagProperties(const id, const menu, const item) {
   return ITEM_ENABLED
 }
 
-public MenuHandler_GagProperties(const id, const menu, const item) {
-  enum { menu_Chat, menu_TeamChat, menu_VoiceChat,
-      menu_Reason, menu_Time, menu_Confirm
-    }
-
-  enum { sequential_Confirm = 3 }
-
+public MenuHandler_SelectFlags(const id, const menu, const item) {
   if(item == MENU_EXIT || item < 0) {
     GagData_Reset(g_adminGagsEditor[id])
 
@@ -517,51 +475,27 @@ public MenuHandler_GagProperties(const id, const menu, const item) {
     return PLUGIN_HANDLED
   }
 
-  switch(item) {
-    case menu_Chat:       g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_Say
-    case menu_TeamChat:   g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_SayTeam
-    case menu_VoiceChat:  g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_Voice
-  }
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  new itemIndex = strtol(g_itemInfo)
 
-  if(ca_gag_menu_type == _MenuType_Custom) {
-    switch(item) {
-      case menu_Reason: {
-        MenuShow_SelectReason(id)
-        menu_destroy(menu)
-        return PLUGIN_HANDLED
-      }
-      case menu_Time:	{
-        MenuShow_SelectTime(id)
-        menu_destroy(menu)
-        return PLUGIN_HANDLED
-      }
-      case menu_Confirm: {
-        new time = g_adminGagsEditor[id][gd_reason][r_time]
-        new flags = g_adminGagsEditor[id][gd_reason][r_flags]
-        new expireAt = g_adminGagsEditor[id][gd_expireAt]
+  switch(itemIndex) {
+    case gagFlag_Say:     g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_Say
+    case gagFlag_SayTeam: g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_SayTeam
+    case gagFlag_Voice:   g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_Voice
 
-        Gag_Save(id, target, time, flags, expireAt)
+    case ITEM_CONFIRM: {
+      new time = g_adminGagsEditor[id][gd_reason][r_time]
+      new flags = g_adminGagsEditor[id][gd_reason][r_flags]
+      new expireAt = g_adminGagsEditor[id][gd_expireAt]
 
-        menu_destroy(menu)
-        return PLUGIN_HANDLED
-      }
-    }
-  } else {
-    switch(item) {
-      case sequential_Confirm: {
-        new time = g_adminGagsEditor[id][gd_reason][r_time]
-        new flags = g_adminGagsEditor[id][gd_reason][r_flags]
-        new expireAt = g_adminGagsEditor[id][gd_expireAt]
+      Gag_Save(id, target, time, flags, expireAt)
 
-        Gag_Save(id, target, time, flags, expireAt)
-
-        menu_destroy(menu)
-        return PLUGIN_HANDLED
-      }
+      menu_destroy(menu)
+      return PLUGIN_HANDLED
     }
   }
 
-  MenuShow_GagProperties(id)
+  MenuShow_SelectFlags(id)
   menu_destroy(menu)
   return PLUGIN_HANDLED
 }
@@ -591,10 +525,16 @@ static MenuShow_SelectReason(const id) {
       new reason[reason_s]
       ArrayGetArray(g_gagReasonsTemplates, i, reason)
 
-      menu_additem(menu,
-        fmt("%s (\\y%s\\w)", reason[r_name], Get_TimeString_seconds(id, reason[r_time])),
-        fmt("%i", i)
-      )
+      if(reason[r_time] > 0) {
+        menu_additem(menu,
+          fmt("%s (\\y%s\\w)", reason[r_name], Get_TimeString_seconds(id, reason[r_time])),
+          fmt("%i", i)
+        )
+      } else {
+        menu_additem(menu,
+          fmt("%s", reason[r_name]), fmt("%i", i)
+        )
+      }
     }
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
@@ -611,10 +551,7 @@ static MenuShow_SelectReason(const id) {
 public MenuHandler_SelectReason(const id, const menu, const item) {
   if(item == MENU_EXIT || item < 0) {
     // Return to prev menu
-    switch(ca_gag_menu_type) {
-      case _MenuType_Custom: MenuShow_GagProperties(id)
-      case _MenuType_Sequential: MenuShow_PlayersList(id)
-    }
+    MenuShow_PlayersList(id)
 
     menu_destroy(menu)
     return PLUGIN_HANDLED
@@ -645,11 +582,25 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
   // Get predefined reason params
   g_adminGagsEditor[id][gd_reason] = reason
 
-  switch(ca_gag_menu_type) {
-    case _MenuType_Custom: MenuShow_GagProperties(id)
-    case _MenuType_Sequential: MenuShow_SelectTime(id)
+  // Time not set
+  if(reason[r_time] == 0) {
+    MenuShow_SelectTime(id)
+
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
   }
 
+  // switch(ca_gag_menu_type) {
+  //   case _MenuType_Custom: MenuShow_SelectFlags(id)
+  // }
+
+  if(reason[r_flags] == gagFlag_Removed) {
+    MenuShow_SelectFlags(id)
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  Gag_Save(id, target, reason[r_time], reason[r_flags])
   menu_destroy(menu)
   return PLUGIN_HANDLED
 }
@@ -675,8 +626,6 @@ static MenuShow_SelectTime(const id) {
     menu_addblank(menu, .slot = false)
   }
 
-  // menu_additem(menu, fmt("%L", id, "Gag_Permanent"))
-
   if(g_gagTimeTemplates_size) {
     for(new i; i < g_gagTimeTemplates_size; i++) {
       new time = ArrayGetCell(g_gagTimeTemplates, i)
@@ -695,13 +644,8 @@ static MenuShow_SelectTime(const id) {
 }
 
 public MenuHandler_SelectTime(const id, const menu, const item) {
-  enum { menu_CustomTime/* , menu_Permament  */}
-
   if(item == MENU_EXIT || item < 0) {
-    switch(ca_gag_menu_type) {
-      case _MenuType_Custom: MenuShow_GagProperties(id)
-      case _MenuType_Sequential: MenuShow_PlayersList(id)
-    }
+    MenuShow_PlayersList(id)
 
     menu_destroy(menu)
     return PLUGIN_HANDLED
@@ -725,18 +669,11 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
     menu_destroy(menu)
     return PLUGIN_HANDLED
   }
-    /* case menu_Permament: {
-      g_adminGagsEditor[id][gd_time] = GAG_FOREVER
-
-      MenuShow_GagProperties(id)
-      menu_destroy(menu)
-      return PLUGIN_HANDLED
-    } */
 
   new time = ArrayGetCell(g_gagTimeTemplates, timeID)
   g_adminGagsEditor[id][gd_reason][r_time] = time
 
-  MenuShow_GagProperties(id)
+  MenuShow_SelectFlags(id)
   menu_destroy(menu)
   return PLUGIN_HANDLED
 }
@@ -824,7 +761,7 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
 
   client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
 
-  MenuShow_GagProperties(id)
+  MenuShow_SelectFlags(id)
   return PLUGIN_HANDLED
 }
 
