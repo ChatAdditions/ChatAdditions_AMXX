@@ -245,6 +245,304 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   return PLUGIN_HANDLED
 }
 
+// Reason choose menu
+static MenuShow_SelectReason(const id) {
+  if(!is_user_connected(id)) {
+    return PLUGIN_HANDLED
+  }
+
+  new target = g_adminGagsEditor[id][gd_target]
+  if(!is_user_connected(target)) {
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
+
+    MenuShow_PlayersList(id)
+    return PLUGIN_HANDLED
+  }
+
+  new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectReason"), "MenuHandler_SelectReason")
+
+  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
+    menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
+  }
+
+  if(g_gagReasonsTemplates_size) {
+    for(new i; i < g_gagReasonsTemplates_size; i++) {
+      new reason[reason_s]
+      ArrayGetArray(g_gagReasonsTemplates, i, reason)
+
+      if(reason[r_time] > 0) {
+        menu_additem(menu,
+          fmt("%s (\\y%s\\w)", reason[r_name], Get_TimeString_seconds(id, reason[r_time])),
+          fmt("%i", i)
+        )
+      } else {
+        menu_additem(menu,
+          fmt("%s", reason[r_name]), fmt("%i", i)
+        )
+      }
+    }
+  } else {
+    menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
+  }
+
+  menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
+  menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
+  menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
+
+  menu_display(id, menu)
+  return PLUGIN_HANDLED
+}
+
+public MenuHandler_SelectReason(const id, const menu, const item) {
+  if(item == MENU_EXIT || item < 0) {
+    // Return to prev menu
+    MenuShow_PlayersList(id)
+
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  new target = g_adminGagsEditor[id][gd_target]
+  if(!is_user_connected(target)) {
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
+
+    MenuShow_PlayersList(id)
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+
+  new reasonID = strtol(g_itemInfo)
+  if(reasonID == ITEM_ENTER_GAG_REASON) {
+    client_cmd(id, "messagemode enter_GagReason")
+
+    menu_display(id, menu)
+    return PLUGIN_HANDLED
+  }
+
+  new reason[reason_s]
+  ArrayGetArray(g_gagReasonsTemplates, reasonID, reason)
+
+  // Get predefined reason params
+  g_adminGagsEditor[id][gd_reason] = reason
+
+  // Time not set
+  if(reason[r_time] == 0) {
+    MenuShow_SelectTime(id)
+
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  if(reason[r_flags] == gagFlag_Removed) {
+    MenuShow_SelectFlags(id)
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  Gag_Save(id, target, reason[r_time], reason[r_flags])
+  menu_destroy(menu)
+  return PLUGIN_HANDLED
+}
+
+// Time choose menu
+static MenuShow_SelectTime(const id) {
+  if(!is_user_connected(id)) {
+    return PLUGIN_HANDLED
+  }
+
+  new target = g_adminGagsEditor[id][gd_target]
+  if(!is_user_connected(target)) {
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
+
+    MenuShow_PlayersList(id)
+    return PLUGIN_HANDLED
+  }
+
+  new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectTime"), "MenuHandler_SelectTime")
+
+  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
+    menu_additem(menu, fmt("%L", id, "Gag_EnterTime"), fmt("%i", ITEM_ENTER_GAG_REASON))
+    menu_addblank(menu, .slot = false)
+  }
+
+  if(g_gagTimeTemplates_size) {
+    for(new i; i < g_gagTimeTemplates_size; i++) {
+      new time = ArrayGetCell(g_gagTimeTemplates, i)
+
+      menu_additem(menu, fmt("%s", Get_TimeString_seconds(id, time)), fmt("%i", i))
+    }
+  } else {
+    menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
+  }
+
+  menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
+  menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
+  menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
+
+  return menu_display(id, menu)
+}
+
+public MenuHandler_SelectTime(const id, const menu, const item) {
+  if(item == MENU_EXIT || item < 0) {
+    MenuShow_PlayersList(id)
+
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  new target = g_adminGagsEditor[id][gd_target]
+  if(!is_user_connected(target)) {
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
+
+    MenuShow_PlayersList(id)
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+
+  new timeID = strtol(g_itemInfo)
+  if(timeID == ITEM_ENTER_GAG_TIME) {
+    client_cmd(id, "messagemode enter_GagTime")
+
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  new time = ArrayGetCell(g_gagTimeTemplates, timeID)
+  g_adminGagsEditor[id][gd_reason][r_time] = time
+
+  MenuShow_SelectFlags(id)
+  menu_destroy(menu)
+  return PLUGIN_HANDLED
+}
+
+// Select flags menu
+static MenuShow_SelectFlags(const id) {
+  if(!is_user_connected(id)) {
+    return
+  }
+
+  new target = g_adminGagsEditor[id][gd_target]
+  if(!is_user_connected(target)) {
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
+
+    MenuShow_PlayersList(id)
+    return
+  }
+
+  new menu = menu_create(fmt("%L", id, "Gag_SelectFlags", target), "MenuHandler_SelectFlags")
+
+  static callback
+  if(!callback) {
+    callback = menu_makecallback("MenuCallback_SelectFlags")
+  }
+
+  new gag_flags_s: gagFlags = g_adminGagsEditor[id][gd_reason][r_flags]
+
+  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSay",
+    (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-"),
+    fmt("%i", gagFlag_Say)
+  )
+  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
+    (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
+    fmt("%i", gagFlag_SayTeam)
+  )
+  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
+    (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"),
+    fmt("%i", gagFlag_Voice)
+  )
+
+  menu_addblank(menu, false)
+
+  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), fmt("%i", ITEM_CONFIRM), .callback = callback)
+
+  menu_addtext(menu, fmt("\n%L", id, "Gag_MenuItem_Resolution",
+    Get_TimeString_seconds(id, g_adminGagsEditor[id][gd_reason][r_time]),
+    Get_GagString_reason(id, target)), false
+  )
+
+  menu_addblank2(menu)
+  menu_addblank2(menu)
+  menu_addblank2(menu)
+  menu_addblank2(menu)
+  menu_addblank2(menu)
+
+  menu_setprop(menu, MPROP_PERPAGE, 0)
+  menu_setprop(menu, MPROP_EXIT, MEXIT_FORCE)
+  menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
+
+  menu_display(id, menu)
+}
+
+public MenuCallback_SelectFlags(const id, const menu, const item) {
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  new itemIndex = strtol(g_itemInfo)
+
+  new bool: isReadyToGag = (g_adminGagsEditor[id][gd_reason][r_flags] != gagFlag_Removed)
+
+  new target = g_adminGagsEditor[id][gd_target]
+  new bool: alreadyHasGag = (g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed)
+  new bool: hasChanges = !GagData_IsEqual(g_currentGags[target], g_adminGagsEditor[id])
+
+  if((itemIndex == ITEM_CONFIRM)) {
+    if(!isReadyToGag) {
+      return ITEM_DISABLED
+    }
+
+    if(alreadyHasGag && !hasChanges) {
+      return ITEM_DISABLED
+    }
+  }
+
+  return ITEM_ENABLED
+}
+
+public MenuHandler_SelectFlags(const id, const menu, const item) {
+  if(item == MENU_EXIT || item < 0) {
+    GagData_Reset(g_adminGagsEditor[id])
+
+    MenuShow_PlayersList(id)
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  new target = g_adminGagsEditor[id][gd_target]
+  if(!is_user_connected(target)) {
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
+
+    MenuShow_PlayersList(id)
+    menu_destroy(menu)
+    return PLUGIN_HANDLED
+  }
+
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  new itemIndex = strtol(g_itemInfo)
+
+  switch(itemIndex) {
+    case gagFlag_Say:     g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_Say
+    case gagFlag_SayTeam: g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_SayTeam
+    case gagFlag_Voice:   g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_Voice
+
+    case ITEM_CONFIRM: {
+      new time = g_adminGagsEditor[id][gd_reason][r_time]
+      new flags = g_adminGagsEditor[id][gd_reason][r_flags]
+      new expireAt = g_adminGagsEditor[id][gd_expireAt]
+
+      Gag_Save(id, target, time, flags, expireAt)
+
+      menu_destroy(menu)
+      return PLUGIN_HANDLED
+    }
+  }
+
+  MenuShow_SelectFlags(id)
+  menu_destroy(menu)
+  return PLUGIN_HANDLED
+}
+
 // Show gag menu
 static MenuShow_ShowGag(const id) {
   if(!is_user_connected(id)) {
@@ -372,308 +670,6 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
   }
 
   MenuShow_PlayersList(id)
-  menu_destroy(menu)
-  return PLUGIN_HANDLED
-}
-
-// Gag Properties menu
-static MenuShow_SelectFlags(const id) {
-  if(!is_user_connected(id)) {
-    return
-  }
-
-  new target = g_adminGagsEditor[id][gd_target]
-  if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
-
-    MenuShow_PlayersList(id)
-    return
-  }
-
-  new menu = menu_create(fmt("%L", id, "Gag_SelectFlags", target), "MenuHandler_SelectFlags")
-
-  static callback
-  if(!callback) {
-    callback = menu_makecallback("MenuCallback_SelectFlags")
-  }
-
-  new gag_flags_s: gagFlags = g_adminGagsEditor[id][gd_reason][r_flags]
-
-  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSay",
-    (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-"),
-    fmt("%i", gagFlag_Say)
-  )
-  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
-    (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
-    fmt("%i", gagFlag_SayTeam)
-  )
-  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
-    (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"),
-    fmt("%i", gagFlag_Voice)
-  )
-
-  menu_addblank(menu, false)
-
-  menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), fmt("%i", ITEM_CONFIRM), .callback = callback)
-
-  menu_addtext(menu, fmt("\n%L", id, "Gag_MenuItem_Resolution",
-    Get_TimeString_seconds(id, g_adminGagsEditor[id][gd_reason][r_time]),
-    Get_GagString_reason(id, target)), false
-  )
-
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-  menu_addblank2(menu)
-
-  menu_setprop(menu, MPROP_PERPAGE, 0)
-  menu_setprop(menu, MPROP_EXIT, MEXIT_FORCE)
-  menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
-
-  menu_display(id, menu)
-}
-
-public MenuCallback_SelectFlags(const id, const menu, const item) {
-  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
-  new itemIndex = strtol(g_itemInfo)
-
-  new bool: isReadyToGag = (g_adminGagsEditor[id][gd_reason][r_flags] != gagFlag_Removed)
-
-  new target = g_adminGagsEditor[id][gd_target]
-  new bool: alreadyHasGag = (g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed)
-  new bool: hasChanges = !GagData_IsEqual(g_currentGags[target], g_adminGagsEditor[id])
-
-  if((itemIndex == ITEM_CONFIRM)) {
-    if(!isReadyToGag) {
-      return ITEM_DISABLED
-    }
-
-    if(alreadyHasGag && !hasChanges) {
-      return ITEM_DISABLED
-    }
-  }
-
-  return ITEM_ENABLED
-}
-
-public MenuHandler_SelectFlags(const id, const menu, const item) {
-  if(item == MENU_EXIT || item < 0) {
-    GagData_Reset(g_adminGagsEditor[id])
-
-    MenuShow_PlayersList(id)
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  new target = g_adminGagsEditor[id][gd_target]
-  if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
-
-    MenuShow_PlayersList(id)
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
-  new itemIndex = strtol(g_itemInfo)
-
-  switch(itemIndex) {
-    case gagFlag_Say:     g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_Say
-    case gagFlag_SayTeam: g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_SayTeam
-    case gagFlag_Voice:   g_adminGagsEditor[id][gd_reason][r_flags] ^= gagFlag_Voice
-
-    case ITEM_CONFIRM: {
-      new time = g_adminGagsEditor[id][gd_reason][r_time]
-      new flags = g_adminGagsEditor[id][gd_reason][r_flags]
-      new expireAt = g_adminGagsEditor[id][gd_expireAt]
-
-      Gag_Save(id, target, time, flags, expireAt)
-
-      menu_destroy(menu)
-      return PLUGIN_HANDLED
-    }
-  }
-
-  MenuShow_SelectFlags(id)
-  menu_destroy(menu)
-  return PLUGIN_HANDLED
-}
-
-// Reason choose menu
-static MenuShow_SelectReason(const id) {
-  if(!is_user_connected(id)) {
-    return PLUGIN_HANDLED
-  }
-
-  new target = g_adminGagsEditor[id][gd_target]
-  if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
-
-    MenuShow_PlayersList(id)
-    return PLUGIN_HANDLED
-  }
-
-  new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectReason"), "MenuHandler_SelectReason")
-
-  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
-    menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
-  }
-
-  if(g_gagReasonsTemplates_size) {
-    for(new i; i < g_gagReasonsTemplates_size; i++) {
-      new reason[reason_s]
-      ArrayGetArray(g_gagReasonsTemplates, i, reason)
-
-      if(reason[r_time] > 0) {
-        menu_additem(menu,
-          fmt("%s (\\y%s\\w)", reason[r_name], Get_TimeString_seconds(id, reason[r_time])),
-          fmt("%i", i)
-        )
-      } else {
-        menu_additem(menu,
-          fmt("%s", reason[r_name]), fmt("%i", i)
-        )
-      }
-    }
-  } else {
-    menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
-  }
-
-  menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
-  menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
-  menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
-
-  menu_display(id, menu)
-  return PLUGIN_HANDLED
-}
-
-public MenuHandler_SelectReason(const id, const menu, const item) {
-  if(item == MENU_EXIT || item < 0) {
-    // Return to prev menu
-    MenuShow_PlayersList(id)
-
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  new target = g_adminGagsEditor[id][gd_target]
-  if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
-
-    MenuShow_PlayersList(id)
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
-
-  new reasonID = strtol(g_itemInfo)
-  if(reasonID == ITEM_ENTER_GAG_REASON) {
-    client_cmd(id, "messagemode enter_GagReason")
-
-    menu_display(id, menu)
-    return PLUGIN_HANDLED
-  }
-
-  new reason[reason_s]
-  ArrayGetArray(g_gagReasonsTemplates, reasonID, reason)
-
-  // Get predefined reason params
-  g_adminGagsEditor[id][gd_reason] = reason
-
-  // Time not set
-  if(reason[r_time] == 0) {
-    MenuShow_SelectTime(id)
-
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  // switch(ca_gag_menu_type) {
-  //   case _MenuType_Custom: MenuShow_SelectFlags(id)
-  // }
-
-  if(reason[r_flags] == gagFlag_Removed) {
-    MenuShow_SelectFlags(id)
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  Gag_Save(id, target, reason[r_time], reason[r_flags])
-  menu_destroy(menu)
-  return PLUGIN_HANDLED
-}
-
-// Time choose menu
-static MenuShow_SelectTime(const id) {
-  if(!is_user_connected(id)) {
-    return PLUGIN_HANDLED
-  }
-
-  new target = g_adminGagsEditor[id][gd_target]
-  if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
-
-    MenuShow_PlayersList(id)
-    return PLUGIN_HANDLED
-  }
-
-  new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectTime"), "MenuHandler_SelectTime")
-
-  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
-    menu_additem(menu, fmt("%L", id, "Gag_EnterTime"), fmt("%i", ITEM_ENTER_GAG_REASON))
-    menu_addblank(menu, .slot = false)
-  }
-
-  if(g_gagTimeTemplates_size) {
-    for(new i; i < g_gagTimeTemplates_size; i++) {
-      new time = ArrayGetCell(g_gagTimeTemplates, i)
-
-      menu_additem(menu, fmt("%s", Get_TimeString_seconds(id, time)), fmt("%i", i))
-    }
-  } else {
-    menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
-  }
-
-  menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
-  menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
-  menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
-
-  return menu_display(id, menu)
-}
-
-public MenuHandler_SelectTime(const id, const menu, const item) {
-  if(item == MENU_EXIT || item < 0) {
-    MenuShow_PlayersList(id)
-
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  new target = g_adminGagsEditor[id][gd_target]
-  if(!is_user_connected(target)) {
-    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
-
-    MenuShow_PlayersList(id)
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
-
-  new timeID = strtol(g_itemInfo)
-  if(timeID == ITEM_ENTER_GAG_TIME) {
-    client_cmd(id, "messagemode enter_GagTime")
-
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
-  }
-
-  new time = ArrayGetCell(g_gagTimeTemplates, timeID)
-  g_adminGagsEditor[id][gd_reason][r_time] = time
-
-  MenuShow_SelectFlags(id)
   menu_destroy(menu)
   return PLUGIN_HANDLED
 }
