@@ -114,10 +114,13 @@ public plugin_init() {
   register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlagsHigh)
   register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlagsHigh)
 
+  register_concmd("amx_gag", "ConCmd_amx_gag", accessFlagsHigh, "Usage: amx_gag [nickName | STEAM_ID | userID | IP] <reason> <time> <flags>")
+
   new const CMDS_Mute[][] = { "gag" }
   for(new i; i < sizeof(CMDS_Mute); i++) {
     register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", (accessFlags | accessFlagsHigh))
   }
+  register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh))
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 }
@@ -264,7 +267,7 @@ static MenuShow_SelectReason(const id) {
     return PLUGIN_HANDLED
   }
 
-  new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectReason"), "MenuHandler_SelectReason")
+  new menu = menu_create(fmt("%L [\\r%s\\y]", id, "Gag_MenuTitle_SelectReason", g_adminTempData[id][gd_name]), "MenuHandler_SelectReason")
 
   if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
     menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
@@ -923,6 +926,59 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
   return PLUGIN_HANDLED
 }
 
+public ConCmd_amx_gag(const id, const level, const cid) {
+  enum amx_gag_s { /* arg_cmd, */ arg_player = 1, arg_reason, arg_time, arg_flags }
+
+  if(!cmd_access(id, level, cid, 1)) {
+    return PLUGIN_HANDLED
+  }
+
+  new argc = read_argc()
+  if(argc == 1) {
+    console_print(id, "\t Usage: amx_gag [nickName | STEAM_ID | userID | IP] <reason> <time> <flags>\n")
+
+    return PLUGIN_HANDLED
+  }
+
+  new args[amx_gag_s][64];
+  for(new i; i < argc; i++) {
+    read_argv(i, args[amx_gag_s: i], charsmax(args[]))
+  }
+
+  new target = FindPlayerByTarget(args[arg_player])
+  if(!target || target == id) {
+    console_print(id, "Can't find player by arg=`%s`", args[arg_player])
+
+    return PLUGIN_HANDLED
+  }
+
+  trim(args[arg_reason])
+
+  // Setup default gag for target player
+  GagData_GetPersonalData(id, target, g_adminTempData[id])
+  g_adminTempData[id][gd_reason][r_time] = 60 * SECONDS_IN_MINUTE
+  g_adminTempData[id][gd_reason][r_flags] = gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice
+  copy(g_adminTempData[id][gd_reason][r_name], charsmax(g_adminTempData[][r_name]), "Not set")
+
+  if(args[arg_reason][0] != EOS) {
+    copy(g_adminTempData[id][gd_reason][r_name], charsmax(g_adminTempData[][r_name]), args[arg_reason])
+  }
+
+  if(args[arg_time][0] != EOS) {
+    new minutes = strtol(args[arg_time])
+    if(minutes != 0) {
+      g_adminTempData[id][gd_reason][r_time] = minutes * SECONDS_IN_MINUTE
+    }
+  }
+
+  if(args[arg_flags][0] != EOS) {
+    g_adminTempData[id][gd_reason][r_flags] = flags_to_bit(args[arg_flags][0])
+  }
+
+  Gag_Save(id, target, g_adminTempData[id][gd_reason][r_time], g_adminTempData[id][gd_reason][r_flags])
+  return PLUGIN_HANDLED
+}
+
 public SrvCmd_AddReason() {
   enum any: args_s { arg_cmd, arg_reason, arg_flags, arg_time }
 
@@ -1231,8 +1287,6 @@ static Gag_Remove(const id, const target) {
   } else {
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerAlreadyRemoved", target)
   }
-
-  MenuShow_PlayersList(id)
 
   return PLUGIN_HANDLED
 }
