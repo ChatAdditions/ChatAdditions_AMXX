@@ -161,6 +161,22 @@ stock show_activity_ex(const actorId, const actorName[], const message[], any: .
   }
 }
 
+stock FindPlayerByTarget(const buffer[]) {
+  if(buffer[0] == '#' && buffer[1]) {
+    return find_player_ex(FindPlayer_MatchUserId, strtol(buffer[1]));
+  }
+
+  new result = find_player_ex(FindPlayer_MatchAuthId, buffer);
+  if (!result) {
+    result = find_player_ex(FindPlayer_MatchIP, buffer);
+  }
+
+  if (!result) {
+    result = find_player_ex(FindPlayer_MatchNameSubstring | FindPlayer_CaseInsensitive | FindPlayer_LastMatched, buffer);
+  }
+
+  return result;
+}
 
 
 /**
