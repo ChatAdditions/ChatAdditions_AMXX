@@ -1097,7 +1097,22 @@ public CA_Client_Voice(const listener, const sender) {
 public CA_Client_SayTeam(id) {
   if(g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam)
   {
-    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedTeamChat")
+    new hoursLeft = (g_currentGags[id][gd_expireAt] - get_systime()) / SECONDS_IN_HOUR
+
+    if(hoursLeft > 5)
+    {
+      new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[id][gd_expireAt])
+
+      client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedTeamChat", id, "Gag_MenuItem_Expire", timeStr)
+    }
+    else
+    {
+      new expireLeft = g_currentGags[id][gd_expireAt] - get_systime()
+      new expireLeftStr[128]; get_time_length(id, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
+
+      client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedTeamChat", id, "Gag_MenuItem_Left", expireLeftStr)
+    }
+
     return CA_SUPERCEDE
   }
 
@@ -1107,7 +1122,22 @@ public CA_Client_SayTeam(id) {
 public CA_Client_Say(id) {
   if(g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
   {
-    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedChat")
+    new hoursLeft = (g_currentGags[id][gd_expireAt] - get_systime()) / SECONDS_IN_HOUR
+
+    if(hoursLeft > 5)
+    {
+      new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[id][gd_expireAt])
+
+      client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedChat", id, "Gag_MenuItem_Expire", timeStr)
+    }
+    else
+    {
+      new expireLeft = g_currentGags[id][gd_expireAt] - get_systime()
+      new expireLeftStr[128]; get_time_length(id, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
+
+      client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedChat", id, "Gag_MenuItem_Left", expireLeftStr)
+    }
+
     return CA_SUPERCEDE
   }
 
