@@ -1012,9 +1012,9 @@ public ConCmd_amx_gag(const id, const level, const cid) {
   }
 
   if(args[arg_time][0] != EOS) {
-    new minutes = strtol(args[arg_time])
-    if(minutes != 0) {
-      g_adminTempData[id][gd_reason][r_time] = minutes * SECONDS_IN_MINUTE
+    new seconds = strtol(args[arg_time]) * SECONDS_IN_MINUTE
+    if(seconds > 0) {
+      g_adminTempData[id][gd_reason][r_time] = seconds
     }
   }
 
