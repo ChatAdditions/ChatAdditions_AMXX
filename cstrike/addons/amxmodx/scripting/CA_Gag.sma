@@ -954,10 +954,10 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
     return PLUGIN_HANDLED
   }
 
-  static timeStr[128]
+  static timeStr[6]
   read_argv(1, timeStr, charsmax(timeStr))
 
-  new time = strtol(timeStr)
+  new time = strtol(timeStr) * SECONDS_IN_MINUTE
   if(time <= 0) {
     client_print_color(id, print_team_red, "%s %L (%s)!", ca_gag_prefix, id, "Gag_NotValidTimeEntered", timeStr)
 
@@ -965,7 +965,6 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
     return PLUGIN_HANDLED
   }
 
-  time *= SECONDS_IN_MINUTE
   g_adminTempData[id][gd_reason][r_time] = time
 
   client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
