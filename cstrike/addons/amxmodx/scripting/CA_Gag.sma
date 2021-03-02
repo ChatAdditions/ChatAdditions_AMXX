@@ -1095,11 +1095,23 @@ public CA_Client_Voice(const listener, const sender) {
 }
 
 public CA_Client_SayTeam(id) {
-  return (g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam) ? CA_SUPERCEDE : CA_CONTINUE
+  if(g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam)
+  {
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedTeamChat")
+    return CA_SUPERCEDE
+  }
+
+  return CA_CONTINUE
 }
 
 public CA_Client_Say(id) {
-  return (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say) ? CA_SUPERCEDE : CA_CONTINUE
+  if(g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
+  {
+    client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedChat")
+    return CA_SUPERCEDE
+  }
+
+  return CA_CONTINUE
 }
 /*
  * @endsection CA:Core API handling
