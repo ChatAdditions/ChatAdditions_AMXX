@@ -27,7 +27,9 @@ new ca_gag_prefix[32],
   ca_gag_immunity_flags[16],
   ca_gag_access_flags[16],
   ca_gag_access_flags_high[16],
-  ca_gag_remove_only_own_gag
+  ca_gag_remove_only_own_gag,
+  ca_gag_sound_ok[128],
+  ca_gag_sound_error[128]
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
@@ -42,16 +44,55 @@ public stock const PluginAuthor[] = "Sergey Shorokhov"
 public stock const PluginURL[] = "https://Dev-CS.ru/"
 public stock const PluginDescription[] = "Manage player chats for the admin."
 
-public plugin_init() {
+public plugin_precache() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
 
   register_dictionary("CA_Gag.txt")
   register_dictionary("common.txt")
   register_dictionary("time.txt")
 
+  register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason")
+  register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates");
+  register_srvcmd("ca_gag_reload_config", "SrvCmd_ReloadConfig")
+
+  Register_CVars()
+
   g_gagReasonsTemplates = ArrayCreate(reason_s)
   g_gagTimeTemplates = ArrayCreate()
 
+  LoadConfig()
+
+  if(ca_gag_sound_ok[0] != EOS && file_exists(fmt("sounds/%s", ca_gag_sound_ok))) {
+    precache_sound(ca_gag_sound_ok)
+  }
+
+  if(ca_gag_sound_error[0] != EOS && file_exists(fmt("sounds/%s", ca_gag_sound_error))) {
+    precache_sound(ca_gag_sound_error)
+  }
+}
+
+public plugin_init() {
+  set_task_ex(GAG_THINKER_FREQ, "Gags_Thinker", .flags = SetTask_Repeat)
+
+  new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
+  new accessFlags = read_flags(ca_gag_access_flags)
+
+  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlagsHigh)
+  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlagsHigh)
+
+  register_concmd("amx_gag", "ConCmd_amx_gag", accessFlagsHigh, "Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>")
+
+  new const CMDS_Mute[][] = { "gag" }
+  for(new i; i < sizeof(CMDS_Mute); i++) {
+    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", (accessFlags | accessFlagsHigh))
+  }
+  register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh))
+  register_clcmd("say", "ClCmd_Say", (accessFlags | accessFlagsHigh))
+
+  CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
+}
+
+Register_CVars() {
   bind_pcvar_string(create_cvar("ca_gag_prefix", "[GAG]",
       .description = "Chat prefix for plugin actions"
     ),
@@ -100,30 +141,19 @@ public plugin_init() {
     ca_gag_remove_only_own_gag
   )
 
-  register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason")
-  register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates");
-  register_srvcmd("ca_gag_reload_config", "SrvCmd_ReloadConfig")
+  get_pcvar_string(create_cvar("ca_gag_sound_ok", "buttons/blip2.wav",
+      .description = "Sound for success action\n \
+        NOTE: Changes will be applied only after reloading the map"
+    ),
+    ca_gag_sound_ok, charsmax(ca_gag_sound_ok)
+  )
 
-  set_task_ex(GAG_THINKER_FREQ, "Gags_Thinker", .flags = SetTask_Repeat)
-
-  LoadConfig()
-
-  new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
-  new accessFlags = read_flags(ca_gag_access_flags)
-
-  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlagsHigh)
-  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlagsHigh)
-
-  register_concmd("amx_gag", "ConCmd_amx_gag", accessFlagsHigh, "Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>")
-
-  new const CMDS_Mute[][] = { "gag" }
-  for(new i; i < sizeof(CMDS_Mute); i++) {
-    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", (accessFlags | accessFlagsHigh))
-  }
-  register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh))
-  register_clcmd("say", "ClCmd_Say", (accessFlags | accessFlagsHigh))
-
-  CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
+  get_pcvar_string(create_cvar("ca_gag_sound_error", "buttons/button2.wav",
+      .description = "Sound for error action\n \
+        NOTE: Changes will be applied only after reloading the map"
+    ),
+    ca_gag_sound_error, charsmax(ca_gag_sound_error)
+  )
 }
 
 public client_putinserver(id) {
@@ -183,6 +213,7 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
   get_players_ex(players, count, flags, nickname)
 
   if(count == 0) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
     return
   }
@@ -255,6 +286,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
   if(target == 0) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -288,6 +320,7 @@ static MenuShow_SelectReason(const id) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -339,6 +372,7 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -397,6 +431,7 @@ static MenuShow_SelectTime(const id) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -438,6 +473,7 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -477,6 +513,7 @@ static MenuShow_SelectFlags(const id) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -560,6 +597,7 @@ public MenuHandler_SelectFlags(const id, const menu, const item) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -686,6 +724,7 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -732,6 +771,7 @@ static MenuShow_EditGag(const id) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -826,6 +866,7 @@ public MenuHandler_EditGag(const id, const menu, const item) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -879,6 +920,7 @@ public ClCmd_Gag(const id, const level, const cid) {
   }
 
   if(get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_default, "%s %L", ca_gag_prefix, id, "Gag_NotEnoughPlayers")
     return PLUGIN_HANDLED
   }
@@ -915,6 +957,7 @@ public ClCmd_EnterGagReason(const id, const level, const cid) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -948,6 +991,7 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
 
   new target = g_adminTempData[id][gd_target]
   if(!is_user_connected(target)) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
@@ -1091,15 +1135,36 @@ public SrvCmd_ReloadConfig() {
  * @section CA:Core API handling
  */
 public CA_Client_Voice(const listener, const sender) {
-  return (g_currentGags[sender][gd_reason][r_flags] & gagFlag_Voice) ? CA_SUPERCEDE : CA_CONTINUE
+  new bool: hasBlock = (g_currentGags[sender][gd_reason][r_flags] & gagFlag_Voice)
+  if(hasBlock) {
+    // UTIL_SendAudio(sender, ca_gag_sound_error) // TODO: implement later
+
+    return CA_SUPERCEDE
+  }
+
+  return CA_CONTINUE
 }
 
 public CA_Client_SayTeam(id) {
-  return (g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam) ? CA_SUPERCEDE : CA_CONTINUE
+  new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam)
+  if(hasBlock) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
+
+    return CA_SUPERCEDE
+  }
+
+  return CA_CONTINUE
 }
 
 public CA_Client_Say(id) {
-  return (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say) ? CA_SUPERCEDE : CA_CONTINUE
+  new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
+  if(hasBlock) {
+    UTIL_SendAudio(id, ca_gag_sound_error)
+
+    return CA_SUPERCEDE
+  }
+
+  return CA_CONTINUE
 }
 /*
  * @endsection CA:Core API handling
@@ -1119,6 +1184,10 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
   new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, gagTime))
 
   new admin = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), adminAuthID)
+
+  if(is_user_connected(admin)) {
+    UTIL_SendAudio(admin, ca_gag_sound_ok)
+  }
 
   // TODO: Rework this
   show_activity_ex(admin, adminName, "%l", "Gag_AdminGagPlayer", name)
@@ -1193,7 +1262,9 @@ static ParseTimes() {
 
     new count = explode_string(buffer, ",", times, sizeof(times), charsmax(times[]))
 
-    ArrayClear(g_gagTimeTemplates)
+    if(g_gagTimeTemplates_size) {
+      ArrayClear(g_gagTimeTemplates)
+    }
 
     for(new i; i < count; i++) {
       trim(times[i])

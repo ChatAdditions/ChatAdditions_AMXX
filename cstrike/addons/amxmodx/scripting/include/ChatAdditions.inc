@@ -54,7 +54,7 @@ enum logLevel_s {
     register_clcmd(fmt("say_team %s%s", BASE_CHAT_TRIGGERS[iter], %0), %1); \
   }
 
-new stock const BASE_CHAT_TRIGGERS[][] = { "", "/", "\", "!", "." };
+new stock const BASE_CHAT_TRIGGERS[][] = { /* "",  */"/", "\", "!", "." };
 
 
 stock parseTime(const value[]) {
@@ -176,6 +176,23 @@ stock FindPlayerByTarget(const buffer[]) {
   }
 
   return result;
+}
+
+stock UTIL_SendAudio(const id, const sample[]) {
+  if(sample[0] == EOS) {
+    return
+  }
+
+  static msgId_SendAudio
+  if(!msgId_SendAudio) {
+    msgId_SendAudio = get_user_msgid("SendAudio")
+  }
+
+  message_begin(MSG_ONE_UNRELIABLE, msgId_SendAudio, .player = id)
+  write_byte(id)
+  write_string(sample)
+  write_short(PITCH_NORM)
+  message_end()
 }
 
 
