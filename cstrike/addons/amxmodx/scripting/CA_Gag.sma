@@ -889,7 +889,7 @@ public ClCmd_Gag(const id, const level, const cid) {
 
 public ClCmd_Say(const id, const level, const cid) {
   if(!cmd_access(id, level, cid, 1)) {
-    return PLUGIN_HANDLED
+    return PLUGIN_CONTINUE
   }
 
   new args[128]; read_args(args, charsmax(args))
@@ -897,7 +897,7 @@ public ClCmd_Say(const id, const level, const cid) {
 
   new const strFind[] = "gag"
   if(strncmp(args[1], strFind, charsmax(strFind)) != 0) {
-    return PLUGIN_HANDLED
+    return PLUGIN_CONTINUE
   }
 
   new nickname[32]
