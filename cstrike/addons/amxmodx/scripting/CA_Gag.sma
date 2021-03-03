@@ -1128,18 +1128,14 @@ public SrvCmd_ReloadConfig() {
 }
 
 static Message_ChatBlocked(const target) {
-  new systime = get_systime()
-
-  new hoursLeft = (g_currentGags[target][gd_expireAt] - systime) / SECONDS_IN_HOUR
+  new secondsLeft = g_currentGags[target][gd_expireAt] - get_systime()
+  new hoursLeft = secondsLeft / SECONDS_IN_HOUR
 
   if(hoursLeft > 5) {
     new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[target][gd_expireAt])
-
     client_print_color(target, print_team_red, "%s %L %L %s", ca_gag_prefix, target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Expire", timeStr)
   } else {
-    new expireLeft = g_currentGags[target][gd_expireAt] - systime
-    new expireLeftStr[128]; get_time_length(target, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
-
+    new expireLeftStr[128]; get_time_length(target, secondsLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
     client_print_color(target, print_team_red, "%s %L %L %s", ca_gag_prefix, target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Left", expireLeftStr)
   }
 }
