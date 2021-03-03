@@ -1136,35 +1136,35 @@ public SrvCmd_ReloadConfig() {
  */
 public CA_Client_Voice(const listener, const sender) {
   new bool: hasBlock = (g_currentGags[sender][gd_reason][r_flags] & gagFlag_Voice)
-  if(hasBlock) {
-    // UTIL_SendAudio(sender, ca_gag_sound_error) // TODO: implement later
-
-    return CA_SUPERCEDE
+  if(!hasBlock) {
+    return CA_CONTINUE
   }
 
-  return CA_CONTINUE
+  // UTIL_SendAudio(sender, ca_gag_sound_error) // TODO: implement later
+
+  return CA_SUPERCEDE
 }
 
 public CA_Client_SayTeam(id) {
   new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam)
-  if(hasBlock) {
-    UTIL_SendAudio(id, ca_gag_sound_error)
-
-    return CA_SUPERCEDE
+  if(!hasBlock) {
+    return CA_CONTINUE
   }
 
-  return CA_CONTINUE
+  UTIL_SendAudio(id, ca_gag_sound_error)
+
+  return CA_SUPERCEDE
 }
 
 public CA_Client_Say(id) {
   new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
-  if(hasBlock) {
-    UTIL_SendAudio(id, ca_gag_sound_error)
-
-    return CA_SUPERCEDE
+  if(!hasBlock) {
+    return CA_CONTINUE
   }
 
-  return CA_CONTINUE
+  UTIL_SendAudio(id, ca_gag_sound_error)
+
+  return CA_SUPERCEDE
 }
 /*
  * @endsection CA:Core API handling
