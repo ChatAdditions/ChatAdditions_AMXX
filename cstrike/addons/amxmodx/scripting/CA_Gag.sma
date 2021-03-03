@@ -891,7 +891,9 @@ public MenuHandler_EditGag(const id, const menu, const item) {
   if(itemIndex == ITEM_CONFIRM) {
     new time = g_adminTempData[id][gd_reason][r_time]
     new flags = g_adminTempData[id][gd_reason][r_flags]
-    new expireAt = g_adminTempData[id][gd_expireAt]
+    new bool: timeChanged = (g_currentGags[target][gd_reason][r_time] != time)
+
+    new expireAt = timeChanged ? 0 : g_adminTempData[id][gd_expireAt]
 
     Gag_Save(id, target, time, flags, expireAt)
 
