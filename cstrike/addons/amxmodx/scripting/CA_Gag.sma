@@ -1082,6 +1082,23 @@ public SrvCmd_ReloadConfig() {
 
   CA_Log(logLevel_Info, "Config re-loaded!")
 }
+
+static Message_ChatBlocked(const target) {
+  new systime = get_systime()
+
+  new hoursLeft = (g_currentGags[target][gd_expireAt] - systime) / SECONDS_IN_HOUR
+
+  if(hoursLeft > 5) {
+    new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[target][gd_expireAt])
+
+   client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedChat", id, "Gag_MenuItem_Expire", timeStr)
+  } else {
+    new expireLeft = g_currentGags[target][gd_expireAt] - systime
+    new expireLeftStr[128]; get_time_length(target, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
+
+    client_print_color(target, print_team_red, "%s %L %L %s", ca_gag_prefix, target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Left", expireLeftStr)
+  }
+}
 /*
  * @endsection user cmds handling
  */
@@ -1095,53 +1112,23 @@ public CA_Client_Voice(const listener, const sender) {
 }
 
 public CA_Client_SayTeam(id) {
-  if(g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam)
-  {
-    new hoursLeft = (g_currentGags[id][gd_expireAt] - get_systime()) / SECONDS_IN_HOUR
-
-    if(hoursLeft > 5)
-    {
-      new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[id][gd_expireAt])
-
-      client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedTeamChat", id, "Gag_MenuItem_Expire", timeStr)
-    }
-    else
-    {
-      new expireLeft = g_currentGags[id][gd_expireAt] - get_systime()
-      new expireLeftStr[128]; get_time_length(id, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
-
-      client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedTeamChat", id, "Gag_MenuItem_Left", expireLeftStr)
-    }
-
-    return CA_SUPERCEDE
+  if(g_currentGags[id][gd_reason][r_flags] & ~gagFlag_SayTeam) {
+    return CA_CONTINUE
   }
 
-  return CA_CONTINUE
+  Message_ChatBlocked(id)
+
+  return CA_SUPERCEDE
 }
 
 public CA_Client_Say(id) {
-  if(g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
-  {
-    new hoursLeft = (g_currentGags[id][gd_expireAt] - get_systime()) / SECONDS_IN_HOUR
-
-    if(hoursLeft > 5)
-    {
-      new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[id][gd_expireAt])
-
-      client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedChat", id, "Gag_MenuItem_Expire", timeStr)
-    }
-    else
-    {
-      new expireLeft = g_currentGags[id][gd_expireAt] - get_systime()
-      new expireLeftStr[128]; get_time_length(id, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
-
-      client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedChat", id, "Gag_MenuItem_Left", expireLeftStr)
-    }
-
-    return CA_SUPERCEDE
+  if(g_currentGags[id][gd_reason][r_flags] & ~gagFlag_Say) {
+    return CA_CONTINUE
   }
 
-  return CA_CONTINUE
+  Message_ChatBlocked(id)
+
+  return CA_SUPERCEDE
 }
 /*
  * @endsection CA:Core API handling

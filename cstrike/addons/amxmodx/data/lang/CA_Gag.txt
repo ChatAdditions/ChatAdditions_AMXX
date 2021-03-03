@@ -44,7 +44,6 @@ Gag_YouSetManual_Reason = ^3Вы установили причину заглу�
 Gag_NotValidTimeEntered = ^3Время указано не верно:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Вам заблокировали ^1чат^3.
-Gag_NotifyPlayer_BlockedTeamChat = ^3Вам заблокировали ^1командный ^3чат.
 
 
 [en]
@@ -93,4 +92,3 @@ Gag_YouSetManual_Reason = ^3You set custom reason:^1
 Gag_NotValidTimeEntered = ^3Entered time not valid:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Your ^1chat ^3has been blocked.
-Gag_NotifyPlayer_BlockedTeamChat = ^3Your ^1team chat ^3has been blocked.
