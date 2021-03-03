@@ -1135,7 +1135,7 @@ static Message_ChatBlocked(const target) {
   if(hoursLeft > 5) {
     new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[target][gd_expireAt])
 
-   client_print_color(id, print_team_red, "%s %L %L %s", ca_gag_prefix, id, "Gag_NotifyPlayer_BlockedChat", id, "Gag_MenuItem_Expire", timeStr)
+    client_print_color(target, print_team_red, "%s %L %L %s", ca_gag_prefix, target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Expire", timeStr)
   } else {
     new expireLeft = g_currentGags[target][gd_expireAt] - systime
     new expireLeftStr[128]; get_time_length(target, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
