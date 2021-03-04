@@ -4,17 +4,23 @@
 
 #define _CA_STORAGE_API_ENDPOINT_included
 
+#pragma dynamic 131072
+
 stock bool: IsSQLQueryFailed(const failstate, const Handle: query, const error[], const errNum) {
   switch(failstate) {
     case TQUERY_CONNECT_FAILED:	{
-      log_amx("SQL: connection failed\n[%i] `%s`", errNum, error)
+      log_amx("SQL: connection failed [%i] `%s`", errNum, error)
       return true
     }
     case TQUERY_QUERY_FAILED: {
-      new lastQue[3072];
-      SQL_GetQueryString(query, lastQue, charsmax(lastQue));
+      log_amx("SQL: query failed [%i] %s", errNum, error);
 
-      log_amx("SQL: query failed\n[%i] %s\nQUERY=`%s`", errNum, error, lastQue)
+      server_print("^n^n ===> Query:")
+      new buffer[8192]; SQL_GetQueryString(query, buffer, charsmax(buffer));
+      for(new i, len = strlen(buffer); i < len; i+=255) {
+        server_print(fmt("%-255s", buffer[i]));
+      }
+
       return true
     }
   }

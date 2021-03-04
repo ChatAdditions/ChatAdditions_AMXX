@@ -134,7 +134,7 @@ Storage_Save(const name[], const authID[], const IP[],
     strcat(g_query, "reason,admin_name,admin_authid,", charsmax(g_query))
     strcat(g_query, "admin_ip,created_at,expire_at,flags )", charsmax(g_query))
 
-    strcat(g_query, fmt("VALUES ( '%s',", name_safe), charsmax(g_query))
+    strcat(g_query, fmt(" VALUES ( '%s',", name_safe), charsmax(g_query))
     strcat(g_query, fmt("'%s',", authID), charsmax(g_query))
     strcat(g_query, fmt("'%s',", IP), charsmax(g_query))
     strcat(g_query, fmt("'%s',", reason_safe), charsmax(g_query))
@@ -153,7 +153,7 @@ Storage_Save(const name[], const authID[], const IP[],
     strcat(g_query, fmt("admin_ip='%s',", adminIP), charsmax(g_query))
     strcat(g_query, "created_at=NOW(),", charsmax(g_query))
     strcat(g_query, fmt("expire_at=FROM_UNIXTIME(%i),", expireAt), charsmax(g_query))
-    strcat(g_query, fmt("flags=%i", flags), charsmax(g_query))
+    strcat(g_query, fmt("flags=%i; ", flags), charsmax(g_query))
   }
 
   SQL_ThreadQuery(g_tuple, "handle_Saved", g_query)
@@ -163,12 +163,12 @@ public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Flo
     return
   }
 
-  strcat(g_query, "SELECT \
+  formatex(g_query, charsmax(g_query), "SELECT \
     name,authid,ip,reason,\
     admin_name,admin_authid,admin_ip,\
-    UNIX_TIMESTAMP(created_at),UNIX_TIMESTAMP(expire_at),flags", charsmax(g_query))
+    UNIX_TIMESTAMP(created_at),UNIX_TIMESTAMP(expire_at),flags")
   strcat(g_query, fmt(" FROM %s", SQL_TBL_GAGS), charsmax(g_query))
-  strcat(g_query, fmt(" WHERE id=%i", SQL_GetInsertId(query)), charsmax(g_query))
+  strcat(g_query, fmt(" WHERE id=%i;", insertID), charsmax(g_query))
 
   SQL_ThreadQuery(g_tuple, "handle_SavedResult", g_query)
 }
