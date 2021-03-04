@@ -1,6 +1,8 @@
 #include <amxmodx>
 #include <sqlx>
 
+#include <cellqueue>
+
 #include <ChatAdditions>
 #include <CA_StorageAPI_endpoint>
 
@@ -15,6 +17,7 @@ const MAX_REASON_LENGTH = 256;
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
+new Queue: g_queueLoad = Invalid_Queue
 
 new ca_storage_host[64],
   ca_storage_user[128],
@@ -36,6 +39,8 @@ public plugin_init() {
 
   Register_CVars()
   AutoExecConfig(true, "CA_Storage_CSBans")
+
+  g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
 }
 public OnConfigsExecuted() {
   g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname, ca_storage_db_timeout)
@@ -44,6 +49,7 @@ public OnConfigsExecuted() {
 }
 public plugin_end() {
   SQL_FreeHandle(g_tuple)
+  QueueDestroy(g_queueLoad)
 }
 public plugin_natives() {
   RegisterNatives()
@@ -111,7 +117,13 @@ public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], 
 
   CA_Log(logLevel_Debug, "Table '%s' created! (queryTime: '%.3f' sec)", SQL_TBL_GAGS, queuetime)
 
+  g_storageInitialized = true
   ExecuteForward(g_fwd_StorageInitialized, g_ret)
+
+  for(new i, len = QueueSize(g_queueLoad); i < len; i++) {
+    new authID[MAX_AUTHID_LENGTH]; QueuePopString(g_queueLoad, authID, charsmax(authID))
+    Storage_Load(authID)
+  }
 }
 
 
@@ -168,7 +180,7 @@ public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Flo
     admin_name,admin_authid,admin_ip,\
     UNIX_TIMESTAMP(created_at),UNIX_TIMESTAMP(expire_at),flags")
   strcat(g_query, fmt(" FROM %s", SQL_TBL_GAGS), charsmax(g_query))
-  strcat(g_query, fmt(" WHERE id=%i;", insertID), charsmax(g_query))
+  strcat(g_query, fmt(" WHERE id=%i;", SQL_GetInsertId(query)), charsmax(g_query))
 
   SQL_ThreadQuery(g_tuple, "handle_SavedResult", g_query)
 }
@@ -209,6 +221,12 @@ public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], siz
 }
 
 Storage_Load(const authID[]) {
+  if(!g_storageInitialized) {
+    QueuePushString(g_queueLoad, authID)
+
+    return
+  }
+
   formatex(g_query, charsmax(g_query), "SELECT name, authid, ip, reason,\
     admin_name, admin_authid, admin_ip, \
     UNIX_TIMESTAMP(created_at), UNIX_TIMESTAMP(expire_at), flags FROM %s", SQL_TBL_GAGS); {

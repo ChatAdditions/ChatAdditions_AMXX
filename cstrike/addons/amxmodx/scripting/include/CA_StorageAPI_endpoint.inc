@@ -6,6 +6,8 @@
 
 #pragma dynamic 131072
 
+new bool: g_storageInitialized
+
 stock bool: IsSQLQueryFailed(const failstate, const Handle: query, const error[], const errNum) {
   switch(failstate) {
     case TQUERY_CONNECT_FAILED:	{
@@ -33,6 +35,7 @@ RegisterNatives() {
   register_native("CA_Storage_Save", "native_Storage_Save");
   register_native("CA_Storage_Load", "native_Storage_Load");
   register_native("CA_Storage_Remove", "native_Storage_Remove");
+  register_native("CA_Storage_IsInitialized", "native_Storage_IsInitialized");
 }
 public native_Storage_Save(const plugin_id, const argc) {
   enum { arg_name = 1, arg_authID, arg_IP, arg_reason, arg_adminName, arg_adminAuthID, arg_adminIP, arg_expireAt, arg_flags }
@@ -60,6 +63,9 @@ public native_Storage_Remove(const plugin_id, const argc) {
 
   new authID[MAX_AUTHID_LENGTH]; get_string(arg_authID, authID, charsmax(authID));
   Storage_Remove(authID);
+}
+public bool: native_Storage_IsInitialized(const plugin_id, const argc) {
+  return g_storageInitialized;
 }
 
 
