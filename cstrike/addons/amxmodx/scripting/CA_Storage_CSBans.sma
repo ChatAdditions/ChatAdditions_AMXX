@@ -8,7 +8,7 @@
 #pragma dynamic 131072
 #pragma tabsize 2
 
-new const SQL_TBL_GAGS[] = "players_gags"
+new const SQL_TBL_GAGS[] = "chatadditions_gags"
 
 const QUERY_LENGTH = 4096
 const MAX_REASON_LENGTH = 256;
@@ -98,7 +98,7 @@ Storage_Create() {
     strcat(g_query, "expire_at DATETIME NOT NULL,", charsmax(g_query))
     strcat(g_query, "flags INTEGER NOT NULL,", charsmax(g_query))
     strcat(g_query, "UNIQUE INDEX authid_unique_idx (authid)", charsmax(g_query))
-    strcat(g_query, ");", charsmax(g_query))
+    strcat(g_query, ") CHARACTER SET utf8 COLLATE utf8_general_ci;", charsmax(g_query))
   }
 
 
