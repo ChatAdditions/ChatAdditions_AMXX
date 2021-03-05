@@ -167,6 +167,7 @@ public client_putinserver(id) {
 
 public client_disconnected(id) {
   GagData_Reset(g_adminTempData[id])
+  GagData_Reset(g_currentGags[id])
   g_inEditMenu[id] = false
 }
 
