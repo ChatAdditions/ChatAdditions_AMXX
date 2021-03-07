@@ -1034,7 +1034,7 @@ public ConCmd_amx_gag(const id, const level, const cid) {
     return PLUGIN_HANDLED
   }
 
-  new args[amx_gag_s][64];
+  new args[amx_gag_s][255]
   for(new i; i < argc; i++) {
     read_argv(i, args[amx_gag_s: i], charsmax(args[]))
   }
