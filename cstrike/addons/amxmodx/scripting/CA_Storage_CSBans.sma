@@ -10,6 +10,11 @@
 #pragma dynamic 131072
 #pragma tabsize 2
 
+#pragma reqlib mysql
+#if !defined AMXMODX_NOAUTOLOAD
+  #pragma loadlib mysql
+#endif
+
 new const SQL_TBL_GAGS[] = "chatadditions_gags"
 
 const QUERY_LENGTH = 4096
@@ -22,8 +27,7 @@ new Queue: g_queueLoad = Invalid_Queue
 new ca_storage_host[64],
   ca_storage_user[128],
   ca_storage_pass[128],
-  ca_storage_dbname[128],
-  ca_storage_db_timeout
+  ca_storage_dbname[128]
 
 public stock const PluginName[] = "ChatAdditions: CSBans storage"
 public stock const PluginVersion[] = CA_VERSION
@@ -43,7 +47,7 @@ public plugin_init() {
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
 }
 public OnConfigsExecuted() {
-  g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname, ca_storage_db_timeout)
+  g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname)
 
   Storage_Create()
 }
@@ -60,33 +64,27 @@ public plugin_cfg() {
 
 Register_CVars() {
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
-      .description = "MySQL database host address"
+      .description = "CSBans MySQL database host address"
     ),
     ca_storage_host, charsmax(ca_storage_host)
   )
 
   bind_pcvar_string(create_cvar("ca_storage_user", "root", FCVAR_PROTECTED,
-      .description = "MySQL database user"
+      .description = "CSBans MySQL database user"
     ),
     ca_storage_user, charsmax(ca_storage_user)
   )
 
   bind_pcvar_string(create_cvar("ca_storage_pass", "", FCVAR_PROTECTED,
-      .description = "MySQL database host password"
+      .description = "CSBans MySQL database host password"
     ),
     ca_storage_pass, charsmax(ca_storage_pass)
   )
 
   bind_pcvar_string(create_cvar("ca_storage_dbname", "players_gags", FCVAR_PROTECTED,
-      .description = "MySQL database name"
+      .description = "CSBans MySQL database name"
     ),
     ca_storage_dbname, charsmax(ca_storage_dbname)
-  )
-
-  bind_pcvar_num(create_cvar("ca_storage_db_timeout", "60", FCVAR_PROTECTED,
-      .description = "MySQL database max timeout"
-    ),
-    ca_storage_db_timeout
   )
 }
 
