@@ -10,6 +10,11 @@
 #pragma dynamic 131072
 #pragma tabsize 2
 
+#pragma reqlib mysql
+#if !defined AMXMODX_NOAUTOLOAD
+  #pragma loadlib mysql
+#endif
+
 new const SQL_TBL_GAGS[] = "chatadditions_gags"
 
 const QUERY_LENGTH = 4096
