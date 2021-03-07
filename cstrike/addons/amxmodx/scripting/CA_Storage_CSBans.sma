@@ -60,25 +60,25 @@ public plugin_cfg() {
 
 Register_CVars() {
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
-      .description = "MySQL database host address"
+      .description = "CSBans MySQL database host address"
     ),
     ca_storage_host, charsmax(ca_storage_host)
   )
 
   bind_pcvar_string(create_cvar("ca_storage_user", "root", FCVAR_PROTECTED,
-      .description = "MySQL database user"
+      .description = "CSBans MySQL database user"
     ),
     ca_storage_user, charsmax(ca_storage_user)
   )
 
   bind_pcvar_string(create_cvar("ca_storage_pass", "", FCVAR_PROTECTED,
-      .description = "MySQL database host password"
+      .description = "CSBans MySQL database host password"
     ),
     ca_storage_pass, charsmax(ca_storage_pass)
   )
 
   bind_pcvar_string(create_cvar("ca_storage_dbname", "players_gags", FCVAR_PROTECTED,
-      .description = "MySQL database name"
+      .description = "CSBans MySQL database name"
     ),
     ca_storage_dbname, charsmax(ca_storage_dbname)
   )
