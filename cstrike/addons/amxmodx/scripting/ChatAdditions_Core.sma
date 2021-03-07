@@ -8,8 +8,8 @@
 
 
 enum logType_s {
-	_Default,
-	_LogToDir
+  _Default,
+  _LogToDir
 }
 
 new logType_s: ca_log_type,
@@ -145,7 +145,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
     return false
   }
 
-  new msg[2048]; vdformat(msg, charsmax(msg), arg_msg, arg_format);
+  new msg[2048]; vdformat(msg, charsmax(msg), arg_msg, arg_format)
 
   switch(ca_log_type) {
     case _LogToDir: log_to_file(g_logsFile, msg)
@@ -169,17 +169,17 @@ public bool: native_CA_PlayerHasBlockedPlayer(const plugin_id, const argc) {
 
 
 static GetLogsFilePath(buffer[], len = PLATFORM_MAX_PATH, const dir[] = "ChatAdditions") {
-	get_localinfo("amxx_logs", buffer, len)
-	strcat(buffer, fmt("/%s", dir), len)
+  get_localinfo("amxx_logs", buffer, len)
+  strcat(buffer, fmt("/%s", dir), len)
 
-	if(!dir_exists(buffer) && mkdir(buffer) == -1) {
-		set_fail_state("[Core API] Can't create folder! (%s)", buffer)
-	}
+  if(!dir_exists(buffer) && mkdir(buffer) == -1) {
+    set_fail_state("[Core API] Can't create folder! (%s)", buffer)
+  }
 
-	new year, month, day
-	date(year, month, day)
+  new year, month, day
+  date(year, month, day)
 
-	strcat(buffer, fmt("/L%i%02i%02i.log", year, month, day), len)
+  strcat(buffer, fmt("/L%i%02i%02i.log", year, month, day), len)
 }
 
 static bool: CVoiceGameMgr__PlayerHasBlockedPlayer(const receiver, const sender) {
