@@ -25,8 +25,7 @@ new g_serverID = -1
 new ca_storage_host[64],
   ca_storage_user[128],
   ca_storage_pass[128],
-  ca_storage_dbname[128],
-  ca_storage_db_timeout
+  ca_storage_dbname[128]
 
 public stock const PluginName[] = "ChatAdditions: GameCMS storage"
 public stock const PluginVersion[] = CA_VERSION
@@ -46,7 +45,7 @@ public plugin_init() {
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
 }
 public OnConfigsExecuted() {
-  g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname, ca_storage_db_timeout)
+  g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname)
   SQL_SetCharset(g_tuple, "utf8")
 
   Storage_Create()
@@ -85,12 +84,6 @@ Register_CVars() {
       .description = "GameCMS MySQL database name"
     ),
     ca_storage_dbname, charsmax(ca_storage_dbname)
-  )
-
-  bind_pcvar_num(create_cvar("ca_storage_db_timeout", "60", FCVAR_PROTECTED,
-      .description = "MySQL database max timeout"
-    ),
-    ca_storage_db_timeout
   )
 }
 
