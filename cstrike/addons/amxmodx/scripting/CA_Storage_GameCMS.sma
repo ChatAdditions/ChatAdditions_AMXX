@@ -11,6 +11,11 @@
 #pragma dynamic 131072
 #pragma tabsize 2
 
+#pragma reqlib mysql
+#if !defined AMXMODX_NOAUTOLOAD
+  #pragma loadlib mysql
+#endif
+
 new const SQL_TBL_GAGS[] = "comms"
 
 const QUERY_LENGTH = 4096
