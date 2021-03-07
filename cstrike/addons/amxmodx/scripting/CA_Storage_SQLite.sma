@@ -8,6 +8,11 @@
 #pragma dynamic 131072
 #pragma tabsize 2
 
+#pragma reqlib sqlite
+#if !defined AMXMODX_NOAUTOLOAD
+  #pragma loadlib sqlite
+#endif
+
 new const SQL_DBNAME[] = "ChatAdditions"
 new const SQL_TBL_GAGS[] = "players_gags"
 
