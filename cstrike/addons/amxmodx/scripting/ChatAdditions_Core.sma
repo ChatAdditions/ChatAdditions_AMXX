@@ -125,7 +125,7 @@ public ClCmd_VModEnable(const id) {
   }
 
   new arg[32]; read_argv(1, arg, charsmax(arg))
-  g_PlayerModEnable[id - 1] = bool: strtol(arg)
+  g_PlayerModEnable[id - 1] = bool: (strtol(arg) != 0)
 }
 
 public ClCmd_vban(const id) {
