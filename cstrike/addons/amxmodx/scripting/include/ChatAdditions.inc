@@ -209,6 +209,18 @@ stock UTIL_SendAudio(const id, const sample[]) {
 native bool: CA_Log(logLevel_s: level, const message[], any:...);
 
 /**
+ * Called to determine if the Receiver has muted (blocked) the Sender.
+ * NOTE: Setting from client menu (Players list -> Mute)
+ *
+ * @param receiver  Receiver client id.
+ * @param sender    Sender client id.
+ *
+ * @return          Returns true if the receiver has blocked the sender
+ */
+
+native bool: CA_PlayerHasBlockedPlayer(const receiver, const sender);
+
+/**
  * Called when player say to chat.
  *
  * @param index   Client index.
