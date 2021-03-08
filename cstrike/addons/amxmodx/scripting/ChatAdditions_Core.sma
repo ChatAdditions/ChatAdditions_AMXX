@@ -104,7 +104,7 @@ public ClCmd_SayTeam(const id) {
 }
 
 public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
-  if(listener == sender) {
+  if(listener == sender /* || !g_PlayerModEnable[listener] */) {
     return HC_CONTINUE
   }
 
@@ -125,7 +125,7 @@ public ClCmd_VModEnable(const id) {
   }
 
   new arg[32]; read_argv(1, arg, charsmax(arg))
-  g_PlayerModEnable[id - 1] = bool: (strtol(arg) != 0)
+  g_PlayerModEnable[id] = bool: (strtol(arg) != 0)
 }
 
 public ClCmd_vban(const id) {
