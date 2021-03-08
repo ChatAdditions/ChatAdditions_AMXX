@@ -66,7 +66,7 @@ public plugin_init() {
       1 = CSBans (as MySQL driver)\n\
       2 = GameCMS (as MySQL driver)",
     .has_min = true, .min_val = 0.0,
-    .has_max = true, .max_val = 3.0
+    .has_max = true, .max_val = 2.0
   )
 
   register_clcmd("say", "ClCmd_Say", ADMIN_ALL)
