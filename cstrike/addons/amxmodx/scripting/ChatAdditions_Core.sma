@@ -60,14 +60,6 @@ public plugin_init() {
     ),
     ca_log_level
   )
-  create_cvar("ca_storage_type", "0",
-    .description = "Storage choose. Used for save gags and another data\n\
-      0 = Local file (as SQLite driver)\n\
-      1 = CSBans (as MySQL driver)\n\
-      2 = GameCMS (as MySQL driver)",
-    .has_min = true, .min_val = 0.0,
-    .has_max = true, .max_val = 2.0
-  )
 
   register_clcmd("say", "ClCmd_Say", ADMIN_ALL)
   register_clcmd("say_team", "ClCmd_SayTeam", ADMIN_ALL)

@@ -41,13 +41,6 @@ public stock const PluginDescription[] = "GameCMS storage provider for ChatAddit
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
 
-  new ca_storage_type = get_cvar_num("ca_storage_type")
-  if(ca_storage_type != 2) {
-    set_fail_state("GameCMS storage type not enabled in config (ca_storage_type = %i)\n\
-      Please disable this plugin in `configs/ChatAdditions-plugins.ini`\n", ca_storage_type
-    )
-  }
-
   if(!SQL_SetAffinity("mysql")) {
     set_fail_state("Can't user 'MySQL'. Check modules.ini")
   }
