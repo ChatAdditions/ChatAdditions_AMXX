@@ -324,7 +324,7 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
   }
 
   g_serverID = SQL_ReadResult(query, 0)
-  CA_Log(logLevel_Info, "Found server `%s` in db. ServerID=%i", net_address, g_serverID)
+  CA_Log(logLevel_Debug, "Found server `%s` in db. ServerID=%i", net_address, g_serverID)
 
   g_storageInitialized = true
   ExecuteForward(g_fwd_StorageInitialized, g_ret)
@@ -344,10 +344,10 @@ enum {
 
 static stock gag_flags_s: GCMS_FlagsTo_CAGAGFlags(const flag) {
   switch(flag) {
-    case GCMS_FLAG_NONE:		return (gagFlag_Removed);
-    case GCMS_FLAG_ALL:		return (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice);
-    case GCMS_FLAG_CHAT:		return (gagFlag_Say | gagFlag_SayTeam);
-    case GCMS_FLAG_VOICE:	return (gagFlag_Voice);
+    case GCMS_FLAG_NONE:    return (gagFlag_Removed);
+    case GCMS_FLAG_ALL:     return (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice);
+    case GCMS_FLAG_CHAT:    return (gagFlag_Say | gagFlag_SayTeam);
+    case GCMS_FLAG_VOICE:   return (gagFlag_Voice);
   }
 
   CA_Log(logLevel_Warning, "[WARN]: GCMS_FlagsTo_CAGAGFlags() => Undefinded flag:%i", flag)
