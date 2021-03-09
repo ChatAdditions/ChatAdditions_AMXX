@@ -1012,9 +1012,15 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
     return PLUGIN_HANDLED
   }
 
+  client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
+
   g_adminTempData[id][gd_reason][r_time] = time
 
-  client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
+  if(g_inEditMenu[id]) {
+    MenuShow_EditGag(id)
+
+    return PLUGIN_HANDLED
+  }
 
   MenuShow_SelectFlags(id)
   return PLUGIN_HANDLED
