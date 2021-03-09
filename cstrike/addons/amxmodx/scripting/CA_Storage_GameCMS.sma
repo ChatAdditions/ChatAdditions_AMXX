@@ -154,7 +154,7 @@ Storage_Save(const name[], const authID[], const IP[],
     strcat(g_query, fmt("'%s',", name_safe), charsmax(g_query))
     strcat(g_query, fmt("UNIX_TIMESTAMP(NOW()),"), charsmax(g_query))
     strcat(g_query, fmt("%i,", expireAt), charsmax(g_query))
-    strcat(g_query, fmt("%i - UNIX_TIMESTAMP(NOW()),", expireAt), charsmax(g_query))
+    strcat(g_query, fmt("(%i - UNIX_TIMESTAMP(NOW())) / 60,", expireAt), charsmax(g_query))
     strcat(g_query, fmt("'%s',", reason_safe), charsmax(g_query))
     strcat(g_query, fmt("'%i',", 1 /* JUST A 1 AND NOTHING ELSE!!! */), charsmax(g_query))
     strcat(g_query, fmt("'%s',", adminName_safe), charsmax(g_query))
