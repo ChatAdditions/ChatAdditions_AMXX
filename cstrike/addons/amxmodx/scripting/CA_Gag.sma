@@ -339,16 +339,19 @@ static MenuShow_SelectReason(const id) {
       new reason[reason_s]
       ArrayGetArray(g_gagReasonsTemplates, i, reason)
 
+      new buffer[2048]
+      formatex(buffer, charsmax(buffer), reason[r_name])
+
       if(reason[r_time] > 0) {
-        menu_additem(menu,
-          fmt("%s (\\y%s\\w)", reason[r_name], Get_TimeString_seconds(id, reason[r_time])),
-          fmt("%i", i)
-        )
-      } else {
-        menu_additem(menu,
-          fmt("%s", reason[r_name]), fmt("%i", i)
-        )
+        strcat(buffer, fmt(" (\\y%s", Get_TimeString_seconds(id, reason[r_time])), charsmax(buffer))
       }
+
+      if(reason[r_flags] != gagFlag_Removed) {
+        strcat(buffer, fmt(", %s", bits_to_flags(reason[r_flags])), charsmax(buffer))
+      }
+
+      strcat(buffer, "\\w)", charsmax(buffer))
+      menu_additem(menu, buffer,  fmt("%i", i))
     }
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
