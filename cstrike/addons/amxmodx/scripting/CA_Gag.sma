@@ -660,7 +660,7 @@ static MenuShow_ShowGag(const id) {
     )
   )
   menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Type",
-      Get_GagFlags_Names(gagFlags_s: g_adminTempData[id][gd_reason][r_flags])
+      Get_GagFlags_Names(gag_flags_s: g_adminTempData[id][gd_reason][r_flags])
     )
   )
 
@@ -1221,7 +1221,7 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
   client_print(0, print_chat, "%l %s, %l %s (%s)",
     "Gag_MenuItem_Reason", reason,
     "Gag_MenuItem_Time", gagTimeStr,
-    Get_GagFlags_Names(gagFlags_s: flags)
+    Get_GagFlags_Names(gag_flags_s: flags)
   )
 
   CA_Log(logLevel_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
@@ -1374,7 +1374,7 @@ static bool: IsTargetHasImmunity(const id, const target) {
   return false
 }
 
-static Get_GagFlags_Names(const gagFlags_s: flags) {
+static Get_GagFlags_Names(const gag_flags_s: flags) {
   // TODO: ML this
 
   new buffer[64]
@@ -1383,7 +1383,7 @@ static Get_GagFlags_Names(const gagFlags_s: flags) {
   }
 
   for(new i = 0; i < sizeof(GAG_FLAGS_STR); i++) {
-    if(flags & gagFlags_s: (1 << i)) {
+    if(flags & gag_flags_s: (1 << i)) {
       strcat(buffer, fmt("%s + ", GAG_FLAGS_STR[i]), charsmax(buffer));
     }
   }
