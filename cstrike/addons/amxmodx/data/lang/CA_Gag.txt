@@ -92,3 +92,52 @@ Gag_YouSetManual_Reason = ^3You set custom reason:^1
 Gag_NotValidTimeEntered = ^3Entered time not valid:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Your ^1chat ^3has been blocked.
+
+
+[es]
+Gag_MenuTitle_PlayersList = Silenciar Jugador
+Gag_MenuTitle_SelectReason = Elegir Motivo:
+Gag_MenuTitle_SelectTime = Elegir Tiempo:
+Gag_MenuItem_RemoveGag = \rQuitar\w
+Gag_MenuItem_EditGag = Editar
+Gag_MenuItem_ShowGag = Jugador Silenciado [\r%s\y]:
+Gag_MenuItem_PropSay = Chat:
+Gag_MenuItem_PropSayTeam = Team Chat:
+Gag_MenuItem_PropVoice = Voz Chat:
+Gag_MenuItem_Time = Tiempo:
+Gag_MenuItem_Confirm = Confirmar!
+Gag_MenuItem_Reason = Motivo:
+Gag_MenuItem_Resolution = Tiempo: \y%s\w (Motivo: \y%s\w)
+Gag_MenuItem_Admin = Admin:
+Gag_MenuItem_Type = Tipo:
+Gag_MenuItem_Length = Duracion:
+Gag_MenuItem_Expire = Expira:
+Gag_MenuItem_Left = Restante:
+
+Gag_GagProperties = Parametros Silencio: [ \r%n\y ]
+Gag_EnterReason = Ingresar Motivo ->\n
+Gag_EnterTime = Ingresar Tiempo->
+
+Gag_Immunity = Inmunidad
+Gag_Gagged = Silenciado
+
+Gag_ChatMsg_Reason = ^4Motivo:^1
+Gag_NotSet = No Definido
+Gag_Permanent = Permanente
+
+Gag_AdminGagPlayer = silencio a jugador %s
+Gag_AdminUngagPlayer = quito silencio a jugador %s
+Gag_PlayerNotConnected = ^3Jugador no conectado!
+Gag_PlayerAlreadyRemoved = ^3Jugador ^4%n^1 ya quitado!^1
+Gag_PlayerExpiredGag = ^3Jugador ^4%n^1 ha expirado el silencio.
+
+Gag_NotEnoughPlayers = ^3No hay suficiente jugadores!
+Gag_NoTemplatesAvailable_Reasons = No hay plantillas de motivos.
+Gag_NoTemplatesAvailable_Times = No hay plantillas de tiempo.
+
+Gag_YouSetManual_Time = ^3Tiempo Personalizado:^1
+Gag_YouSetManual_Reason = ^3Motivo Personalizado:^1
+Gag_NotValidTimeEntered = ^3Tiempo ingresado no es valido:^1
+
+Gag_NotifyPlayer_BlockedChat = ^3Tu ^1chat ^3ha sido bloqueado.
+
