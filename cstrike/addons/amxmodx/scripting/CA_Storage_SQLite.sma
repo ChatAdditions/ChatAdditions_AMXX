@@ -8,6 +8,11 @@
 #pragma dynamic 131072
 #pragma tabsize 2
 
+#pragma reqlib sqlite
+#if !defined AMXMODX_NOAUTOLOAD
+  #pragma loadlib sqlite
+#endif
+
 new const SQL_DBNAME[] = "ChatAdditions"
 new const SQL_TBL_GAGS[] = "players_gags"
 
@@ -24,6 +29,7 @@ public stock const PluginDescription[] = "SQLite storage provider for ChatAdditi
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
+
   if(!SQL_SetAffinity("sqlite")) {
     set_fail_state("Can't user 'SQLite'. Check modules.ini")
   }

@@ -8,8 +8,8 @@
 
 
 enum logType_s {
-	_Default,
-	_LogToDir
+  _Default,
+  _LogToDir
 }
 
 new logType_s: ca_log_type,
@@ -22,6 +22,16 @@ new g_fwdClientSay,
   g_fwdClientSayTeam,
   g_fwdClientVoice,
   g_retVal
+
+// FROM https://github.com/s1lentq/ReGameDLL_CS/blob/master/regamedll/game_shared/voice_gamemgr.cpp
+
+// Set to 1 for each player if the player wants to use voice in this mod.
+// (If it's zero, then the server reports that the game rules are saying the player can't hear anyone).
+new bool: g_PlayerModEnable[MAX_PLAYERS + 1]
+
+// Tells which players don't want to hear each other.
+// These are indexed as clients and each bit represents a client (so player entity is bit + 1).
+new g_BanMasks[MAX_PLAYERS + 1]
 
 
 public stock const PluginName[] = "ChatAdditions: Core"
@@ -55,6 +65,9 @@ public plugin_init() {
   register_clcmd("say_team", "ClCmd_SayTeam", ADMIN_ALL)
   RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer, "CSGameRules_CanPlayerHearPlayer", .post = false)
 
+  register_clcmd("VModEnable", "ClCmd_VModEnable", ADMIN_ALL)
+  register_clcmd("vban", "ClCmd_vban", ADMIN_ALL)
+
   g_fwdClientSay = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL)
   g_fwdClientSayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL)
   g_fwdClientVoice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
@@ -74,6 +87,7 @@ public plugin_natives() {
   register_library("ChatAdditions_Core")
 
   register_native("CA_Log", "native_CA_Log")
+  register_native("CA_PlayerHasBlockedPlayer", "native_CA_PlayerHasBlockedPlayer")
 }
 
 
@@ -90,7 +104,7 @@ public ClCmd_SayTeam(const id) {
 }
 
 public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
-  if(listener == sender) {
+  if(listener == sender /* || !g_PlayerModEnable[listener] */) {
     return HC_CONTINUE
   }
 
@@ -105,6 +119,24 @@ public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
   return HC_CONTINUE
 }
 
+public ClCmd_VModEnable(const id) {
+  if(read_argc() < 2) {
+    return
+  }
+
+  new arg[32]; read_argv(1, arg, charsmax(arg))
+  g_PlayerModEnable[id] = bool: (strtol(arg) != 0)
+}
+
+public ClCmd_vban(const id) {
+  if(read_argc() < 2) {
+    return
+  }
+
+  new arg[32]; read_argv(1, arg, charsmax(arg))
+  g_BanMasks[id] = strtol(arg, .base = 16)
+}
+
 public bool: native_CA_Log(const plugin_id, const argc) {
   enum { arg_level = 1, arg_msg, arg_format }
 
@@ -113,7 +145,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
     return false
   }
 
-  new msg[2048]; vdformat(msg, charsmax(msg), arg_msg, arg_format);
+  new msg[2048]; vdformat(msg, charsmax(msg), arg_msg, arg_format)
 
   switch(ca_log_type) {
     case _LogToDir: log_to_file(g_logsFile, msg)
@@ -123,17 +155,39 @@ public bool: native_CA_Log(const plugin_id, const argc) {
   return true
 }
 
+public bool: native_CA_PlayerHasBlockedPlayer(const plugin_id, const argc) {
+  enum { arg_receiver = 1, arg_sender }
+
+  new receiver = get_param(arg_receiver)
+  new sender = get_param(arg_sender)
+  if(CVoiceGameMgr__PlayerHasBlockedPlayer(receiver, sender)) {
+    return true
+  }
+
+  return false
+}
+
 
 static GetLogsFilePath(buffer[], len = PLATFORM_MAX_PATH, const dir[] = "ChatAdditions") {
-	get_localinfo("amxx_logs", buffer, len)
-	strcat(buffer, fmt("/%s", dir), len)
+  get_localinfo("amxx_logs", buffer, len)
+  strcat(buffer, fmt("/%s", dir), len)
 
-	if(!dir_exists(buffer) && mkdir(buffer) == -1) {
-		set_fail_state("[Core API] Can't create folder! (%s)", buffer)
-	}
+  if(!dir_exists(buffer) && mkdir(buffer) == -1) {
+    set_fail_state("[Core API] Can't create folder! (%s)", buffer)
+  }
 
-	new year, month, day
-	date(year, month, day)
+  new year, month, day
+  date(year, month, day)
 
-	strcat(buffer, fmt("/L%i%02i%02i.log", year, month, day), len)
+  strcat(buffer, fmt("/L%i%02i%02i.log", year, month, day), len)
+}
+
+static bool: CVoiceGameMgr__PlayerHasBlockedPlayer(const receiver, const sender) {
+  #define CanPlayerHearPlayer(%0,%1)  ( ~g_BanMasks[%0] & ( 1 << (%1 - 1) ) )
+
+  if(receiver <= 0 || receiver > MaxClients || sender <= 0 || sender > MaxClients) {
+    return false
+  }
+
+  return bool: !CanPlayerHearPlayer(receiver, sender)
 }

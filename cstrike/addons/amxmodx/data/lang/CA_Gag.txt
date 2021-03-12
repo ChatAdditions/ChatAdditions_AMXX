@@ -1,6 +1,6 @@
 [ru]
 Gag_MenuTitle_PlayersList = Заглушить игрока
-Gag_MenuTitle_SelectReason = Выберите причину для заглушки:
+Gag_MenuTitle_SelectReason = Выберите причину:
 Gag_MenuTitle_SelectTime = Выберите время для заглушки:
 Gag_MenuItem_RemoveGag = \rСнять\w
 Gag_MenuItem_EditGag = Редактировать
@@ -19,7 +19,7 @@ Gag_MenuItem_Expire = Истекает:
 Gag_MenuItem_Left = Осталось:
 
 Gag_SelectFlags = Параметры заглушки игрока: [ \r%n\y ]
-Gag_EnterReason = Ввести причину ->\n
+Gag_EnterReason = Ввести свою ->\n
 Gag_EnterTime = Указать время ->
 
 Gag_Immunity = Иммунитет
@@ -48,7 +48,7 @@ Gag_NotifyPlayer_BlockedChat = ^3Вам заблокировали ^1чат^3.
 
 [en]
 Gag_MenuTitle_PlayersList = Gag player
-Gag_MenuTitle_SelectReason = Choose gag reason:
+Gag_MenuTitle_SelectReason = Choose reason:
 Gag_MenuTitle_SelectTime = Choose gag time:
 Gag_MenuItem_RemoveGag = \rRemove\w
 Gag_MenuItem_EditGag = Edit

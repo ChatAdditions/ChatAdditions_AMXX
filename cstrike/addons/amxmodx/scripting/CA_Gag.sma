@@ -167,6 +167,7 @@ public client_putinserver(id) {
 
 public client_disconnected(id) {
   GagData_Reset(g_adminTempData[id])
+  GagData_Reset(g_currentGags[id])
   g_inEditMenu[id] = false
 }
 
@@ -338,16 +339,19 @@ static MenuShow_SelectReason(const id) {
       new reason[reason_s]
       ArrayGetArray(g_gagReasonsTemplates, i, reason)
 
+      new buffer[2048]
+      formatex(buffer, charsmax(buffer), reason[r_name])
+
       if(reason[r_time] > 0) {
-        menu_additem(menu,
-          fmt("%s (\\y%s\\w)", reason[r_name], Get_TimeString_seconds(id, reason[r_time])),
-          fmt("%i", i)
-        )
-      } else {
-        menu_additem(menu,
-          fmt("%s", reason[r_name]), fmt("%i", i)
-        )
+        strcat(buffer, fmt(" (\\y%s", Get_TimeString_seconds(id, reason[r_time])), charsmax(buffer))
       }
+
+      if(reason[r_flags] != gagFlag_Removed) {
+        strcat(buffer, fmt(", %s", bits_to_flags(reason[r_flags])), charsmax(buffer))
+      }
+
+      strcat(buffer, "\\w)", charsmax(buffer))
+      menu_additem(menu, buffer,  fmt("%i", i))
     }
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
@@ -656,7 +660,7 @@ static MenuShow_ShowGag(const id) {
     )
   )
   menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Type",
-      Get_GagFlags_Names(gagFlags_s: g_adminTempData[id][gd_reason][r_flags])
+      Get_GagFlags_Names(gag_flags_s: g_adminTempData[id][gd_reason][r_flags])
     )
   )
 
@@ -891,7 +895,9 @@ public MenuHandler_EditGag(const id, const menu, const item) {
   if(itemIndex == ITEM_CONFIRM) {
     new time = g_adminTempData[id][gd_reason][r_time]
     new flags = g_adminTempData[id][gd_reason][r_flags]
-    new expireAt = g_adminTempData[id][gd_expireAt]
+    new bool: timeChanged = (g_currentGags[target][gd_reason][r_time] != time)
+
+    new expireAt = timeChanged ? 0 : g_adminTempData[id][gd_expireAt]
 
     Gag_Save(id, target, time, flags, expireAt)
 
@@ -1009,9 +1015,15 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
     return PLUGIN_HANDLED
   }
 
+  client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
+
   g_adminTempData[id][gd_reason][r_time] = time
 
-  client_print_color(id, print_team_red, "%s %L (%s)", ca_gag_prefix, id, "Gag_YouSetManual_Time", Get_TimeString_seconds(id, time))
+  if(g_inEditMenu[id]) {
+    MenuShow_EditGag(id)
+
+    return PLUGIN_HANDLED
+  }
 
   MenuShow_SelectFlags(id)
   return PLUGIN_HANDLED
@@ -1031,7 +1043,7 @@ public ConCmd_amx_gag(const id, const level, const cid) {
     return PLUGIN_HANDLED
   }
 
-  new args[amx_gag_s][64];
+  new args[amx_gag_s][255]
   for(new i; i < argc; i++) {
     read_argv(i, args[amx_gag_s: i], charsmax(args[]))
   }
@@ -1209,7 +1221,7 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
   client_print(0, print_chat, "%l %s, %l %s (%s)",
     "Gag_MenuItem_Reason", reason,
     "Gag_MenuItem_Time", gagTimeStr,
-    Get_GagFlags_Names(gagFlags_s: flags)
+    Get_GagFlags_Names(gag_flags_s: flags)
   )
 
   CA_Log(logLevel_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
@@ -1362,7 +1374,7 @@ static bool: IsTargetHasImmunity(const id, const target) {
   return false
 }
 
-static Get_GagFlags_Names(const gagFlags_s: flags) {
+static Get_GagFlags_Names(const gag_flags_s: flags) {
   // TODO: ML this
 
   new buffer[64]
@@ -1371,7 +1383,7 @@ static Get_GagFlags_Names(const gagFlags_s: flags) {
   }
 
   for(new i = 0; i < sizeof(GAG_FLAGS_STR); i++) {
-    if(flags & gagFlags_s: (1 << i)) {
+    if(flags & gag_flags_s: (1 << i)) {
       strcat(buffer, fmt("%s + ", GAG_FLAGS_STR[i]), charsmax(buffer));
     }
   }

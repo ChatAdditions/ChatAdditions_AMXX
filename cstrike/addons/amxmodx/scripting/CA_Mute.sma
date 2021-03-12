@@ -58,14 +58,24 @@ public plugin_init() {
 
 
 public ClCmd_Mute(const id) {
+  if(!is_user_connected(id)) {
+    return PLUGIN_CONTINUE
+  }
+
+  if(get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
+    client_print_color(id, print_team_default, "%s %L", ca_mute_prefix, id, "Mute_NotEnoughPlayers")
+    return PLUGIN_HANDLED
+  }
+
   MenuShow_PlayersList(id)
 
   return PLUGIN_HANDLED
 }
 
 static MenuShow_PlayersList(const id) {
-  if(!is_user_connected(id))
+  if(!is_user_connected(id)) {
     return
+  }
 
   new menu = menu_create(fmt("%L", id, "Mute_MenuTitle"), "MenuHandler_PlayersList")
 
@@ -93,11 +103,11 @@ static MenuShow_PlayersList(const id) {
 
       get_user_name(target, name, charsmax(name))
 
-      if(g_playersMute[id][target]) {
+      if(g_playersMute[id][target] || CA_PlayerHasBlockedPlayer(id, target)) {
         strcat(name, " \\d[ \\r+\\d ]", charsmax(name))
       }
 
-      if(g_globalMute[target] || g_playersMute[target][id]) {
+      if(g_globalMute[target] || g_playersMute[target][id] || CA_PlayerHasBlockedPlayer(target, id)) {
         strcat(name, fmt(" \\d(\\y%L\\d)", id, "Mute_PlayerMutedYou"), charsmax(name))
       }
 
@@ -122,6 +132,11 @@ public MenuCallback_PlayersList(const id, const menu, const item) {
 
   // Disable all players in menu when local user muted all
   if(userID != ITEM_MUTE_ALL && g_globalMute[id]) {
+    return ITEM_DISABLED
+  }
+
+  new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
+  if(CA_PlayerHasBlockedPlayer(id, target)) {
     return ITEM_DISABLED
   }
 
