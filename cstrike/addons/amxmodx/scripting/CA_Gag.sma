@@ -26,6 +26,7 @@ new ca_gag_prefix[32],
   ca_gag_times[64],
   ca_gag_immunity_flags[16],
   ca_gag_access_flags[16],
+  ca_gag_access_flags_own_reason[16],
   ca_gag_access_flags_high[16],
   ca_gag_remove_only_own_gag,
   ca_gag_sound_ok[128],
@@ -76,8 +77,9 @@ public plugin_init() {
 
   new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
   new accessFlags = read_flags(ca_gag_access_flags)
+  new accessFlagsOwnReason = read_flags(ca_gag_access_flags_own_reason);
 
-  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlagsHigh)
+  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", (accessFlagsHigh | accessFlagsOwnReason))
   register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlagsHigh)
 
   register_concmd("amx_gag", "ConCmd_amx_gag", accessFlagsHigh, "Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>")
@@ -121,6 +123,13 @@ Register_CVars() {
         NOTE: `ca_gag_access_flags_high` can gag this users"
     ),
     ca_gag_access_flags, charsmax(ca_gag_access_flags)
+  )
+
+  bind_pcvar_string(create_cvar("ca_gag_access_flags_own_reason", "d",
+      .description = "Admin flag\n \
+        users with this flag can enter their own gag reason"
+    ),
+    ca_gag_access_flags_own_reason, charsmax(ca_gag_access_flags_own_reason)
   )
 
   bind_pcvar_string(create_cvar("ca_gag_access_flags_high", "l",
@@ -330,7 +339,9 @@ static MenuShow_SelectReason(const id) {
 
   new menu = menu_create(fmt("%L [\\r%s\\y]", id, "Gag_MenuTitle_SelectReason", g_adminTempData[id][gd_name]), "MenuHandler_SelectReason")
 
-  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
+  new iFlags = get_user_flags(id);
+
+  if(iFlags & read_flags(ca_gag_access_flags_high) || iFlags & read_flags(ca_gag_access_flags_own_reason)) {
     menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
   }
 
