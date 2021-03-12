@@ -18,6 +18,7 @@ Mute_UseTooOften = ^3Вы используете слишком часто!
 Mute_PlayerNowMutedAll = теперь НЕ слышит никого!
 Mute_PlayerNowUnmutedAll = снова слышит всех.
 
+
 [en]
 Mute_MenuTitle = Players mute menu:
 Mute_MuteAll = Mute all
@@ -37,3 +38,25 @@ Mute_UseTooOften = ^3You use very often!
 
 Mute_PlayerNowMutedAll = CAN'T hear anybody now!
 Mute_PlayerNowUnmutedAll = can hear anybody now.
+
+
+[es]
+Mute_MenuTitle = Menu de Muteo de Jugadores:
+Mute_MuteAll = Mutear a Todos
+
+Mute_YouMutePlayer = Ahora no podes oir a ese jugador.
+Mute_YouUnmutePlayer = Ahora podes oir a ese jugador.
+
+Mute_NotEnoughPlayers = No hay suficiente jugadores!
+Mute_PlayerNotConnected = ^3Jugador no esta conectado!
+
+Mute_PlayerMutedYou = Te Muteo
+
+Mute_PlayerNowMutedYou = No puede oirte.
+Mute_PlayerNowUnmutedYou = Ahora puede oirte.
+
+Mute_UseTooOften = ^3Espera unos segundos antes de volver a usar!
+
+Mute_PlayerNowMutedAll = Ahora no escuchas a nadie.
+Mute_PlayerNowUnmutedAll = Ahora podes escuchar a todos.
+
