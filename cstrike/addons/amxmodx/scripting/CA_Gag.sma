@@ -268,6 +268,8 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
     menu_additem(menu, fmt("%s %s", name, Get_PlayerPostfix(id, target, hasImmunity)), fmt("%i", get_user_userid(target)), .callback = callback)
   }
 
+  menu_setprop(menu, MPROP_SHOWPAGE, false)
+
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
   menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
   menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
@@ -377,6 +379,8 @@ static MenuShow_SelectReason(const id) {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
   }
 
+  menu_setprop(menu, MPROP_SHOWPAGE, false)
+
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
   menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
   menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
@@ -480,6 +484,8 @@ static MenuShow_SelectTime(const id) {
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
   }
+
+  menu_setprop(menu, MPROP_SHOWPAGE, false)
 
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
   menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
