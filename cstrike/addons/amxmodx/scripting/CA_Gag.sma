@@ -105,7 +105,7 @@ Register_CVars() {
 
   bind_pcvar_string(create_cvar("ca_gag_times", "1i, 5i, 10i, 30i, 1h, 1d, 1w, 1m",
       .description = "Gag time values for choose\n \
-        format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week\n \
+        format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week, 1m = 1 month, 1y = 1 year\n \
         NOTE: Changes will be applied only after reloading the map (or command `ca_gag_reload_config`)"
     ),
     ca_gag_times, charsmax(ca_gag_times)
