@@ -26,6 +26,8 @@ new ca_gag_prefix[32],
   ca_gag_times[64],
   ca_gag_immunity_flags[16],
   ca_gag_access_flags[16],
+  ca_gag_access_flags_own_reason[16],
+  ca_gag_access_flags_own_time[16],
   ca_gag_access_flags_high[16],
   ca_gag_remove_only_own_gag,
   ca_gag_sound_ok[128],
@@ -76,9 +78,11 @@ public plugin_init() {
 
   new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
   new accessFlags = read_flags(ca_gag_access_flags)
+  new accessFlagsOwnReason = read_flags(ca_gag_access_flags_own_reason)
+  new accessFlagsOwnTime = read_flags(ca_gag_access_flags_own_time)
 
-  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", accessFlagsHigh)
-  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", accessFlagsHigh)
+  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", (accessFlagsHigh | accessFlagsOwnReason))
+  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", (accessFlagsHigh | accessFlagsOwnTime))
 
   register_concmd("amx_gag", "ConCmd_amx_gag", accessFlagsHigh, "Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>")
 
@@ -101,7 +105,7 @@ Register_CVars() {
 
   bind_pcvar_string(create_cvar("ca_gag_times", "1i, 5i, 10i, 30i, 1h, 1d, 1w, 1m",
       .description = "Gag time values for choose\n \
-        format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week\n \
+        format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week, 1m = 1 month, 1y = 1 year\n \
         NOTE: Changes will be applied only after reloading the map (or command `ca_gag_reload_config`)"
     ),
     ca_gag_times, charsmax(ca_gag_times)
@@ -121,6 +125,20 @@ Register_CVars() {
         NOTE: `ca_gag_access_flags_high` can gag this users"
     ),
     ca_gag_access_flags, charsmax(ca_gag_access_flags)
+  )
+
+  bind_pcvar_string(create_cvar("ca_gag_access_flags_own_reason", "d",
+      .description = "Admin flag\n \
+        users with this flag can enter their own gag reason"
+    ),
+    ca_gag_access_flags_own_reason, charsmax(ca_gag_access_flags_own_reason)
+  )
+
+  bind_pcvar_string(create_cvar("ca_gag_access_flags_own_time", "e",
+      .description = "Admin flag\n \
+        users with this flag can enter their own gag time"
+    ),
+    ca_gag_access_flags_own_time, charsmax(ca_gag_access_flags_own_time)
   )
 
   bind_pcvar_string(create_cvar("ca_gag_access_flags_high", "l",
@@ -250,6 +268,8 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
     menu_additem(menu, fmt("%s %s", name, Get_PlayerPostfix(id, target, hasImmunity)), fmt("%i", get_user_userid(target)), .callback = callback)
   }
 
+  menu_setprop(menu, MPROP_SHOWPAGE, false)
+
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
   menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
   menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
@@ -330,7 +350,11 @@ static MenuShow_SelectReason(const id) {
 
   new menu = menu_create(fmt("%L [\\r%s\\y]", id, "Gag_MenuTitle_SelectReason", g_adminTempData[id][gd_name]), "MenuHandler_SelectReason")
 
-  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
+  new playerFlags = get_user_flags(id)
+  new accessFagsHigh = read_flags(ca_gag_access_flags_high)
+  new accessFagsOwnReason = read_flags(ca_gag_access_flags_own_reason)
+
+  if(playerFlags & (accessFagsHigh | accessFagsOwnReason)) {
     menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
   }
 
@@ -356,6 +380,8 @@ static MenuShow_SelectReason(const id) {
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
   }
+
+  menu_setprop(menu, MPROP_SHOWPAGE, false)
 
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
   menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
@@ -444,7 +470,11 @@ static MenuShow_SelectTime(const id) {
 
   new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectTime"), "MenuHandler_SelectTime")
 
-  if(get_user_flags(id) & read_flags(ca_gag_access_flags_high)) {
+  new playerFlags = get_user_flags(id)
+  new accessFagsHigh = read_flags(ca_gag_access_flags_high)
+  new accessFagsOwnTime = read_flags(ca_gag_access_flags_own_time)
+
+  if(playerFlags & (accessFagsHigh | accessFagsOwnTime)) {
     menu_additem(menu, fmt("%L", id, "Gag_EnterTime"), fmt("%i", ITEM_ENTER_GAG_TIME))
     menu_addblank(menu, .slot = false)
   }
@@ -458,6 +488,8 @@ static MenuShow_SelectTime(const id) {
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
   }
+
+  menu_setprop(menu, MPROP_SHOWPAGE, false)
 
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
   menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
