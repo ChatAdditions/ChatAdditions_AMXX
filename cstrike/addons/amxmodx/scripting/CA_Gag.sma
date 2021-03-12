@@ -78,8 +78,8 @@ public plugin_init() {
 
   new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
   new accessFlags = read_flags(ca_gag_access_flags)
-  new accessFlagsOwnReason = read_flags(ca_gag_access_flags_own_reason);
-  new accessFlagsOwnTime = read_flags(ca_gag_access_flags_own_time);
+  new accessFlagsOwnReason = read_flags(ca_gag_access_flags_own_reason)
+  new accessFlagsOwnTime = read_flags(ca_gag_access_flags_own_time)
 
   register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", (accessFlagsHigh | accessFlagsOwnReason))
   register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", (accessFlagsHigh | accessFlagsOwnTime))
@@ -350,9 +350,11 @@ static MenuShow_SelectReason(const id) {
 
   new menu = menu_create(fmt("%L [\\r%s\\y]", id, "Gag_MenuTitle_SelectReason", g_adminTempData[id][gd_name]), "MenuHandler_SelectReason")
 
-  new iFlags = get_user_flags(id);
+  new playerFlags = get_user_flags(id)
+  new accessFagsHigh = read_flags(ca_gag_access_flags_high)
+  new accessFagsOwnReason = read_flags(ca_gag_access_flags_own_reason)
 
-  if(iFlags & read_flags(ca_gag_access_flags_high) || iFlags & read_flags(ca_gag_access_flags_own_reason)) {
+  if(playerFlags & (accessFagsHigh | accessFagsOwnReason)) {
     menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
   }
 
@@ -468,9 +470,11 @@ static MenuShow_SelectTime(const id) {
 
   new menu = menu_create(fmt("%L", id, "Gag_MenuTitle_SelectTime"), "MenuHandler_SelectTime")
 
-  new iFlags = get_user_flags(id);
+  new playerFlags = get_user_flags(id)
+  new accessFagsHigh = read_flags(ca_gag_access_flags_high)
+  new accessFagsOwnTime = read_flags(ca_gag_access_flags_own_time)
 
-  if(iFlags & read_flags(ca_gag_access_flags_high) || iFlags & read_flags(ca_gag_access_flags_own_time)) {
+  if(iFlags & (accessFagsHigh | accessFagsOwnTime)) {
     menu_additem(menu, fmt("%L", id, "Gag_EnterTime"), fmt("%i", ITEM_ENTER_GAG_TIME))
     menu_addblank(menu, .slot = false)
   }
