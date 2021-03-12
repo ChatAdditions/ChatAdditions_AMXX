@@ -474,7 +474,7 @@ static MenuShow_SelectTime(const id) {
   new accessFagsHigh = read_flags(ca_gag_access_flags_high)
   new accessFagsOwnTime = read_flags(ca_gag_access_flags_own_time)
 
-  if(iFlags & (accessFagsHigh | accessFagsOwnTime)) {
+  if(playerFlags & (accessFagsHigh | accessFagsOwnTime)) {
     menu_additem(menu, fmt("%L", id, "Gag_EnterTime"), fmt("%i", ITEM_ENTER_GAG_TIME))
     menu_addblank(menu, .slot = false)
   }
