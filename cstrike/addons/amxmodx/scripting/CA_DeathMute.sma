@@ -62,11 +62,13 @@ public CBasePlayer_Killed(const id, const attacker) {
     return
   }
 
+  client_print_color(id, print_team_red, "%s %L", ca_deathmute_prefix, id, "DeathMute_ChatMessage", ca_deathmute_time)
   set_task_ex(ca_deathmute_time, "DisableSpeakWithAlive", .id = id)
 }
 
 public DisableSpeakWithAlive(const id) {
   g_canSpeakWithAlive[id] = false
+  client_print_color(id, print_team_red, "%s %L", ca_deathmute_prefix, id, "DeathMute_YouMuted")
 }
 
 public CA_Client_Voice(const listener, const sender) {

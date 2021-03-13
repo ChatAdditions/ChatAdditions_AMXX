@@ -1,0 +1,9 @@
+[en]
+DeathMute_ChatMessage = You have ^3%.0f seconds^1 to give information to your teammates, then the living ^3will not hear you^1.
+DeathMute_YouMuted =  The time for transmitting information ^3is over^1. Live players ^3can't hear you^1.
+
+
+[ru]
+DeathMute_ChatMessage = У Вас есть ^3%.0f сек^1, чтобы дать информацию тиммейтам, далее живые Вас ^3не услышат^1.
+DeathMute_YouMuted = Время для передачи информации ^3истекло^1. Живые игроки Вас ^3не слышат^1.
+
