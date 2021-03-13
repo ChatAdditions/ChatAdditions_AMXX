@@ -9,8 +9,12 @@
 
 new ca_deathmute_prefix[32],
   Float: ca_deathmute_time,
-  NotifyType_s: ca_deathmute_notify_type
-
+  NotifyType_s: ca_deathmute_notify_type,
+  Float: ca_deathmute_notify_hud_x,
+  Float: ca_deathmute_notify_hud_y,
+  ca_deathmute_notify_hud_r,
+  ca_deathmute_notify_hud_g,
+  ca_deathmute_notify_hud_b
 
 enum NotifyType_s: {
   notify_Disabled,
@@ -21,19 +25,19 @@ enum NotifyType_s: {
 
 new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1] = { false, ... }
 
-public stock const PluginName[] = "ChatAdditions: Death mute"
+public stock const PluginName[] = "CA Addon: Death mute"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
 public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
-public stock const PluginDescription[] = "Alive players don't hear dead players after 5secs"
+public stock const PluginDescription[] = "Alive players don't hear dead players after 5 secs"
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
-  register_dictionary("CA_DeathMute.txt")
+  register_dictionary("CA_Addon_DeathMute.txt")
 
   Register_CVars()
 
-  AutoExecConfig(true, "CA_DeathMute")
+  AutoExecConfig(true, "CA_Addon_DeathMute")
 
   RegisterHamPlayer(Ham_Killed, "CBasePlayer_Killed", .Post = true)
   RegisterHamPlayer(Ham_Spawn, "CBasePlayer_Spawn", .Post = true)
@@ -60,6 +64,43 @@ Register_CVars() {
         2 - HUD message\n\
         3 - ProgressBar"
     ), ca_deathmute_notify_type
+  )
+
+  bind_pcvar_float(create_cvar("ca_deathmute_notify_hud_x", "-1.0",
+      .description = "X position for HUD message\n\
+        -1.0 - center",
+      .has_min = true, .min_val = -1.0,
+      .has_max = true, .max_val = 1.0
+    ), ca_deathmute_notify_hud_x
+  )
+
+  bind_pcvar_float(create_cvar("ca_deathmute_notify_hud_y", "0.15",
+      .description = "Y position for HUD message\n\
+        -1.0 - center",
+      .has_min = true, .min_val = -1.0,
+      .has_max = true, .max_val = 1.0
+    ), ca_deathmute_notify_hud_y
+  )
+
+  bind_pcvar_num(create_cvar("ca_deathmute_notify_hud_r", "200",
+      .description = "Red color value (in RGB) [0...255]",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = 255.0
+    ), ca_deathmute_notify_hud_r
+  )
+
+  bind_pcvar_num(create_cvar("ca_deathmute_notify_hud_g", "50",
+      .description = "Green color value (in RGB) [0...255]",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = 255.0
+    ), ca_deathmute_notify_hud_g
+  )
+
+  bind_pcvar_num(create_cvar("ca_deathmute_notify_hud_b", "0",
+      .description = "Blue color value (in RGB) [0...255]",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = 255.0
+    ), ca_deathmute_notify_hud_b
   )
 }
 
@@ -94,6 +135,15 @@ public CBasePlayer_Killed(const id, const attacker) {
   }
 
   if(ca_deathmute_notify_type == notify_HUD) {
+    set_hudmessage(
+      ca_deathmute_notify_hud_r,
+      ca_deathmute_notify_hud_g,
+      ca_deathmute_notify_hud_b,
+      ca_deathmute_notify_hud_x,
+      ca_deathmute_notify_hud_y,
+      .fadeouttime = 0.0,
+      .holdtime = ca_deathmute_time - 1.0
+    )
     show_hudmessage(id, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
   }
 }
@@ -110,6 +160,15 @@ public DisableSpeakWithAlive(const id) {
   }
 
   if(ca_deathmute_notify_type == notify_HUD) {
+    set_hudmessage(
+      ca_deathmute_notify_hud_r,
+      ca_deathmute_notify_hud_g,
+      ca_deathmute_notify_hud_b,
+      ca_deathmute_notify_hud_x,
+      ca_deathmute_notify_hud_y,
+      .fadeouttime = 0.0,
+      .holdtime = ca_deathmute_time - 1.0
+    )
     show_hudmessage(id, "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
   }
 }
