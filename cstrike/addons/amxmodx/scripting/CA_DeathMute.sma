@@ -38,7 +38,7 @@ Register_CVars() {
         0 - disabled functionality",
       .has_min = true, .min_val = 0.0,
       .has_max = true, .max_val = 240.0
-    )
+    ), ca_deathmute_time
   )
 }
 
