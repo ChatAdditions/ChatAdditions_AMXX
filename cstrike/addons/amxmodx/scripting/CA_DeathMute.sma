@@ -4,9 +4,20 @@
 
 #include <ChatAdditions>
 
-new ca_deathmute_prefix[32],
-  Float: ca_deathmute_time
+#pragma ctrlchar '\'
+#pragma tabsize 2
 
+new ca_deathmute_prefix[32],
+  Float: ca_deathmute_time,
+  NotifyType_s: ca_deathmute_notify_type
+
+
+enum NotifyType_s: {
+  notify_Disabled,
+  notify_Chat,
+  notify_HUD,
+  notify_ProgressBar,
+}
 
 new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1] = { false, ... }
 
@@ -41,6 +52,15 @@ Register_CVars() {
       .has_max = true, .max_val = 240.0
     ), ca_deathmute_time
   )
+
+  bind_pcvar_num(create_cvar("ca_deathmute_notify_type", "1",
+      .description = "Notification type for \n\
+        0 - disabled functionality\n\
+        1 - chat message\n\
+        2 - HUD message\n\
+        3 - ProgressBar"
+    ), ca_deathmute_notify_type
+  )
 }
 
 public client_disconnected(id) {
@@ -63,13 +83,35 @@ public CBasePlayer_Killed(const id, const attacker) {
     return
   }
 
-  client_print_color(id, print_team_red, "%s %L", ca_deathmute_prefix, id, "DeathMute_ChatMessage", ca_deathmute_time)
   set_task_ex(ca_deathmute_time, "DisableSpeakWithAlive", .id = id)
+
+  if(ca_deathmute_notify_type == notify_Disabled) {
+    return
+  }
+
+  if(ca_deathmute_notify_type == notify_Chat) {
+    client_print_color(id, print_team_red, "%s %L", ca_deathmute_prefix, id, "DeathMute_ChatMessage", ca_deathmute_time)
+  }
+
+  if(ca_deathmute_notify_type == notify_HUD) {
+    show_hudmessage(id, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+  }
 }
 
 public DisableSpeakWithAlive(const id) {
   g_canSpeakWithAlive[id] = false
-  client_print_color(id, print_team_red, "%s %L", ca_deathmute_prefix, id, "DeathMute_YouMuted")
+
+  if(ca_deathmute_notify_type == notify_Disabled) {
+    return
+  }
+
+  if(ca_deathmute_notify_type == notify_Chat) {
+    client_print_color(id, print_team_red, "%s %L", ca_deathmute_prefix, id, "DeathMute_YouMuted")
+  }
+
+  if(ca_deathmute_notify_type == notify_HUD) {
+    show_hudmessage(id, "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
+  }
 }
 
 public CA_Client_Voice(const listener, const sender) {
