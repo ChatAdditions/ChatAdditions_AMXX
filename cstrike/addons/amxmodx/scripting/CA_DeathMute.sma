@@ -4,7 +4,9 @@
 
 #include <ChatAdditions>
 
-new Float: ca_deathmute_time
+new ca_deathmute_prefix[32],
+  Float: ca_deathmute_time
+
 
 new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1] = { false, ... }
 
@@ -26,6 +28,11 @@ public plugin_init() {
 }
 
 Register_CVars() {
+  bind_pcvar_string(create_cvar("ca_deathmute_prefix", "[Death mute]",
+      .description = "Chat prefix for plugin actions"
+    ), ca_deathmute_prefix, charsmax(ca_deathmute_prefix)
+  )
+
   bind_pcvar_float(create_cvar("ca_deathmute_time", "5.0",
       .description = "Time (in seconds) for killed players, during which they can report information to living players.\n\
         0 - disabled functionality",
