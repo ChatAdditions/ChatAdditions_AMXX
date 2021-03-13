@@ -18,6 +18,7 @@ public stock const PluginDescription[] = "Alive players don't hear dead players 
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
+  register_dictionary("CA_DeathMute.txt")
 
   Register_CVars()
 
