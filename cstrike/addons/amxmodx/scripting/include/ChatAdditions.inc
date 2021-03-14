@@ -236,8 +236,8 @@ native bool: CA_PlayerHasBlockedPlayer(const receiver, const sender);
  *
  * @param index   Client index.
  *
- * @return      PLUGIN_CONTINUE to allow send message
- *              PLUGIN_HANDLED or higher to prevent message
+ * @return      CA_CONTINUE to allow send message
+ *              CA_SUPERCEDE or higher to prevent message
  */
 forward CA_Client_Say(index);
 
@@ -246,8 +246,8 @@ forward CA_Client_Say(index);
  *
  * @param index   Client index.
  *
- * @return      PLUGIN_CONTINUE to allow send message
- *              PLUGIN_HANDLED or higher to prevent message
+ * @return      CA_CONTINUE to allow send message
+ *              CA_SUPERCEDE or higher to prevent message
  */
 forward CA_Client_SayTeam(index);
 
@@ -260,7 +260,21 @@ forward CA_Client_SayTeam(index);
  * @param listener   Receiver index.
  * @param sender   Sender index.
  *
- * @return      PLUGIN_CONTINUE to allow send voice
- *              PLUGIN_HANDLED or higher to prevent the voice
+ * @return      CA_CONTINUE to allow send voice
+ *              CA_SUPERCEDE or higher to prevent the voice
  */
 forward CA_Client_Voice(const listener, const sender);
+
+
+/**
+ * Called when player change nickname.
+ *
+ * @note
+ *
+ * @param id        Client index.
+ * @param newName   New name.
+ *
+ * @return      CA_CONTINUE to allow send voice
+ *              CA_SUPERCEDE or higher to prevent the voice
+ */
+forward CA_Client_ChangeName(const id, const newName[]);

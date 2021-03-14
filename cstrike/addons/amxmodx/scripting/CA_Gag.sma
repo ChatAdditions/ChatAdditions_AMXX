@@ -31,7 +31,8 @@ new ca_gag_prefix[32],
   ca_gag_access_flags_high[16],
   ca_gag_remove_only_own_gag,
   ca_gag_sound_ok[128],
-  ca_gag_sound_error[128]
+  ca_gag_sound_error[128],
+  bool: ca_gag_block_nicnkame_change
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
@@ -171,6 +172,13 @@ Register_CVars() {
         NOTE: Changes will be applied only after reloading the map"
     ),
     ca_gag_sound_error, charsmax(ca_gag_sound_error)
+  )
+
+  bind_pcvar_num(create_cvar("ca_gag_block_nicnkame_change", "1",
+      .description = "Block nickname change for gagged player\n \
+        0 = no restrictions"
+    ),
+    ca_gag_block_nicnkame_change
   )
 }
 
@@ -1225,6 +1233,19 @@ public CA_Client_Say(id) {
 
   return CA_SUPERCEDE
 }
+
+public CA_Client_ChangeName(const id, const newName[]) {
+  if(!ca_gag_block_nicnkame_change) {
+    return CA_CONTINUE
+  }
+
+  new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
+  if(!hasBlock) {
+    return CA_CONTINUE
+  }
+
+  return CA_SUPERCEDE
+}
 /*
  * @endsection CA:Core API handling
  */
@@ -1269,9 +1290,9 @@ public CA_Storage_Loaded(const name[], const authID[], const IP[], const reason[
     return
   }
 
-  new targetName[MAX_NAME_LENGTH]; get_user_name(target, targetName, charsmax(targetName))
+  copy(g_currentGags[target][gd_name], charsmax(g_currentGags[][gd_name]), name)
+  // set_user_info(target, "name", name)
 
-  copy(g_currentGags[target][gd_name], charsmax(g_currentGags[][gd_name]), targetName)
   copy(g_currentGags[target][gd_authID], charsmax(g_currentGags[][gd_authID]), authID)
   copy(g_currentGags[target][gd_IP], charsmax(g_currentGags[][gd_IP]), IP)
 

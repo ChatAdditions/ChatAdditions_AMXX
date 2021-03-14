@@ -21,6 +21,7 @@ new const LOG_FOLDER[] = "ChatAdditions"
 new g_fwdClientSay,
   g_fwdClientSayTeam,
   g_fwdClientVoice,
+  g_fwdClientChangeName,
   g_retVal
 
 // FROM https://github.com/s1lentq/ReGameDLL_CS/blob/master/regamedll/game_shared/voice_gamemgr.cpp
@@ -64,6 +65,7 @@ public plugin_init() {
   register_clcmd("say", "ClCmd_Say", ADMIN_ALL)
   register_clcmd("say_team", "ClCmd_SayTeam", ADMIN_ALL)
   RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer, "CSGameRules_CanPlayerHearPlayer", .post = false)
+  RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName, "CBasePlayer_SetClientUserInfoName", .post = false)
 
   register_clcmd("VModEnable", "ClCmd_VModEnable", ADMIN_ALL)
   register_clcmd("vban", "ClCmd_vban", ADMIN_ALL)
@@ -71,6 +73,7 @@ public plugin_init() {
   g_fwdClientSay = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL)
   g_fwdClientSayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL)
   g_fwdClientVoice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
+  g_fwdClientChangeName = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
 
   AutoExecConfig(.name = "ChatAdditions")
 
@@ -114,6 +117,18 @@ public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
     SetHookChainReturn(ATYPE_BOOL, false)
 
     return HC_BREAK
+  }
+
+  return HC_CONTINUE
+}
+
+public CBasePlayer_SetClientUserInfoName(const id, const infobuffer[], newName[]) {
+  ExecuteForward(g_fwdClientChangeName, g_retVal, id, newName)
+
+  if(g_retVal == CA_SUPERCEDE) {
+    SetHookChainReturn(ATYPE_BOOL, false)
+
+    return HC_SUPERCEDE
   }
 
   return HC_CONTINUE
