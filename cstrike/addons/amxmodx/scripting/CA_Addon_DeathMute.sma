@@ -1,6 +1,6 @@
 #include <amxmodx>
 #include <amxmisc>
-#include <hamsandwich>
+#include <reapi>
 
 #include <ChatAdditions>
 
@@ -39,8 +39,8 @@ public plugin_init() {
 
   AutoExecConfig(true, "CA_Addon_DeathMute")
 
-  RegisterHamPlayer(Ham_Killed, "CBasePlayer_Killed", .Post = true)
-  RegisterHamPlayer(Ham_Spawn, "CBasePlayer_Spawn", .Post = true)
+  RegisterHookChain(RG_CBasePlayer_Killed, "CBasePlayer_Killed", .post = true)
+  RegisterHookChain(RG_CSGameRules_PlayerSpawn, "CBasePlayer_Spawn", .post = true)
 }
 
 Register_CVars() {
