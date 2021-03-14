@@ -195,6 +195,17 @@ stock UTIL_SendAudio(const id, const sample[]) {
   message_end()
 }
 
+stock UTIL_BarTime(const id, const time) {
+  static msgId_BarTime
+  if(!msgId_BarTime) {
+    msgId_BarTime = get_user_msgid("BarTime")
+  }
+
+  message_begin(MSG_ONE_UNRELIABLE, msgId_BarTime, .player = id)
+  write_short(time)
+  message_end()
+}
+
 
 /**
  * Log a message for every ChatAdditions module.

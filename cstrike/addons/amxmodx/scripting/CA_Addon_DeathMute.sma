@@ -10,6 +10,7 @@
 new ca_deathmute_prefix[32],
   Float: ca_deathmute_time,
   NotifyType_s: ca_deathmute_notify_type,
+  bool: ca_deathmute_notify_show_progressbar,
   Float: ca_deathmute_notify_hud_x,
   Float: ca_deathmute_notify_hud_y,
   ca_deathmute_notify_hud_r,
@@ -19,8 +20,7 @@ new ca_deathmute_prefix[32],
 enum NotifyType_s: {
   notify_Disabled,
   notify_Chat,
-  notify_HUD,
-  notify_ProgressBar,
+  notify_HUD
 }
 
 new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1] = { false, ... }
@@ -61,9 +61,14 @@ Register_CVars() {
       .description = "Notification type for \n\
         0 - disabled functionality\n\
         1 - chat message\n\
-        2 - HUD message\n\
-        3 - ProgressBar"
+        2 - HUD message"
     ), ca_deathmute_notify_type
+  )
+
+  bind_pcvar_num(create_cvar("ca_deathmute_notify_show_progressbar", "1",
+      .description = "Show progressbar \n\
+        0 - disabled functionality"
+    ), ca_deathmute_notify_show_progressbar
   )
 
   bind_pcvar_float(create_cvar("ca_deathmute_notify_hud_x", "-1.0",
@@ -112,11 +117,10 @@ public client_disconnected(id) {
 }
 
 public CBasePlayer_Spawn(const id) {
-  if(!is_user_alive(id)) {
-    return
-  }
-
   g_canSpeakWithAlive[id] = true
+  if(task_exists(id)) {
+    remove_task(id)
+  }
 }
 
 public CBasePlayer_Killed(const id, const attacker) {
@@ -145,6 +149,10 @@ public CBasePlayer_Killed(const id, const attacker) {
       .holdtime = ca_deathmute_time - 1.0
     )
     show_hudmessage(id, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+  }
+
+  if(ca_deathmute_notify_show_progressbar) {
+    UTIL_BarTime(id, floatround(ca_deathmute_time))
   }
 }
 
