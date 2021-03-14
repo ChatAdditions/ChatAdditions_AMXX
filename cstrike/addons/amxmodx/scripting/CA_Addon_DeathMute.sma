@@ -182,6 +182,10 @@ public DisableSpeakWithAlive(const id) {
 }
 
 public CA_Client_Voice(const listener, const sender) {
+  if(ca_deathmute_time <= 0.0) {
+    return CA_CONTINUE
+  }
+
   if(!g_canSpeakWithAlive[sender] && !is_user_alive(sender)) {
     return CA_SUPERCEDE
   }
