@@ -1,5 +1,4 @@
-# Chat Additions
-[![Downloads status](https://img.shields.io/github/downloads/ChatAdditions/ChatAdditions_AMXX/total?label=Download%40latest)](https://github.com/ChatAdditions/ChatAdditions_AMXX/releases/latest)
+## Chat Additions [![Downloads status](https://img.shields.io/github/downloads/ChatAdditions/ChatAdditions_AMXX/total?label=Download%40latest)](https://github.com/ChatAdditions/ChatAdditions_AMXX/releases/latest)
 
 <img src="https://user-images.githubusercontent.com/18553678/110173492-b9b22080-7e0f-11eb-812b-360d221b0e6b.png">
 
