@@ -38,7 +38,9 @@ public plugin_init() {
   Storage_Create()
 }
 public plugin_end() {
-  SQL_FreeHandle(g_tuple)
+  if(g_tuple != Empty_Handle) {
+    SQL_FreeHandle(g_tuple)
+  }
 }
 public plugin_natives() {
   RegisterNatives()
