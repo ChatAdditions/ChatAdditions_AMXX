@@ -13,23 +13,27 @@ jobs:
   build:
     name: Build plugins
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        amxmodx: ["1.9"]
 
-      fail-fast: false
     steps:
       - name: Checkout repo
         uses: actions/checkout@v1
 
       - name: Download AMXX && ReAPI and unpacking
         env:
-          AMXMODX: ${{ matrix.amxmodx }}
+          AMXMODX: "1.9"
+          REAPI: "5.19.0.211"
         run: |
           curl -s https://www.amxmodx.org/amxxdrop/$AMXMODX/$(curl https://www.amxmodx.org/amxxdrop/$AMXMODX/amxmodx-latest-base-linux) -# | tar xz
-          curl -OL https://github.com/s1lentq/reapi/releases/download/5.19.0.211/reapi_5.19.0.211-dev.zip -#
+          curl -OL https://github.com/s1lentq/reapi/releases/download/$REAPI/reapi_$REAPI-dev.zip -#
           unzip reapi_*-dev.zip && rm reapi_*-dev.zip
           cd addons/amxmodx && rm scripting/*.sma && rm plugins/*.amxx
+
+      - name: Declare SHA & branch
+        id: vars
+        shell: bash
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
       - name: Compile plugins AMXX Version
         run: |
@@ -40,3 +44,18 @@ jobs:
             echo -n "Compiling $sourcefile ...";\
             ./amxxpc -d3 $sourcefile -o../plugins/$(echo $sourcefile | sed -e 's/\.sma$/.amxx/') || exit 1;\
           done
+
+      - name: Update version in plugins
+        env:
+          PLUGIN_VERSION: "${{ steps.vars.outputs.sha_short }}"
+        run: |
+          cd cstrike/addons/amxmodx/scripting/include
+          sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
+
+          echo "asset_plugin_name=ChatAdditions-$PLUGIN_VERSION" >> $GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.asset_plugin_name }}.tar.gz
+          path: ${{github.workspace}}/cstrike/

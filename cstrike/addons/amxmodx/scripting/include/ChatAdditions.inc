@@ -15,7 +15,9 @@
   #pragma loadlib ChatAdditions_Core
 #endif
 
-#define CA_VERSION "%CA_VERSION%"
+#if !defined CA_VERSION
+  #define CA_VERSION "%CA_VERSION%"
+#endif
 
 /**
 * Return types
