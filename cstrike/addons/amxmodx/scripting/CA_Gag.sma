@@ -32,7 +32,7 @@ new ca_gag_prefix[32],
   ca_gag_remove_only_own_gag,
   ca_gag_sound_ok[128],
   ca_gag_sound_error[128],
-  bool: ca_gag_block_nicnkame_change
+  bool: ca_gag_block_nickname_change
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
@@ -174,11 +174,11 @@ Register_CVars() {
     ca_gag_sound_error, charsmax(ca_gag_sound_error)
   )
 
-  bind_pcvar_num(create_cvar("ca_gag_block_nicnkame_change", "1",
+  bind_pcvar_num(create_cvar("ca_gag_block_nickname_change", "1",
       .description = "Block nickname change for gagged player\n \
         0 = no restrictions"
     ),
-    ca_gag_block_nicnkame_change
+    ca_gag_block_nickname_change
   )
 }
 
@@ -1235,7 +1235,7 @@ public CA_Client_Say(id) {
 }
 
 public CA_Client_ChangeName(const id, const newName[]) {
-  if(!ca_gag_block_nicnkame_change) {
+  if(!ca_gag_block_nickname_change) {
     return CA_CONTINUE
   }
 
