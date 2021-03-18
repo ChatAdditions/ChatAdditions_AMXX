@@ -274,7 +274,7 @@ forward CA_Client_Voice(const listener, const sender);
  * @param id        Client index.
  * @param newName   New name.
  *
- * @return      CA_CONTINUE to allow send voice
- *              CA_SUPERCEDE or higher to prevent the voice
+ * @return      CA_CONTINUE to allow change nickname
+ *              CA_SUPERCEDE or higher to prevent
  */
 forward CA_Client_ChangeName(const id, const newName[]);
