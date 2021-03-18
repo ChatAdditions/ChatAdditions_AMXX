@@ -57,5 +57,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.asset_plugin_name }}.tar.gz
+          name: ${{ env.asset_plugin_name }}
           path: ${{github.workspace}}/cstrike/
