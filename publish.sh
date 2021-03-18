@@ -70,7 +70,6 @@ mkdir -p ${OUTPUT_DIR}/addons/amxmodx/plugins/
 # Copy source files to compiler directory
 scripting_dir=${OUTPUT_DIR}/addons/amxmodx/scripting
 cp -rp cstrike/addons/amxmodx/*    ${OUTPUT_DIR}/addons/amxmodx/
-cp -rp cstrike/addons/amxmodx/scripting/    ${scripting_dir}
 # cp -rp extra/*           ${OUTPUT_DIR}
 
 cd ${scripting_dir}
