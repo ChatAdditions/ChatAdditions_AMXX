@@ -1291,6 +1291,8 @@ public CA_Storage_Loaded(const name[], const authID[], const IP[], const reason[
   }
 
   copy(g_currentGags[target][gd_name], charsmax(g_currentGags[][gd_name]), name)
+
+  // FIXME: Nickname can't change on DEAD player.
   // set_user_info(target, "name", name)
 
   copy(g_currentGags[target][gd_authID], charsmax(g_currentGags[][gd_authID]), authID)
