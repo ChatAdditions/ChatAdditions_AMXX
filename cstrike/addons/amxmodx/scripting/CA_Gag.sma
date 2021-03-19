@@ -361,12 +361,13 @@ static MenuShow_SelectReason(const id) {
   new playerFlags = get_user_flags(id)
   new accessFlagsHigh = read_flags(ca_gag_access_flags_high)
   new accessFlagsOwnReason = read_flags(ca_gag_access_flags_own_reason)
+  new bool: hasReasonsTemplates = bool: (g_gagReasonsTemplates_size != 0)
 
-  if(playerFlags & (accessFlagsHigh | accessFlagsOwnReason)) {
+  if(playerFlags & (accessFlagsHigh | accessFlagsOwnReason) || !hasReasonsTemplates) {
     menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
   }
 
-  if(g_gagReasonsTemplates_size) {
+  if(hasReasonsTemplates) {
     for(new i; i < g_gagReasonsTemplates_size; i++) {
       new reason[reason_s]
       ArrayGetArray(g_gagReasonsTemplates, i, reason)
@@ -1322,6 +1323,7 @@ static LoadConfig() {
     g_gagReasonsTemplates = ArrayCreate(reason_s)
   } else if(ArraySize(g_gagReasonsTemplates) > 0) {
     ArrayClear(g_gagReasonsTemplates)
+    g_gagReasonsTemplates_size = 0
   }
 
   AutoExecConfig(.name = "CA_Gag")
