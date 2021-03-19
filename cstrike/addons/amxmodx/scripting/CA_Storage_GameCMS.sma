@@ -358,10 +358,10 @@ static stock gag_flags_s: GCMS_FlagsTo_CAGAGFlags(const flag) {
 }
 
 static stock CAGAGFlags_to_GCMS_Flags(const gag_flags_s: flags) {
-  if((flags & gagFlag_Voice) == gagFlag_Voice) {
+  if(flags == gagFlag_Voice) {
     return GCMS_FLAG_VOICE;
   }
-  if((flags & (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice)) == (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice)) {
+  if(flags == (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice)) {
     return GCMS_FLAG_ALL;
   }
   if(flags & (gagFlag_Say | gagFlag_SayTeam)) {
