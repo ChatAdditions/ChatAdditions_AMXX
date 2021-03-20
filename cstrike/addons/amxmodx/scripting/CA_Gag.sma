@@ -1096,6 +1096,12 @@ public ConCmd_amx_gag(const id, const level, const cid) {
     return PLUGIN_HANDLED
   }
 
+  if(g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed) {
+    console_print(id, "Player '%n' has already gagged.", target)
+
+    return PLUGIN_HANDLED
+  }
+
   trim(args[arg_reason])
 
   // Setup default gag for target player
