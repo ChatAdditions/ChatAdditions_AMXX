@@ -9,6 +9,7 @@
 
 new ca_deathmute_prefix[32],
   Float: ca_deathmute_time,
+  bool: ca_deathmute_dead_hear_alive,
   NotifyType_s: ca_deathmute_notify_type,
   bool: ca_deathmute_notify_show_progressbar,
   Float: ca_deathmute_notify_hud_x,
@@ -57,8 +58,15 @@ Register_CVars() {
     ), ca_deathmute_time
   )
 
+  bind_pcvar_num(create_cvar("ca_deathmute_dead_hear_alive", "1",
+      .description = "Death mute mode \n\
+        0 - alive hear only alive, dead hear all\n\
+        1 - alive hear only alive, dead hear only dead"
+    ), ca_deathmute_dead_hear_alive
+  )
+
   bind_pcvar_num(create_cvar("ca_deathmute_notify_type", "1",
-      .description = "Notification type for \n\
+      .description = "Notification type for dead players \n\
         0 - disabled functionality\n\
         1 - chat message\n\
         2 - HUD message"
@@ -186,7 +194,14 @@ public CA_Client_Voice(const listener, const sender) {
     return CA_CONTINUE
   }
 
-  if(!g_canSpeakWithAlive[sender] && !is_user_alive(sender) && is_user_alive(listener)) {
+  new bool: listenerAlive = is_user_alive(listener)
+  new bool: senderAlive = is_user_alive(sender)
+
+  if(!g_canSpeakWithAlive[sender] && !senderAlive && listenerAlive) {
+    return CA_SUPERCEDE
+  }
+
+  if(!ca_deathmute_dead_hear_alive && !listenerAlive && senderAlive) {
     return CA_SUPERCEDE
   }
 
