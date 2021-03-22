@@ -72,10 +72,10 @@ Mute_PlayerNotConnected = ^3Spieler nicht verbunden!
 
 Mute_PlayerMutedYou = hat Dich gemuted
 
-Mute_PlayerNowMutedYou = hat Dich gemuted.
+Mute_PlayerNowMutedYou = hat Dich gerade gemuted.
 Mute_PlayerNowUnmutedYou = kann Dich wieder hören.
 
-Mute_UseTooOften = ^3Warte ein paar Sekunden!
+Mute_UseTooOften = ^3Zu oft genutzt!
 
 Mute_PlayerNowMutedAll = Du hörst NIEMANDEN!
 Mute_PlayerNowUnmutedAll = Du hörst ALLE!
