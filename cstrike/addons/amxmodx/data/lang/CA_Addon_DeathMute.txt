@@ -12,4 +12,4 @@ DeathMute_YouMuted = Jugadores vivos ^3no pueden oírte^1.
 
 [de]
 DeathMute_ChatMessage = ^3%.0f Sekunden^1 für die Team-Kommunikation, anschliessend kann Dich ^3niemand mehr hören^1.
-DeathMute_YouMuted = Lebende Spieler können Dich ^3nicht hören^1.
+DeathMute_YouMuted = Dein Team kann Dich ^3nicht hören^1.
