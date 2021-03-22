@@ -60,3 +60,22 @@ Mute_UseTooOften = ^3Espera unos segundos antes de volver a usar!
 Mute_PlayerNowMutedAll = Ahora no escuchas a nadie.
 Mute_PlayerNowUnmutedAll = Ahora podes escuchar a todos.
 
+[de]
+Mute_MenuTitle = Spieler muten: 
+Mute_MuteAll = Alle muten
+
+Mute_YouMutePlayer = Der Spieler ist gemuted
+Mute_YouUnmutePlayer = Du kannst den Spieler wieder hören
+
+Mute_NotEnoughPlayers = ^3Nicht genug Spieler!
+Mute_PlayerNotConnected = ^3Spieler nicht verbunden!
+
+Mute_PlayerMutedYou = hat Dich gemuted
+
+Mute_PlayerNowMutedYou = hat Dich jetzt gemuted.
+Mute_PlayerNowUnmutedYou = kann Dich wieder hören.
+
+Mute_UseTooOften = ^3Warte ein paar Sekunden!
+
+Mute_PlayerNowMutedAll = Du hörst NIEMANDEN!
+Mute_PlayerNowUnmutedAll = Du hörst ALLE!
