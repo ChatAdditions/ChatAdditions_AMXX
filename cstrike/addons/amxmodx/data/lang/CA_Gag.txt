@@ -142,7 +142,7 @@ Gag_NotValidTimeEntered = ^3Tiempo ingresado no es valido:^1
 Gag_NotifyPlayer_BlockedChat = ^3Tu ^1chat ^3ha sido bloqueado.
 
 [de]
-Gag_MenuTitle_PlayersList = Spieler stummschalten
+Gag_MenuTitle_PlayersList = Spieler muten
 Gag_MenuTitle_SelectReason = Wählen einen Grund:
 Gag_MenuTitle_SelectTime = Wähle die Dauer:
 Gag_MenuItem_RemoveGag = \gEntfernen\w
