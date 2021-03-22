@@ -183,7 +183,7 @@ Gag_NoTemplatesAvailable_Reasons = ^3Keine Gründe vorhanden.
 Gag_NoTemplatesAvailable_Times = ^3Keine Dauer vorhanden.
 
 Gag_YouSetManual_Time = ^3Dauer:^1
-Gag_YouSetManual_Reason = ^3Grund für Stummschalten:^1
+Gag_YouSetManual_Reason = ^3Grund für Mute:^1
 Gag_NotValidTimeEntered = ^3Die Dauer stimmt nicht:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Dein ^1Chat ^3wurde blockeriert.
