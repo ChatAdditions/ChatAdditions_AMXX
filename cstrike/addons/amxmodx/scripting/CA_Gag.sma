@@ -1196,10 +1196,10 @@ static Message_ChatBlocked(const target) {
 
   if(hoursLeft > 5) {
     new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[target][gd_expireAt])
-    client_print_color(target, print_team_red, "%L %L %L %s", id, "Gag_prefix", target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Expire", timeStr)
+    client_print_color(target, print_team_red, "%L %L %L %s", target, "Gag_prefix", target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Expire", timeStr)
   } else {
     new expireLeftStr[128]; get_time_length(target, secondsLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
-    client_print_color(target, print_team_red, "%L %L %L %s", id, "Gag_prefix", target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Left", expireLeftStr)
+    client_print_color(target, print_team_red, "%L %L %L %s", target, "Gag_prefix", target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Left", expireLeftStr)
   }
 }
 /*
@@ -1531,7 +1531,7 @@ static bool: Gag_Remove(const id, const target) {
 static Gag_Expired(const id) {
   GagData_Reset(g_currentGags[id])
 
-  client_print_color(0, print_team_default, "%L %L", id, "Gag_prefix", LANG_PLAYER, "Gag_PlayerExpiredGag", id)
+  client_print_color(0, print_team_default, "%L %L", LANG_PLAYER, "Gag_prefix", LANG_PLAYER, "Gag_PlayerExpiredGag", id)
 }
 
 
