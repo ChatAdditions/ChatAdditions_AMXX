@@ -1504,3 +1504,68 @@ static Gag_Expired(const id) {
 
   client_print_color(0, print_team_default, "%s %L", ca_gag_prefix, LANG_PLAYER, "Gag_PlayerExpiredGag", id)
 }
+
+
+public plugin_natives() {
+  register_native("ca_set_user_gag", "native_ca_set_user_gag")
+  register_native("ca_get_user_gag", "native_ca_get_user_gag")
+  register_native("ca_has_user_gag", "native_ca_has_user_gag")
+  register_native("ca_remove_user_gag", "native_ca_remove_user_gag")
+}
+
+public native_ca_set_user_gag(const plugin_id, const argc) {
+  enum { arg_index = 1, arg_reason, arg_minutes, arg_flags }
+
+  g_adminTempData[0][gd_target] = get_param(arg_index)
+  get_string(arg_reason, g_adminTempData[0][gd_reason][r_name], charsmax(g_adminTempData[][r_name]))
+  g_adminTempData[0][gd_reason][r_time] = get_param(arg_minutes) * SECONDS_IN_MINUTE
+  g_adminTempData[0][gd_reason][r_flags] = gag_flags_s: get_param(arg_flags)
+
+  Gag_Save(0,
+    g_adminTempData[0][gd_target],
+    g_adminTempData[0][gd_reason][r_time],
+    g_adminTempData[0][gd_reason][r_flags]
+  )
+}
+
+public bool: native_ca_get_user_gag(const plugin_id, const argc) {
+  enum { arg_index = 1, arg_reason, arg_minutes, arg_flags }
+
+  new target = get_param(arg_index)
+  new gag_flags_s: flags = g_currentGags[target][gd_reason][r_flags]
+  if(!flags) {
+    return false
+  }
+
+  set_string(arg_reason, g_currentGags[target][gd_reason][r_name], charsmax(g_adminTempData[][r_name]))
+  set_param_byref(arg_minutes, g_currentGags[target][gd_reason][r_time] / SECONDS_IN_MINUTE)
+  set_param_byref(arg_flags, flags)
+
+  return true
+}
+
+public bool: native_ca_has_user_gag(const plugin_id, const argc) {
+  enum { arg_index = 1 }
+
+  new target = get_param(arg_index)
+  new gag_flags_s: flags = g_currentGags[target][gd_reason][r_flags]
+  
+  return bool: (flags != gagFlag_Removed)
+}
+
+public bool: native_ca_remove_user_gag(const plugin_id, const argc) {
+  enum { arg_index = 1 }
+
+  new target = get_param(arg_index)
+  new gag_flags_s: flags = g_currentGags[target][gd_reason][r_flags]
+  if(flags == gagFlag_Removed) {
+    return false
+  }
+
+  GagData_Copy(g_adminTempData[0], g_currentGags[target])
+  g_adminTempData[0][gd_target] = target
+
+  Gag_Remove(0, target)
+
+  return true
+}
