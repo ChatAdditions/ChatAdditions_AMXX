@@ -45,6 +45,7 @@ Gag_NotValidTimeEntered = ^3Время указано не верно:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Вам заблокировали ^1чат^3.
 
+Gag_prefix = [^2GAG^1]
 
 [en]
 Gag_MenuTitle_PlayersList = Gag player
@@ -93,6 +94,7 @@ Gag_NotValidTimeEntered = ^3Entered time not valid:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Your ^1chat ^3has been blocked.
 
+Gag_prefix = [^2GAG^1]
 
 [es]
 Gag_MenuTitle_PlayersList = Silenciar Jugador
@@ -141,6 +143,8 @@ Gag_NotValidTimeEntered = ^3Tiempo ingresado no es valido:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Tu ^1chat ^3ha sido bloqueado.
 
+Gag_prefix = [^2GAG^1]
+
 [de]
 Gag_MenuTitle_PlayersList = Spieler stummschalten
 Gag_MenuTitle_SelectReason = Wählen einen Grund:
@@ -187,3 +191,5 @@ Gag_YouSetManual_Reason = ^3Grund für Muten:^1
 Gag_NotValidTimeEntered = ^3Die Dauer stimmt nicht:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Dein ^1Chat ^3wurde blockeriert.
+
+Gag_prefix = [^2GAG^1]
