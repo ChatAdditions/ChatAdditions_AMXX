@@ -137,51 +137,56 @@ stock GagData_GetPersonalData(const admin = 0, const target, buffer[gagData_s]) 
  * Sets client's gag data.
  *
  * @param index         Client index
- * @param gagData      Gag data with gagData_s
+ * @param reason        Reason
+ * @param Minutes       Minutes
+ * @param Flags         Flags
  *
  * @noreturn
  * @error               If the client index is not within the range of 1 to
  *                      MaxClients, or the client is not connected, an error
  *                      will be thrown.
  */
-native ca_set_user_gag(index, const reason[], const time, const gag_flags_s: flags = (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
+native bool: ca_set_user_gag(const index, const reason[], const minutes, const gag_flags_s: flags);
 
 /**
  * Get client's gag data.
  *
- * @param index         Client index
- * @param reason		Gag reason
- * @param time			Time (in seconds)
- * @param flags			flags
+ * @param index       Client index
+ * @param reason		  Gag reason
+ * @param minutes			minutes
+ * @param flags			  flags
  *
- * @return				True if has Gag.
+ * @return				      True if has Gag.
  * @error               If the client index is not within the range of 1 to
  *                      MaxClients, or the client is not connected, an error
  *                      will be thrown.
  */
-native bool: ca_get_user_gag(index, reason[], &time, &gag_flags_s: flags);
+native bool: ca_get_user_gag(const index, reason[], &minutes, &gag_flags_s: flags);
 
 /**
  * Has client gag?
  *
  * @param index         Client index
  *
- * @return				True if has Gag.
+ * @return				      True if has Gag.
  * @error               If the client index is not within the range of 1 to
  *                      MaxClients, or the client is not connected, an error
  *                      will be thrown.
  */
-native bool: ca_has_user_gag(index);
+native bool: ca_has_user_gag(const index);
 
 /**
  * Remove client's gag data..
  *
  * @param index         Client index
  *
- * @noreturn
+ * @return				      True if gag has been removed.
  * @error               If the client index is not within the range of 1 to
  *                      MaxClients, or the client is not connected, an error
  *                      will be thrown.
  */
-native ca_remove_user_gag(index);
+native bool: ca_remove_user_gag(const index);
 
+
+forward CA_gag_setted(const target, reason[], minutes, gag_flags_s: flags);
+forward CA_gag_removed(const target, reason[], minutes, gag_flags_s: flags);
