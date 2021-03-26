@@ -86,17 +86,17 @@ public plugin_init() {
   new accessFlagsOwnReason = read_flags(ca_gag_access_flags_own_reason)
   new accessFlagsOwnTime = read_flags(ca_gag_access_flags_own_time)
 
-  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", (accessFlagsHigh | accessFlagsOwnReason))
-  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", (accessFlagsHigh | accessFlagsOwnTime))
+  register_clcmd("enter_GagReason", "ClCmd_EnterGagReason", (accessFlagsHigh | accessFlagsOwnReason), .FlagManager = false)
+  register_clcmd("enter_GagTime", "ClCmd_EnterGagTime", (accessFlagsHigh | accessFlagsOwnTime), .FlagManager = false)
 
-  register_concmd("amx_gag", "ConCmd_amx_gag", accessFlagsHigh, "Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>")
+  register_concmd("amx_gag", "ConCmd_amx_gag", accessFlagsHigh, "Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>", .FlagManager = false)
 
   new const CMDS_Mute[][] = { "gag" }
   for(new i; i < sizeof(CMDS_Mute); i++) {
-    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", (accessFlags | accessFlagsHigh))
+    register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Gag", (accessFlags | accessFlagsHigh), .FlagManager = false)
   }
-  register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh))
-  register_clcmd("say", "ClCmd_Say", (accessFlags | accessFlagsHigh))
+  register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh), .FlagManager = false)
+  register_clcmd("say", "ClCmd_Say", (accessFlags | accessFlagsHigh), .FlagManager = false)
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 

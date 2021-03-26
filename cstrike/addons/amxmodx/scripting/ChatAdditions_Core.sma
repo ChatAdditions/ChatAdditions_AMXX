@@ -67,8 +67,8 @@ public plugin_init() {
   RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer, "CSGameRules_CanPlayerHearPlayer", .post = false)
   RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName, "CBasePlayer_SetClientUserInfoName", .post = false)
 
-  register_clcmd("VModEnable", "ClCmd_VModEnable", ADMIN_ALL)
-  register_clcmd("vban", "ClCmd_vban", ADMIN_ALL)
+  register_clcmd("VModEnable", "ClCmd_VModEnable", ADMIN_ALL, .FlagManager = false)
+  register_clcmd("vban", "ClCmd_vban", ADMIN_ALL, .FlagManager = false)
 
   g_fwdClientSay = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL)
   g_fwdClientSayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL)
