@@ -41,6 +41,10 @@ enum {
   ITEM_CONFIRM = -3
 }
 
+new g_fwd_gag_setted,
+  g_fwd_gag_removed,
+  g_ret
+
 public stock const PluginName[] = "CA: Gag"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
@@ -95,6 +99,13 @@ public plugin_init() {
   register_clcmd("say", "ClCmd_Say", (accessFlags | accessFlagsHigh))
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
+
+  Register_Forwards()
+}
+
+public plugin_end() {
+  DestroyForward(g_fwd_gag_setted)
+  DestroyForward(g_fwd_gag_removed)
 }
 
 Register_CVars() {
@@ -1459,7 +1470,7 @@ static Get_GagFlags_Names(const gag_flags_s: flags) {
 }
 
 
-static Gag_Save(const id, const target, const time, const flags, const expireAt = 0) {
+static bool: Gag_Save(const id, const target, const time, const flags, const expireAt = 0) {
   GagData_Copy(g_currentGags[target], g_adminTempData[id])
   GagData_Reset(g_adminTempData[id])
 
@@ -1472,6 +1483,17 @@ static Gag_Save(const id, const target, const time, const flags, const expireAt 
     gag[gd_expireAt] = (expireAt != 0) ? (expireAt) : (time + get_systime())
   }
 
+  ExecuteForward(g_fwd_gag_setted, g_ret,
+    target,
+    gag[gd_reason][r_name],
+    gag[gd_reason][r_time],
+    gag[gd_reason][r_flags]
+  )
+
+  if(g_ret == CA_SUPERCEDE) {
+    return false
+  }
+
   CA_Storage_Save(
     gag[gd_name], gag[gd_authID], gag[gd_IP], gag[gd_reason][r_name],
     gag[gd_adminName], gag[gd_adminAuthID], gag[gd_adminIP],
@@ -1481,10 +1503,23 @@ static Gag_Save(const id, const target, const time, const flags, const expireAt 
   g_currentGags[target] = gag
 
   client_cmd(target, "-voicerecord")
+
+  return true
 }
 
-static Gag_Remove(const id, const target) {
+static bool: Gag_Remove(const id, const target) {
   if(g_adminTempData[id][gd_reason][r_flags] != gagFlag_Removed) {
+    ExecuteForward(g_fwd_gag_removed, g_ret,
+      target,
+      g_currentGags[target][gd_reason][r_name],
+      g_currentGags[target][gd_reason][r_time],
+      g_currentGags[target][gd_reason][r_flags]
+    )
+
+    if(g_ret == CA_SUPERCEDE) {
+      return false
+    }
+
     show_activity_ex(id, g_currentGags[target][gd_adminName], "%l", "Gag_AdminUngagPlayer", g_currentGags[target][gd_name])
 
     GagData_Reset(g_adminTempData[id])
@@ -1492,11 +1527,12 @@ static Gag_Remove(const id, const target) {
 
     new authID[MAX_AUTHID_LENGTH]; get_user_authid(target, authID, charsmax(authID))
     CA_Storage_Remove(authID)
+    return true
   } else {
     client_print_color(id, print_team_red, "%s %L", ca_gag_prefix, id, "Gag_PlayerAlreadyRemoved", target)
   }
 
-  return PLUGIN_HANDLED
+  return false
 }
 
 static Gag_Expired(const id) {
@@ -1506,6 +1542,11 @@ static Gag_Expired(const id) {
 }
 
 
+Register_Forwards() {
+  g_fwd_gag_setted = CreateMultiForward("CA_gag_setted", ET_STOP, FP_CELL, FP_STRING, FP_CELL, FP_CELL)
+  g_fwd_gag_removed = CreateMultiForward("CA_gag_removed", ET_STOP, FP_CELL, FP_STRING, FP_CELL, FP_CELL)
+}
+
 public plugin_natives() {
   register_native("ca_set_user_gag", "native_ca_set_user_gag")
   register_native("ca_get_user_gag", "native_ca_get_user_gag")
@@ -1513,7 +1554,7 @@ public plugin_natives() {
   register_native("ca_remove_user_gag", "native_ca_remove_user_gag")
 }
 
-public native_ca_set_user_gag(const plugin_id, const argc) {
+public bool: native_ca_set_user_gag(const plugin_id, const argc) {
   enum { arg_index = 1, arg_reason, arg_minutes, arg_flags }
 
   g_adminTempData[0][gd_target] = get_param(arg_index)
@@ -1521,7 +1562,7 @@ public native_ca_set_user_gag(const plugin_id, const argc) {
   g_adminTempData[0][gd_reason][r_time] = get_param(arg_minutes) * SECONDS_IN_MINUTE
   g_adminTempData[0][gd_reason][r_flags] = gag_flags_s: get_param(arg_flags)
 
-  Gag_Save(0,
+  return Gag_Save(0,
     g_adminTempData[0][gd_target],
     g_adminTempData[0][gd_reason][r_time],
     g_adminTempData[0][gd_reason][r_flags]
@@ -1549,7 +1590,7 @@ public bool: native_ca_has_user_gag(const plugin_id, const argc) {
 
   new target = get_param(arg_index)
   new gag_flags_s: flags = g_currentGags[target][gd_reason][r_flags]
-  
+
   return bool: (flags != gagFlag_Removed)
 }
 
@@ -1565,7 +1606,5 @@ public bool: native_ca_remove_user_gag(const plugin_id, const argc) {
   GagData_Copy(g_adminTempData[0], g_currentGags[target])
   g_adminTempData[0][gd_target] = target
 
-  Gag_Remove(0, target)
-
-  return true
+  return Gag_Remove(0, target)
 }

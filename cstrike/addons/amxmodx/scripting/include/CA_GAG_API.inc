@@ -146,7 +146,7 @@ stock GagData_GetPersonalData(const admin = 0, const target, buffer[gagData_s]) 
  *                      MaxClients, or the client is not connected, an error
  *                      will be thrown.
  */
-native ca_set_user_gag(const index, const reason[], const minutes, const gag_flags_s: flags);
+native bool: ca_set_user_gag(const index, const reason[], const minutes, const gag_flags_s: flags);
 
 /**
  * Get client's gag data.
@@ -187,3 +187,6 @@ native bool: ca_has_user_gag(const index);
  */
 native bool: ca_remove_user_gag(const index);
 
+
+forward CA_gag_setted(const target, reason[], minutes, gag_flags_s: flags);
+forward CA_gag_removed(const target, reason[], minutes, gag_flags_s: flags);
