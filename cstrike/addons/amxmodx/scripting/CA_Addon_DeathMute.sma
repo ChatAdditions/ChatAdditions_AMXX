@@ -7,8 +7,7 @@
 #pragma ctrlchar '\'
 #pragma tabsize 2
 
-new ca_deathmute_prefix[32],
-  Float: ca_deathmute_time,
+new Float: ca_deathmute_time,
   bool: ca_deathmute_dead_hear_alive,
   NotifyType_s: ca_deathmute_notify_type,
   bool: ca_deathmute_notify_show_progressbar,
@@ -45,11 +44,6 @@ public plugin_init() {
 }
 
 Register_CVars() {
-  bind_pcvar_string(create_cvar("ca_deathmute_prefix", "[Death mute]",
-      .description = "Chat prefix for plugin actions"
-    ), ca_deathmute_prefix, charsmax(ca_deathmute_prefix)
-  )
-
   bind_pcvar_float(create_cvar("ca_deathmute_time", "5.0",
       .description = "Time (in seconds) for killed players, during which they can report information to living players.\n\
         0 - disabled functionality",
@@ -143,7 +137,7 @@ public CBasePlayer_Killed(const id, const attacker) {
   }
 
   if(ca_deathmute_notify_type == notify_Chat) {
-    client_print_color(id, print_team_red, "%s %L", ca_deathmute_prefix, id, "DeathMute_ChatMessage", ca_deathmute_time)
+    client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_ChatMessage", ca_deathmute_time)
   }
 
   if(ca_deathmute_notify_type == notify_HUD) {
@@ -172,7 +166,7 @@ public DisableSpeakWithAlive(const id) {
   }
 
   if(ca_deathmute_notify_type == notify_Chat) {
-    client_print_color(id, print_team_red, "%s %L", ca_deathmute_prefix, id, "DeathMute_YouMuted")
+    client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_YouMuted")
   }
 
   if(ca_deathmute_notify_type == notify_HUD) {

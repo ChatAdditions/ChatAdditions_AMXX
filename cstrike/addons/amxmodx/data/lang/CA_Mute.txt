@@ -18,6 +18,7 @@ Mute_UseTooOften = ^3Вы используете слишком часто!
 Mute_PlayerNowMutedAll = теперь НЕ слышит никого!
 Mute_PlayerNowUnmutedAll = снова слышит всех.
 
+Mute_prefix = [^2MUTE^1]
 
 [en]
 Mute_MenuTitle = Players mute menu:
@@ -39,6 +40,7 @@ Mute_UseTooOften = ^3You use very often!
 Mute_PlayerNowMutedAll = CAN'T hear anybody now!
 Mute_PlayerNowUnmutedAll = can hear anybody now.
 
+Mute_prefix = [^2MUTE^1]
 
 [es]
 Mute_MenuTitle = Menu de Muteo de Jugadores:
@@ -60,6 +62,8 @@ Mute_UseTooOften = ^3Espera unos segundos antes de volver a usar!
 Mute_PlayerNowMutedAll = Ahora no escuchas a nadie.
 Mute_PlayerNowUnmutedAll = Ahora podes escuchar a todos.
 
+Mute_prefix = [^2MUTE^1]
+
 [de]
 Mute_MenuTitle = Spieler muten: 
 Mute_MuteAll = Alle muten
@@ -79,3 +83,5 @@ Mute_UseTooOften = ^3Warte ein paar Sekunden!
 
 Mute_PlayerNowMutedAll = Du hörst NIEMANDEN!
 Mute_PlayerNowUnmutedAll = Du hörst ALLE!
+
+Mute_prefix = [^2MUTE^1]
