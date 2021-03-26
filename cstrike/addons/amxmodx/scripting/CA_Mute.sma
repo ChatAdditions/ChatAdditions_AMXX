@@ -11,8 +11,7 @@ new bool: g_globalMute[MAX_PLAYERS + 1]
 
 new Float: g_nextUse[MAX_PLAYERS + 1]
 
-new Float: ca_mute_use_delay,
-  ca_mute_prefix[32]
+new Float: ca_mute_use_delay
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
@@ -40,12 +39,6 @@ public plugin_init() {
     ca_mute_use_delay
   )
 
-  bind_pcvar_string(create_cvar("ca_mute_prefix", "[MUTE]",
-      .description = "Chat prefix for plugin actions"
-    ),
-    ca_mute_prefix, charsmax(ca_mute_prefix)
-  )
-
   new const CMDS_Mute[][] = { "mute" }
   for(new i; i < sizeof(CMDS_Mute); i++) {
     register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Mute", ADMIN_ALL, .FlagManager = false)
@@ -63,7 +56,7 @@ public ClCmd_Mute(const id) {
   }
 
   if(get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
-    client_print_color(id, print_team_default, "%s %L", ca_mute_prefix, id, "Mute_NotEnoughPlayers")
+    client_print_color(id, print_team_default, "%L %L", id, "Mute_prefix", id, "Mute_NotEnoughPlayers")
     return PLUGIN_HANDLED
   }
 
@@ -153,7 +146,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   new Float: gametime = get_gametime()
   if(g_nextUse[id] > gametime) {
-    client_print_color(id, print_team_red, "%s %L", ca_mute_prefix, id, "Mute_UseTooOften")
+    client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_UseTooOften")
 
     menu_destroy(menu)
     MenuShow_PlayersList(id)
@@ -166,7 +159,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   if(userID == ITEM_MUTE_ALL) {
     g_globalMute[id] ^= true
 
-    client_print_color(0, print_team_default, "%s \3%n\1 %L ", ca_mute_prefix,
+    client_print_color(0, print_team_default, "%L \3%n\1 %L ", id, "Mute_prefix",
       id, LANG_PLAYER, g_globalMute[id] ? "Mute_PlayerNowMutedAll" : "Mute_PlayerNowUnmutedAll"
     )
 
@@ -179,7 +172,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
   if(player == 0) {
-    client_print_color(id, print_team_red, "%s %L", ca_mute_prefix, id, "Mute_PlayerNotConnected")
+    client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_PlayerNotConnected")
 
     menu_destroy(menu)
     MenuShow_PlayersList(id)
@@ -187,11 +180,11 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   }
 
   g_playersMute[id][player] ^= true
-  client_print_color(id, print_team_default, "%s %L \3%n\1", ca_mute_prefix,
+  client_print_color(id, print_team_default, "%L %L \3%n\1", id, "Mute_prefix",
     id, g_playersMute[id][player] ? "Mute_YouMutePlayer" : "Mute_YouUnmutePlayer", player
   )
 
-  client_print_color(player, print_team_default, "%s \3%n\1 %L ", ca_mute_prefix,
+  client_print_color(player, print_team_default, "%L \3%n\1 %L ", id, "Mute_prefix",
     id, player, g_playersMute[id][player] ? "Mute_PlayerNowMutedYou" : "Mute_PlayerNowUnmutedYou"
   )
 
