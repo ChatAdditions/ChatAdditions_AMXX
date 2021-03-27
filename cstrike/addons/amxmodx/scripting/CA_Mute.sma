@@ -44,7 +44,7 @@ public plugin_init() {
     register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Mute", ADMIN_ALL, .FlagManager = false)
   }
 
-  AutoExecConfig(.name = "CA_Mute")
+  AutoExecConfig(true, "CA_Mute", "ChatAdditions")
 
   CA_Log(logLevel_Debug, "[CA]: Mute initialized!")
 }

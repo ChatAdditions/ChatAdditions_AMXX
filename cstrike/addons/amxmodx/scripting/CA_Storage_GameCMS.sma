@@ -46,7 +46,7 @@ public plugin_init() {
   }
 
   Register_CVars()
-  AutoExecConfig(true, "CA_Storage_GameCMS")
+  AutoExecConfig(true, "CA_Storage_GameCMS", "ChatAdditions")
 
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
 }

@@ -37,7 +37,7 @@ public plugin_init() {
 
   Register_CVars()
 
-  AutoExecConfig(true, "CA_Addon_DeathMute")
+  AutoExecConfig(true, "CA_Addon_DeathMute", "ChatAdditions")
 
   RegisterHookChain(RG_CBasePlayer_Killed, "CBasePlayer_Killed", .post = true)
   RegisterHookChain(RG_CSGameRules_PlayerSpawn, "CBasePlayer_Spawn", .post = true)
