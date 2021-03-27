@@ -43,7 +43,7 @@ public plugin_init() {
   }
 
   Register_CVars()
-  AutoExecConfig(true, "CA_Storage_CSBans")
+  AutoExecConfig(true, "CA_Storage_CSBans", "ChatAdditions")
 
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
 }

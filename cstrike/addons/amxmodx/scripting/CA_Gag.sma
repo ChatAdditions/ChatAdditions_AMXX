@@ -1336,7 +1336,7 @@ static LoadConfig() {
     g_gagReasonsTemplates_size = 0
   }
 
-  AutoExecConfig(.name = "CA_Gag")
+  AutoExecConfig(true, "CA_Gag", "ChatAdditions")
 
   new configsDir[PLATFORM_MAX_PATH]
   get_configsdir(configsDir, charsmax(configsDir))

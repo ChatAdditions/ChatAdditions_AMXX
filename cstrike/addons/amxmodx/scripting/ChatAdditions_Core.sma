@@ -75,7 +75,7 @@ public plugin_init() {
   g_fwdClientVoice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
   g_fwdClientChangeName = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
 
-  AutoExecConfig(.name = "ChatAdditions")
+  AutoExecConfig(true, "ChatAdditions_core", "ChatAdditions")
 
   CA_Log(logLevel_Debug, "Chat Additions: Core initialized!")
 }
