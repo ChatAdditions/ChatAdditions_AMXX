@@ -188,8 +188,8 @@ public CA_Client_Voice(const listener, const sender) {
     return CA_CONTINUE
   }
 
-  new bool: listenerAlive = is_user_alive(listener)
-  new bool: senderAlive = is_user_alive(sender)
+  new bool: listenerAlive = bool:is_user_alive(listener)
+  new bool: senderAlive = bool:is_user_alive(sender)
 
   if(!g_canSpeakWithAlive[sender] && !senderAlive && listenerAlive) {
     return CA_SUPERCEDE
