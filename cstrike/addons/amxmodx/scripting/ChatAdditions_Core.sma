@@ -48,7 +48,7 @@ public plugin_init() {
   GetLogsFilePath(g_logsPath, .dir = LOG_FOLDER)
 
   bind_pcvar_num(create_cvar("ca_log_type", "1",
-      .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = log to plugins folder (logs/%s/L*.log)", LOG_FOLDER),
+      .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER),
       .has_min = true, .min_val = 0.0,
       .has_max = true, .max_val = float(_LogToDir)
     ),
