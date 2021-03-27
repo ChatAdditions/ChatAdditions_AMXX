@@ -14,7 +14,7 @@ enum logType_s {
 
 new logType_s: ca_log_type,
   logLevel_s: ca_log_level = logLevel_Debug,
-  g_logsFile[PLATFORM_MAX_PATH]
+  g_logsPath[PLATFORM_MAX_PATH]
 
 new const LOG_FOLDER[] = "ChatAdditions"
 
@@ -45,7 +45,7 @@ public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
   create_cvar("ChatAdditions_version", PluginVersion, (FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED))
 
-  GetLogsFilePath(g_logsFile, .dir = LOG_FOLDER)
+  GetLogsFilePath(g_logsPath, .dir = LOG_FOLDER)
 
   bind_pcvar_num(create_cvar("ca_log_type", "1",
       .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = log to plugins folder (logs/%s/L*.log)", LOG_FOLDER),
@@ -162,8 +162,25 @@ public bool: native_CA_Log(const plugin_id, const argc) {
 
   new msg[2048]; vdformat(msg, charsmax(msg), arg_msg, arg_format)
 
+  new pluginName[32]
+  get_plugin(plugin_id, pluginName, charsmax(pluginName))
+
+  replace(pluginName, charsmax(pluginName), ".amxx", "")
+
+  new logsPath[PLATFORM_MAX_PATH]
+  formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
+
+  if(!dir_exists(logsPath))
+    mkdir(logsPath)
+
+  new year, month, day
+  date(year, month, day)
+
+  new logsFile[PLATFORM_MAX_PATH];
+  formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
+
   switch(ca_log_type) {
-    case _LogToDir: log_to_file(g_logsFile, msg)
+    case _LogToDir: log_to_file(logsFile, msg)
     case _Default: log_amx(msg)
   }
 
@@ -190,11 +207,6 @@ static GetLogsFilePath(buffer[], len = PLATFORM_MAX_PATH, const dir[] = "ChatAdd
   if(!dir_exists(buffer) && mkdir(buffer) == -1) {
     set_fail_state("[Core API] Can't create folder! (%s)", buffer)
   }
-
-  new year, month, day
-  date(year, month, day)
-
-  strcat(buffer, fmt("/L%i%02i%02i.log", year, month, day), len)
 }
 
 static bool: CVoiceGameMgr__PlayerHasBlockedPlayer(const receiver, const sender) {
