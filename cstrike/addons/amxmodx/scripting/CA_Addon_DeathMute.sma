@@ -54,9 +54,11 @@ Register_CVars() {
   )
 
   bind_pcvar_num(create_cvar("ca_deathmute_dead_hear_alive", "1",
-      .description = "Death mute mode \n\
+      .description = "Death mute mode\n\
         0 - alive hear only alive, dead hear all\n\
-        1 - alive hear only alive, dead hear only dead"
+        1 - alive hear only alive, dead hear only dead",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = 1.0
     ), ca_deathmute_dead_hear_alive
   )
 
