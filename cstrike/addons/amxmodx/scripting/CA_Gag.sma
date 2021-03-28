@@ -97,6 +97,9 @@ public plugin_init() {
   register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh), .FlagManager = false)
   register_clcmd("say", "ClCmd_Say", (accessFlags | accessFlagsHigh), .FlagManager = false)
 
+  register_clcmd("amx_tsay", "ClCmd_adminSay", ADMIN_ALL)
+  register_clcmd("amx_csay", "ClCmd_adminSay", ADMIN_ALL)
+
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 
   Register_Forwards()
@@ -1254,6 +1257,18 @@ public CA_Client_ChangeName(const id, const newName[]) {
   if(!hasBlock) {
     return CA_CONTINUE
   }
+
+  return CA_SUPERCEDE
+}
+
+public ClCmd_adminSay(const id) {
+  new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
+  if(!hasBlock) {
+    return CA_CONTINUE
+  }
+
+  UTIL_SendAudio(id, ca_gag_sound_error)
+  Message_ChatBlocked(id)
 
   return CA_SUPERCEDE
 }
