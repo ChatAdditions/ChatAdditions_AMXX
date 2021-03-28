@@ -1,19 +1,19 @@
 [ru]
 DeathMute_ChatMessage = У Вас есть ^3%.0f сек^1, чтобы дать информацию тиммейтам, далее живые Вас ^3не услышат^1.
 DeathMute_YouMuted = Живые игроки Вас ^3не слышат^1.
-DeathMute_prefix = [^2Death mute^1]
+DeathMute_prefix = [^3Death mute^1]
 
 [en]
 DeathMute_ChatMessage = You have ^3%.0f seconds^1 to give information to your teammates, then the living ^3will not hear you^1.
 DeathMute_YouMuted =  Live players ^3can't hear you^1.
-DeathMute_prefix = [^2Death mute^1]
+DeathMute_prefix = [^3Death mute^1]
 
 [es]
 DeathMute_ChatMessage = Tienes ^3%.0f segundos^1, para comunicarte con el equipo, después de eso tu equipo no ^3te oirá más^1.
 DeathMute_YouMuted = Jugadores vivos ^3no pueden oírte^1.
-DeathMute_prefix = [^2Death mute^1]
+DeathMute_prefix = [^3Death mute^1]
 
 [de]
 DeathMute_ChatMessage = ^3%.0f Sekunden^1 für die Team-Kommunikation, anschliessend kann Dich ^3niemand mehr hören^1.
 DeathMute_YouMuted = Lebende Spieler können Dich ^3nicht hören^1.
-DeathMute_prefix = [^2Death mute^1]
+DeathMute_prefix = [^3Death mute^1]
