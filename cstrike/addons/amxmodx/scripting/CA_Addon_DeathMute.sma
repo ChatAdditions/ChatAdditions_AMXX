@@ -15,7 +15,8 @@ new Float: ca_deathmute_time,
   Float: ca_deathmute_notify_hud_y,
   ca_deathmute_notify_hud_r,
   ca_deathmute_notify_hud_g,
-  ca_deathmute_notify_hud_b
+  ca_deathmute_notify_hud_b,
+  ca_deathmute_immunity_flags[16]
 
 enum NotifyType_s: {
   notify_Disabled,
@@ -53,9 +54,11 @@ Register_CVars() {
   )
 
   bind_pcvar_num(create_cvar("ca_deathmute_dead_hear_alive", "1",
-      .description = "Death mute mode \n\
+      .description = "Death mute mode\n\
         0 - alive hear only alive, dead hear all\n\
-        1 - alive hear only alive, dead hear only dead"
+        1 - alive hear only alive, dead hear only dead",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = 1.0
     ), ca_deathmute_dead_hear_alive
   )
 
@@ -109,6 +112,12 @@ Register_CVars() {
       .has_max = true, .max_val = 255.0
     ), ca_deathmute_notify_hud_b
   )
+
+  bind_pcvar_string(create_cvar("ca_deathmute_immunity_flags", "a",
+      .description = "User immunity flag"
+    ),
+    ca_deathmute_immunity_flags, charsmax(ca_deathmute_immunity_flags)
+  )
 }
 
 public client_disconnected(id) {
@@ -127,6 +136,10 @@ public CBasePlayer_Spawn(const id) {
 
 public CBasePlayer_Killed(const id, const attacker) {
   if(ca_deathmute_time <= 0.0) {
+    return
+  }
+
+  if(read_flags(ca_deathmute_immunity_flags) & get_user_flags(id)) {
     return
   }
 
