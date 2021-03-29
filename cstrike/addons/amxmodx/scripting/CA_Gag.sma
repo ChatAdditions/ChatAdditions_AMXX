@@ -31,7 +31,7 @@ new ca_gag_times[64],
   ca_gag_remove_only_own_gag,
   ca_gag_sound_ok[128],
   ca_gag_sound_error[128],
-  bool: ca_gag_block_nickname_change
+  bool: ca_gag_block_nickname_change,
   bool: ca_gag_block_admin_chat
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
