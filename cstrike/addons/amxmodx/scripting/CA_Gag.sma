@@ -32,6 +32,7 @@ new ca_gag_times[64],
   ca_gag_sound_ok[128],
   ca_gag_sound_error[128],
   bool: ca_gag_block_nickname_change
+  bool: ca_gag_block_admin_chat
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
@@ -193,6 +194,13 @@ Register_CVars() {
         0 = no restrictions"
     ),
     ca_gag_block_nickname_change
+  )
+
+  bind_pcvar_num(create_cvar("ca_gag_block_admin_chat", "1",
+      .description = "Also block adminchat if admin gagged\n \
+        0 = no restrictions"
+    ),
+    ca_gag_block_admin_chat
   )
 }
 
@@ -1270,7 +1278,7 @@ public CA_Client_ChangeName(const id, const newName[]) {
 
 public ClCmd_adminSay(const id) {
   new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
-  if(!hasBlock) {
+  if(!hasBlock || !ca_gag_block_admin_chat) {
     return CA_CONTINUE
   }
 
