@@ -44,6 +44,13 @@ new g_fwd_gag_setted,
   g_fwd_gag_removed,
   g_ret
 
+new const g_adminChatCmds[][] = {
+  "amx_say", "amx_asay", "amx_chat", "amx_psay",
+  "amx_teamsay", "amx_bsay", "amx_bsay2", "amx_csay",
+  "amx_csay2", "amx_rsay", "amx_rsay2", "amx_tsay",
+  "amx_tsay2"
+}
+
 public stock const PluginName[] = "CA: Gag"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
@@ -97,8 +104,8 @@ public plugin_init() {
   register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh), .FlagManager = false)
   register_clcmd("say", "ClCmd_Say", (accessFlags | accessFlagsHigh), .FlagManager = false)
 
-  register_clcmd("amx_tsay", "ClCmd_adminSay", ADMIN_ALL)
-  register_clcmd("amx_csay", "ClCmd_adminSay", ADMIN_ALL)
+  for(new i; i < sizeof g_adminChatCmds; i++)
+    register_clcmd(g_adminChatCmds[i], "ClCmd_adminSay", ADMIN_CHAT);
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 
