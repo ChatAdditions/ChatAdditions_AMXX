@@ -41,29 +41,21 @@ public stock const PluginAuthor[] = "Sergey Shorokhov"
 public stock const PluginURL[] = "https://Dev-CS.ru/"
 public stock const PluginDescription[] = "A core plugin for control different types of chat."
 
-public plugin_init() {
+public plugin_precache() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
   create_cvar("ChatAdditions_version", PluginVersion, (FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED))
 
   GetLogsFilePath(g_logsPath, .dir = LOG_FOLDER)
 
-  bind_pcvar_num(create_cvar("ca_log_type", "1",
-      .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER),
-      .has_min = true, .min_val = 0.0,
-      .has_max = true, .max_val = float(_LogToDir)
-    ),
-    ca_log_type
-  )
-  bind_pcvar_num(create_cvar("ca_log_level", "3",
-      .description = "Log level\n 0 = disable logs\n 1 = add info messages logs\n 2 = add warinigs info\n 3 = add debug messages",
-      .has_min = true, .min_val = 0.0,
-      .has_max = true, .max_val = float(logLevel_Debug)
-    ),
-    ca_log_level
-  )
+  Register_CVars()
 
+  AutoExecConfig(true, "ChatAdditions_core", "ChatAdditions")
+}
+
+public plugin_init() {
   register_clcmd("say", "ClCmd_Say", ADMIN_ALL)
   register_clcmd("say_team", "ClCmd_SayTeam", ADMIN_ALL)
+
   RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer, "CSGameRules_CanPlayerHearPlayer", .post = false)
   RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName, "CBasePlayer_SetClientUserInfoName", .post = false)
 
@@ -75,8 +67,6 @@ public plugin_init() {
   g_fwdClientVoice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
   g_fwdClientChangeName = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
 
-  AutoExecConfig(true, "ChatAdditions_core", "ChatAdditions")
-
   CA_Log(logLevel_Debug, "Chat Additions: Core initialized!")
 }
 
@@ -84,6 +74,24 @@ public plugin_end() {
   DestroyForward(g_fwdClientSay)
   DestroyForward(g_fwdClientSayTeam)
   DestroyForward(g_fwdClientVoice)
+}
+
+Register_CVars() {
+  bind_pcvar_num(create_cvar("ca_log_type", "1",
+      .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER),
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = float(_LogToDir)
+    ),
+    ca_log_type
+  )
+
+  bind_pcvar_num(create_cvar("ca_log_level", "3",
+      .description = "Log level\n 0 = disable logs\n 1 = add info messages logs\n 2 = add warinigs info\n 3 = add debug messages",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = float(logLevel_Debug)
+    ),
+    ca_log_level
+  )
 }
 
 public plugin_natives() {
@@ -169,6 +177,8 @@ public bool: native_CA_Log(const plugin_id, const argc) {
 
   new logsPath[PLATFORM_MAX_PATH]
   formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
+
+  log_amx(">>> LOGS PATH: %s", logsPath)
 
   if(!dir_exists(logsPath))
     mkdir(logsPath)
