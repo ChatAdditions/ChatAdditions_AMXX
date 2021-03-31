@@ -26,6 +26,8 @@ enum NotifyType_s: {
 
 new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1] = { false, ... }
 
+new g_syncHudOj
+
 public stock const PluginName[] = "CA Addon: Death mute"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
@@ -42,6 +44,8 @@ public plugin_init() {
 
   RegisterHookChain(RG_CBasePlayer_Killed, "CBasePlayer_Killed", .post = true)
   RegisterHookChain(RG_CSGameRules_PlayerSpawn, "CBasePlayer_Spawn", .post = true)
+
+  g_syncHudOj = CreateHudSyncObj()
 }
 
 Register_CVars() {
@@ -145,25 +149,29 @@ public CBasePlayer_Killed(const id, const attacker) {
 
   set_task_ex(ca_deathmute_time, "DisableSpeakWithAlive", .id = id)
 
-  if(ca_deathmute_notify_type == notify_Disabled) {
-    return
-  }
+  switch(ca_deathmute_notify_type) {
+    case notify_Disabled: return
 
-  if(ca_deathmute_notify_type == notify_Chat) {
-    client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_ChatMessage", ca_deathmute_time)
-  }
+    case notify_Chat: client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_ChatMessage", ca_deathmute_time)
 
-  if(ca_deathmute_notify_type == notify_HUD) {
-    set_hudmessage(
-      ca_deathmute_notify_hud_r,
-      ca_deathmute_notify_hud_g,
-      ca_deathmute_notify_hud_b,
-      ca_deathmute_notify_hud_x,
-      ca_deathmute_notify_hud_y,
-      .fadeouttime = 0.0,
-      .holdtime = ca_deathmute_time - 1.0
-    )
-    show_hudmessage(id, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+    case notify_HUD: {
+      set_hudmessage(
+        ca_deathmute_notify_hud_r,
+        ca_deathmute_notify_hud_g,
+        ca_deathmute_notify_hud_b,
+        ca_deathmute_notify_hud_x,
+        ca_deathmute_notify_hud_y,
+        .fadeouttime = 0.0,
+        .holdtime = ca_deathmute_time - 1.0
+      )
+
+      static clearedMessage[256]
+
+      formatex(clearedMessage, charsmax(clearedMessage), "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+      ReplaceColors(clearedMessage, charsmax(clearedMessage))
+
+      ShowSyncHudMsg(id, g_syncHudOj, clearedMessage)
+    }
   }
 
   if(ca_deathmute_notify_show_progressbar) {
@@ -174,25 +182,27 @@ public CBasePlayer_Killed(const id, const attacker) {
 public DisableSpeakWithAlive(const id) {
   g_canSpeakWithAlive[id] = false
 
-  if(ca_deathmute_notify_type == notify_Disabled) {
-    return
-  }
+  switch(ca_deathmute_notify_type) {
+    case notify_Chat: client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_YouMuted")
 
-  if(ca_deathmute_notify_type == notify_Chat) {
-    client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_YouMuted")
-  }
+    case notify_HUD: {
+      set_hudmessage(
+        ca_deathmute_notify_hud_r,
+        ca_deathmute_notify_hud_g,
+        ca_deathmute_notify_hud_b,
+        ca_deathmute_notify_hud_x,
+        ca_deathmute_notify_hud_y,
+        .fadeouttime = 0.0,
+        .holdtime = ca_deathmute_time - 1.0
+      )
 
-  if(ca_deathmute_notify_type == notify_HUD) {
-    set_hudmessage(
-      ca_deathmute_notify_hud_r,
-      ca_deathmute_notify_hud_g,
-      ca_deathmute_notify_hud_b,
-      ca_deathmute_notify_hud_x,
-      ca_deathmute_notify_hud_y,
-      .fadeouttime = 0.0,
-      .holdtime = ca_deathmute_time - 1.0
-    )
-    show_hudmessage(id, "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
+      static clearedMessage[256]
+
+      formatex(clearedMessage, charsmax(clearedMessage), "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
+      ReplaceColors(clearedMessage, charsmax(clearedMessage))
+
+      ShowSyncHudMsg(id, g_syncHudOj, clearedMessage)
+    }
   }
 }
 
@@ -215,3 +225,9 @@ public CA_Client_Voice(const listener, const sender) {
   return CA_CONTINUE
 }
 
+stock ReplaceColors(text[], len)
+{
+  replace_string(text, len, "\1", "")
+  replace_string(text, len, "\3", "")
+  replace_string(text, len, "\4", "")
+}
