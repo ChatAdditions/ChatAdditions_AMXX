@@ -178,8 +178,6 @@ public bool: native_CA_Log(const plugin_id, const argc) {
   new logsPath[PLATFORM_MAX_PATH]
   formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
 
-  log_amx(">>> LOGS PATH: %s", logsPath)
-
   if(!dir_exists(logsPath))
     mkdir(logsPath)
 
