@@ -165,7 +165,12 @@ public CBasePlayer_Killed(const id, const attacker) {
         .holdtime = ca_deathmute_time - 1.0
       )
 
-      ShowSyncHudMsg(id, g_syncHudOj, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+      static clearedMessage[256]
+
+      formatex(clearedMessage, charsmax(clearedMessage), "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+      ReplaceColors(clearedMessage, charsmax(clearedMessage))
+
+      ShowSyncHudMsg(id, g_syncHudOj, clearedMessage)
     }
   }
 
@@ -191,7 +196,12 @@ public DisableSpeakWithAlive(const id) {
         .holdtime = ca_deathmute_time - 1.0
       )
 
-      ShowSyncHudMsg(id, g_syncHudOj, "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
+      static clearedMessage[256]
+
+      formatex(clearedMessage, charsmax(clearedMessage), "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
+      ReplaceColors(clearedMessage, charsmax(clearedMessage))
+
+      ShowSyncHudMsg(id, g_syncHudOj, clearedMessage)
     }
   }
 }
@@ -215,3 +225,9 @@ public CA_Client_Voice(const listener, const sender) {
   return CA_CONTINUE
 }
 
+stock ReplaceColors(text[], len)
+{
+  replace_string(text, len, "\1", "")
+  replace_string(text, len, "\3", "")
+  replace_string(text, len, "\4", "")
+}
