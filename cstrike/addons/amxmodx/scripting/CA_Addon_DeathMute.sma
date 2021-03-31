@@ -26,6 +26,8 @@ enum NotifyType_s: {
 
 new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1] = { false, ... }
 
+new g_syncHudOj
+
 public stock const PluginName[] = "CA Addon: Death mute"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
@@ -42,6 +44,8 @@ public plugin_init() {
 
   RegisterHookChain(RG_CBasePlayer_Killed, "CBasePlayer_Killed", .post = true)
   RegisterHookChain(RG_CSGameRules_PlayerSpawn, "CBasePlayer_Spawn", .post = true)
+
+  g_syncHudOj = CreateHudSyncObj()
 }
 
 Register_CVars() {
@@ -160,7 +164,8 @@ public CBasePlayer_Killed(const id, const attacker) {
         .fadeouttime = 0.0,
         .holdtime = ca_deathmute_time - 1.0
       )
-      show_hudmessage(id, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+
+      ShowSyncHudMsg(id, g_syncHudOj, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
     }
   }
 
@@ -185,7 +190,8 @@ public DisableSpeakWithAlive(const id) {
         .fadeouttime = 0.0,
         .holdtime = ca_deathmute_time - 1.0
       )
-      show_hudmessage(id, "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
+
+      ShowSyncHudMsg(id, g_syncHudOj, "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
     }
   }
 }
