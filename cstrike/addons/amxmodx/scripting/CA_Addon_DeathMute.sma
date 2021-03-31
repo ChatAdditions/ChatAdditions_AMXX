@@ -145,25 +145,23 @@ public CBasePlayer_Killed(const id, const attacker) {
 
   set_task_ex(ca_deathmute_time, "DisableSpeakWithAlive", .id = id)
 
-  if(ca_deathmute_notify_type == notify_Disabled) {
-    return
-  }
+  switch(ca_deathmute_notify_type) {
+    case notify_Disabled: return
 
-  if(ca_deathmute_notify_type == notify_Chat) {
-    client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_ChatMessage", ca_deathmute_time)
-  }
+    case notify_Chat: client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_ChatMessage", ca_deathmute_time)
 
-  if(ca_deathmute_notify_type == notify_HUD) {
-    set_hudmessage(
-      ca_deathmute_notify_hud_r,
-      ca_deathmute_notify_hud_g,
-      ca_deathmute_notify_hud_b,
-      ca_deathmute_notify_hud_x,
-      ca_deathmute_notify_hud_y,
-      .fadeouttime = 0.0,
-      .holdtime = ca_deathmute_time - 1.0
-    )
-    show_hudmessage(id, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+    case notify_HUD: {
+      set_hudmessage(
+        ca_deathmute_notify_hud_r,
+        ca_deathmute_notify_hud_g,
+        ca_deathmute_notify_hud_b,
+        ca_deathmute_notify_hud_x,
+        ca_deathmute_notify_hud_y,
+        .fadeouttime = 0.0,
+        .holdtime = ca_deathmute_time - 1.0
+      )
+      show_hudmessage(id, "%L", id, "DeathMute_ChatMessage", ca_deathmute_time)
+    }
   }
 
   if(ca_deathmute_notify_show_progressbar) {
@@ -174,25 +172,21 @@ public CBasePlayer_Killed(const id, const attacker) {
 public DisableSpeakWithAlive(const id) {
   g_canSpeakWithAlive[id] = false
 
-  if(ca_deathmute_notify_type == notify_Disabled) {
-    return
-  }
+  switch(ca_deathmute_notify_type) {
+    case notify_Chat: client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_YouMuted")
 
-  if(ca_deathmute_notify_type == notify_Chat) {
-    client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_YouMuted")
-  }
-
-  if(ca_deathmute_notify_type == notify_HUD) {
-    set_hudmessage(
-      ca_deathmute_notify_hud_r,
-      ca_deathmute_notify_hud_g,
-      ca_deathmute_notify_hud_b,
-      ca_deathmute_notify_hud_x,
-      ca_deathmute_notify_hud_y,
-      .fadeouttime = 0.0,
-      .holdtime = ca_deathmute_time - 1.0
-    )
-    show_hudmessage(id, "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
+    case notify_HUD: {
+      set_hudmessage(
+        ca_deathmute_notify_hud_r,
+        ca_deathmute_notify_hud_g,
+        ca_deathmute_notify_hud_b,
+        ca_deathmute_notify_hud_x,
+        ca_deathmute_notify_hud_y,
+        .fadeouttime = 0.0,
+        .holdtime = ca_deathmute_time - 1.0
+      )
+      show_hudmessage(id, "%L", id, "DeathMute_YouMuted", ca_deathmute_time)
+    }
   }
 }
 
