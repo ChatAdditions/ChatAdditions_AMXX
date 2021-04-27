@@ -1543,7 +1543,7 @@ static bool: Gag_Remove(const id, const target) {
       return false
     }
 
-    show_activity_ex(id, g_currentGags[target][gd_adminName], "%l", "Gag_AdminUngagPlayer", g_currentGags[target][gd_name])
+    show_activity_ex(id, fmt("%n", id), "%l", "Gag_AdminUngagPlayer", g_currentGags[target][gd_name])
 
     GagData_Reset(g_adminTempData[id])
     GagData_Reset(g_currentGags[target])
