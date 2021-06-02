@@ -357,9 +357,17 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
   ExecuteForward(g_fwd_StorageInitialized, g_ret)
 
   // Load prepared data from storage
+  new queueCounter
   for(new i, len = QueueSize(g_queueLoad); i < len; i++) {
     new authID[MAX_AUTHID_LENGTH]; QueuePopString(g_queueLoad, authID, charsmax(authID))
     Storage_Load(authID)
+
+    ++queueCounter
+  }
+
+  if(queueCounter) {
+    CA_Log(logLevel_Info, "Loaded %i queue gags from DB (slow DB connection issue)", queueCounter)
+    queueCounter = 0
   }
 
   // Save prepared data to storage
@@ -370,6 +378,13 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
       gagData[gd_reason][r_name], gagData[gd_adminName], gagData[gd_adminAuthID],
       gagData[gd_adminIP], gagData[gd_expireAt], gagData[gd_reason][r_flags]
     )
+
+    ++queueCounter
+  }
+
+  if(queueCounter) {
+    CA_Log(logLevel_Info, "Saved %i queue gags to DB (slow DB connection issue)", queueCounter)
+    queueCounter = 0
   }
 }
 
