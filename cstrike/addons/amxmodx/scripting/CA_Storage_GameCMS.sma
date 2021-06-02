@@ -23,7 +23,8 @@ const MAX_REASON_LENGTH = 256;
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
-new Queue: g_queueLoad = Invalid_Queue
+new Queue: g_queueLoad = Invalid_Queue,
+  Queue: g_queueSave = Invalid_Queue
 
 new g_serverID = -1
 
@@ -49,6 +50,7 @@ public plugin_init() {
   AutoExecConfig(true, "CA_Storage_GameCMS", "ChatAdditions")
 
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
+  g_queueSave = QueueCreate(gagData_s)
 }
 public OnConfigsExecuted() {
   g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname)
@@ -62,6 +64,7 @@ public plugin_end() {
   }
 
   QueueDestroy(g_queueLoad)
+  QueueDestroy(g_queueSave)
 }
 public plugin_natives() {
   RegisterNatives()
@@ -134,6 +137,27 @@ public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], 
 Storage_Save(const name[], const authID[], const IP[],
   const reason[], const adminName[], const adminAuthID[],
   const adminIP[], const expireAt, const flags) {
+
+  if(!g_storageInitialized) {
+    new gagData[gagData_s]; {
+      copy(gagData[gd_name], charsmax(gagData[gd_name]), name)
+      copy(gagData[gd_authID], charsmax(gagData[gd_authID]), authID)
+      copy(gagData[gd_IP], charsmax(gagData[gd_IP]), IP)
+
+      copy(gagData[gd_adminName], charsmax(gagData[gd_adminName]), adminName)
+      copy(gagData[gd_adminAuthID], charsmax(gagData[gd_adminAuthID]), adminAuthID)
+      copy(gagData[gd_adminIP], charsmax(gagData[gd_adminIP]), adminIP)
+
+      copy(gagData[gd_reason][r_name], charsmax(gagData[r_name]), reason)
+      gagData[gd_reason][r_flags] = gag_flags_s: flags
+
+      gagData[gd_expireAt] = expireAt
+    }
+
+    QueuePushArray(g_queueSave, gagData)
+
+    return
+  }
 
   #pragma unused adminIP, adminAuthID, IP
   new name_safe[MAX_NAME_LENGTH * 2];
@@ -332,9 +356,20 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
   g_storageInitialized = true
   ExecuteForward(g_fwd_StorageInitialized, g_ret)
 
+  // Load prepared data from storage
   for(new i, len = QueueSize(g_queueLoad); i < len; i++) {
     new authID[MAX_AUTHID_LENGTH]; QueuePopString(g_queueLoad, authID, charsmax(authID))
     Storage_Load(authID)
+  }
+
+  // Save prepared data to storage
+  for(new i, len = QueueSize(g_queueSave); i < len; i++) {
+    new gagData[gagData_s]; QueuePopArray(g_queueSave, gagData, sizeof(gagData))
+
+    Storage_Save(gagData[gd_name], gagData[gd_authID], gagData[gd_IP],
+      gagData[gd_reason][r_name], gagData[gd_adminName], gagData[gd_adminAuthID],
+      gagData[gd_adminIP], gagData[gd_expireAt], gagData[gd_reason][r_flags]
+    )
   }
 }
 
