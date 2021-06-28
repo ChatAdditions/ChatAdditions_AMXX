@@ -198,7 +198,7 @@ native bool: ca_remove_user_gag(const index);
  * @param adminAuthID   Admin authID
  * @param adminIP       Admin IP
  * @param reason        Reason
- * @param time          Time (in minutes)
+ * @param time          Time (in seconds)
  * @param flags         Flags (chat, teamChat, voice)
  * @param expireAt      Time when gag expire
  *
@@ -215,7 +215,7 @@ forward CA_gag_setted(
  *
  * @param target    Target index
  * @param target    Reason
- * @param minutes   Time (in minutes)
+ * @param minutes   Time (in seconds)
  * @param flags     Flags (chat, teamChat, voice)
  *
  * @return              Return CA_SUPERCEDE for prevent Gag remove.
