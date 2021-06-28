@@ -187,6 +187,11 @@ native bool: ca_has_user_gag(const index);
  */
 native bool: ca_remove_user_gag(const index);
 
+forward CA_gag_setted(
+  const target, name[], authID[], IP[],
+  adminName[], adminAuthID[], adminIP[],
+  reason[], time, gag_flags_s: flags,
+  expireAt);
 
 forward CA_gag_setted(const target, reason[], minutes, gag_flags_s: flags);
 forward CA_gag_removed(const target, reason[], minutes, gag_flags_s: flags);

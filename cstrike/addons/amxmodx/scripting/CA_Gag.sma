@@ -1508,9 +1508,19 @@ static bool: Gag_Save(const id, const target, const time, const flags, const exp
 
   ExecuteForward(g_fwd_gag_setted, g_ret,
     target,
+    gag[gd_name],
+    gag[gd_authID],
+    gag[gd_IP],
+
+    gag[gd_adminName],
+    gag[gd_adminAuthID],
+    gag[gd_adminIP],
+
     gag[gd_reason][r_name],
     gag[gd_reason][r_time],
-    gag[gd_reason][r_flags]
+    gag[gd_reason][r_flags],
+
+    gag[gd_expireAt]
   )
 
   if(g_ret == CA_SUPERCEDE) {
@@ -1566,7 +1576,12 @@ static Gag_Expired(const id) {
 
 
 Register_Forwards() {
-  g_fwd_gag_setted = CreateMultiForward("CA_gag_setted", ET_STOP, FP_CELL, FP_STRING, FP_CELL, FP_CELL)
+  g_fwd_gag_setted = CreateMultiForward("CA_gag_setted", ET_STOP,
+    FP_CELL, FP_STRING, FP_STRING, FP_STRING,
+    FP_STRING, FP_STRING, FP_STRING,
+    FP_STRING, FP_CELL, FP_CELL,
+    FP_CELL
+  )
   g_fwd_gag_removed = CreateMultiForward("CA_gag_removed", ET_STOP, FP_CELL, FP_STRING, FP_CELL, FP_CELL)
 }
 
