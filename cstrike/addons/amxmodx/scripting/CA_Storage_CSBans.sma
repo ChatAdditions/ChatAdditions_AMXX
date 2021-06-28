@@ -5,6 +5,7 @@
 
 #include <ChatAdditions>
 #include <CA_StorageAPI_endpoint>
+#include <CA_GAG_API>
 
 #pragma ctrlchar '\'
 #pragma dynamic 131072
