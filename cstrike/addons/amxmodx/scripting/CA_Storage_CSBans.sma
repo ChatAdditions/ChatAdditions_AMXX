@@ -330,6 +330,14 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
 }
 
 Storage_Remove(const authID[]) {
+  if(g_storageInitialized || g_tuple == Empty_Handle) {
+    CA_Log(logLevel_Warning, "Storage_Remove(): Storage connection not initialized. Query not executed. (g_storageInitialized=%i, g_tuple=%i)",
+      g_storageInitialized, g_tuple
+    )
+
+    return
+  }
+
   formatex(g_query, charsmax(g_query), "DELETE FROM %s ", SQL_TBL_GAGS); {
     strcat(g_query, fmt("WHERE (authid = '%s')", authID), charsmax(g_query))
   }
