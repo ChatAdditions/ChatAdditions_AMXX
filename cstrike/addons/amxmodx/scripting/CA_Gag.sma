@@ -397,11 +397,21 @@ static MenuShow_SelectReason(const id) {
       new buffer[2048]
       formatex(buffer, charsmax(buffer), reason[r_name])
 
+      new bool: reasonHasTime, bool: reasonHasFlags
+
       if(reason[r_time] > 0) {
-        strcat(buffer, fmt(" (\\y%s", Get_TimeString_seconds(id, reason[r_time])), charsmax(buffer))
+        reasonHasTime = true
       }
 
       if(reason[r_flags] != gagFlag_Removed) {
+        reasonHasFlags = true
+      }
+
+      if(reasonHasTime) {
+        strcat(buffer, fmt(" (\\y%s", Get_TimeString_seconds(id, reason[r_time])), charsmax(buffer))
+      }
+
+      if(reasonHasFlags) {
         strcat(buffer, fmt(", %s", bits_to_flags(reason[r_flags])), charsmax(buffer))
       }
 
