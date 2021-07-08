@@ -412,7 +412,7 @@ static MenuShow_SelectReason(const id) {
       }
 
       if(reasonHasFlags) {
-        strcat(buffer, fmt(", %s", bits_to_flags(reason[r_flags])), charsmax(buffer))
+        strcat(buffer, fmt("%s%s", reasonHasTime ? ", " : " \\y(", bits_to_flags(reason[r_flags])), charsmax(buffer))
       }
 
       strcat(buffer, "\\w)", charsmax(buffer))
