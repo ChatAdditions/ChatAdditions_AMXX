@@ -415,7 +415,10 @@ static MenuShow_SelectReason(const id) {
         strcat(buffer, fmt("%s%s", reasonHasTime ? ", " : " \\y(", bits_to_flags(reason[r_flags])), charsmax(buffer))
       }
 
-      strcat(buffer, "\\w)", charsmax(buffer))
+      if(reasonHasTime || reasonHasFlags) {
+        strcat(buffer, "\\w)", charsmax(buffer))
+      }
+
       menu_additem(menu, buffer,  fmt("%i", i))
     }
   } else {
