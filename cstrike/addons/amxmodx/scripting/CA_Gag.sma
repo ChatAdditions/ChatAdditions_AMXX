@@ -401,7 +401,7 @@ static MenuShow_SelectReason(const id) {
       new bool: reasonHasFlags = (reason[r_flags] != gagFlag_Removed)
 
       if(reasonHasTime || reasonHasFlags) {
-        strcat(buffer, " \\y($time$flags)\\w", charsmax(buffer))
+        strcat(buffer, " (\\y$time$flags\\w)", charsmax(buffer))
       }
 
       replace_stringex(buffer, charsmax(buffer), "$time",
@@ -409,7 +409,7 @@ static MenuShow_SelectReason(const id) {
       )
 
       replace_stringex(buffer, charsmax(buffer), "$flags",
-        reasonHasFlags ? fmt(", %s", bits_to_flags(reason[r_flags])) : ""
+        reasonHasFlags ? fmt("%s%s", (reasonHasTime && reasonHasFlags) ? ", " : "", bits_to_flags(reason[r_flags])) : ""
       )
 
       menu_additem(menu, buffer,  fmt("%i", i))
