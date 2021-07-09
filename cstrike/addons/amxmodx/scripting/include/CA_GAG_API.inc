@@ -187,6 +187,37 @@ native bool: ca_has_user_gag(const index);
  */
 native bool: ca_remove_user_gag(const index);
 
+/**
+ * Called on Gag save.
+ *
+ * @param target        Targed index
+ * @param name          Targed name
+ * @param authID        Targed AuthID
+ * @param IP            Targed IP
+ * @param adminName     Admin name
+ * @param adminAuthID   Admin authID
+ * @param adminIP       Admin IP
+ * @param reason        Reason
+ * @param time          Time (in seconds)
+ * @param flags         Flags (chat, teamChat, voice)
+ * @param expireAt      Time when gag expire
+ *
+ * @return              Return CA_SUPERCEDE for prevent Gag.
+ */
+forward CA_gag_setted(
+  const target, name[], authID[], IP[],
+  adminName[], adminAuthID[], adminIP[],
+  reason[], time, gag_flags_s: flags,
+  expireAt);
 
-forward CA_gag_setted(const target, reason[], minutes, gag_flags_s: flags);
+/**
+ * Called on gag remove action.
+ *
+ * @param target    Target index
+ * @param target    Reason
+ * @param minutes   Time (in seconds)
+ * @param flags     Flags (chat, teamChat, voice)
+ *
+ * @return              Return CA_SUPERCEDE for prevent Gag remove.
+ */
 forward CA_gag_removed(const target, reason[], minutes, gag_flags_s: flags);
