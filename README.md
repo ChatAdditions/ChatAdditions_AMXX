@@ -1,9 +1,8 @@
 <h1 align="center">
-  <br>
   <a href="https://github.com/ChatAdditions/ChatAdditions_AMXX/releases"><img src="https://user-images.githubusercontent.com/18553678/125533850-6771c07f-021f-4882-b395-7d68d2679513.png" width="500px" alt="Chat Additions"></a>
 </h1>
 
-<h4 align="center">AMXModX plugin chat control tool with rich functionality and API.</h4>
+<p align="center">AMXModX plugin chat control tool with rich functionality and API.</p>
 
 <p align="center">
   <a href="https://github.com/ChatAdditions/ChatAdditions_AMXX/releases/latest">
@@ -16,10 +15,10 @@
     <img src="https://img.shields.io/github/v/release/wopox1337/ChatsAdditions_AMXX?include_prereleases&style=flat-square&logo=github&logoColor=white"
          alt="Release">
     <a href="https://www.amxmodx.org/downloads-new.php">
-    <img src="https://img.shields.io/badge/AMXModX-%3E%3D1.9.0-blue?style=flat-square&logo=github&logoColor=white"
+    <img src="https://img.shields.io/badge/AMXModX-%3E%3D1.9.0-blue?style=flat-square"
          alt="AMXModX dependency">
     <a href="https://github.com/wopox1337/ChatsAdditions_AMXX/discussions">
-    <img src="https://img.shields.io/badge/discussions-on%20github-informational?style=flat-square&logo=twitter"
+    <img src="https://img.shields.io/badge/discussions-on%20github-informational?style=flat-square&logo=googlechat"
          alt="Discussions">
 </p>
       
@@ -50,11 +49,16 @@ Rich API capabilities allow the system to connect any functionality (work with p
 ## Features
       
 ## Wiki
+Do you **need some help**? Check the _articles_ from the [wiki](https://github.com/ChatAdditions/ChatAdditions_AMXX/wiki).
 
 ## Contributing
+Got **something interesting** you'd like to **share**? Learn about [contributing](https://github.com/ChatAdditions/ChatAdditions_AMXX/blob/master/.github/CONTRIBUTING.md).
 
 ## Credits
 
 ## Support
+Reach out to me at one of the following places:
 
 ## License
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://github.com/ChatAdditions/ChatAdditions_AMXX/blob/master/.github/LICENSE)
+ Copyright © Sergey Shorokhov
