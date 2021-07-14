@@ -37,7 +37,7 @@ public stock const PluginName[] = "ChatAdditions: GameCMS storage"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
 public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
-public stock const PluginDescription[] = "GameCMS storage provider for ChatAdditions"
+public stock const PluginDescription[] = "GameCMS (MySQL) storage provider for ChatAdditions"
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
