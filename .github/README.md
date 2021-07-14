@@ -27,6 +27,7 @@
   <a href="#requirements">Requirements</a> •
   <a href="#installation">Installation</a> •
   <a href="#updating">Updating</a> •
+  <a href="#downloads">Downloads</a> •
   <a href="#features">Features</a> •
   <a href="#wiki">Wiki</a> •
   <a href="#contributing">Contributing</a> •
@@ -62,6 +63,10 @@ Rich API capabilities allow the system to connect any functionality (work with p
 - Restart the server (command `restart` or change the map);
 - Make sure that the versions of the plugins are up to date with the command `amxx list`.
 
+## Downloads
+- [Release builds](https://github.com/ChatAdditions/ChatAdditions_AMXX/releases)
+- [Dev builds](https://github.com/ChatAdditions/ChatAdditions_AMXX/actions/workflows/build.yml)
+      
 ## Features
       
 ## Wiki
