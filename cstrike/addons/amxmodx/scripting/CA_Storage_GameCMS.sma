@@ -93,7 +93,7 @@ Register_CVars() {
   )
 
   bind_pcvar_string(create_cvar("ca_storage_dbname", "players_gags", FCVAR_PROTECTED,
-      .description = "GameCMS MySQL database name"
+      .description = "GameCMS MySQL database name (not recommended to change)"
     ),
     ca_storage_dbname, charsmax(ca_storage_dbname)
   )
