@@ -42,18 +42,18 @@ Allows you to fully or selectively limit the player to use any chat (voice, gene
 Modular system, allows you to use only the necessary tasks capabilities, thereby saving server resources.
 Rich API capabilities allow the system to connect any functionality (work with player statistics, automation of decisions on blocking).
 
-      
-      
-      
-      
 ## Installation
 - [Download the latest](https://github.com/ChatAdditions/ChatAdditions_AMXX/releases/latest) stable version from the release section.
 - Extract the `cstrike` folder to the root folder of the HLDS server;
 - Compile all plugins (`*.sma`) from the folder `scripting/` with your preferred compiler ([`v1.9`](https://www.amxmodx.org/downloads-new.php) or [`v1.10`](https://www.amxmodx.org/downloads-new.php?branch=master))
-- Put compiled plugins (`.amxx`) into `plugins/`;
+- Put compiled plugins (`*.amxx`) into `amxmodx/plugins/` folder on the HLDS server.
 - Check if all plugins are running correctly and in the correct order with the command `amxx list`.
 
 ## Updating
+- Compile all (`*.sma`) files with the actual files from the `/scripting/include/` folder;
+- Put compiled plugins (`*.amxx`) into `amxmodx/plugins/` folder on the HLDS server;
+- Restart the server (command `restart` or change the map);
+- Make sure that the versions of the plugins are up to date with the command `amxx list`.
 
 ## Features
       
