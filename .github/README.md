@@ -87,9 +87,16 @@ Do you **need some help**? Check the _articles_ from the [wiki](https://github.c
 Got **something interesting** you'd like to **share**? Learn about [contributing](CONTRIBUTING.md).
 
 ## Credits
+I would like to thank the creators of AMXModX and ReAPI and everyone who helps me in developing and testing this system, who supports my interest.
+      
+**Thank you guys! 👍**
 
 ## Support
 Reach out to me at one of the following places:
+- Github issues;
+- Github discussions;
+- [Telegram](https://t.me/ShorokhovSergey);
+- E-Mail;
 
 ## License
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
