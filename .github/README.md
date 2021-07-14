@@ -31,9 +31,7 @@
   <a href="#features">Features</a> •
   <a href="#wiki">Wiki</a> •
   <a href="#contributing">Contributing</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#support">Support</a> •
-  <a href="#license">License</a>
+  <a href="#credits">Credits</a>
 </p>
 
 ---
