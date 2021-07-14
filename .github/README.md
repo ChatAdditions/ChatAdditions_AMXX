@@ -68,7 +68,18 @@ Rich API capabilities allow the system to connect any functionality (work with p
 - [Dev builds](https://github.com/ChatAdditions/ChatAdditions_AMXX/actions/workflows/build.yml)
       
 ## Features
-      
+- Compatibility with any chat manager;
+- No [`VoiceTranscoder`](https://github.com/WPMGPRoSToTeMa/VoiceTranscoder) or [`ReVoice`](https://github.com/s1lentq/revoice/) required;
+- Flexible system of access rights and immunities for players;
+- Modular system, rich API capabilities, and flexibility;
+- Simple, intuitive interface (UX);
+- Multi-language support;
+- Simple, user-friendly configuration;
+- `CA_Gag`: Simple, flexible templates system (reasons, times, punishment type);
+- `CA_Gag`: Support for SQLite, MySQL, CSBans, GameCMS;
+- User-friendly logging system with good customization;
+- Up-to-date support and updates.
+
 ## Wiki
 Do you **need some help**? Check the _articles_ from the [wiki](https://github.com/ChatAdditions/ChatAdditions_AMXX/wiki).
 
