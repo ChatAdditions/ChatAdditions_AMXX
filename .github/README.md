@@ -43,6 +43,9 @@ Chat Additions is a set of tools for managing voice as well as text chat, for yo
 Allows you to fully or selectively limit the player to use any chat (voice, general, team, admin).
 Modular system, allows you to use only the necessary tasks capabilities, thereby saving server resources.
 Rich API capabilities allow the system to connect any functionality (work with player statistics, automation of decisions on blocking).
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/18553678/125630814-d572260e-f64a-419b-8a61-6c30b788c188.gif" alt="Chat Additions in work"></a>
+</p>
 
 ## Requirements
 - HLDS installed;
