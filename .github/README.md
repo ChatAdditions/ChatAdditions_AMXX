@@ -24,6 +24,7 @@
       
 <p align="center">
   <a href="#about">About</a> •
+  <a href="#requirements">Requirements</a> •
   <a href="#installation">Installation</a> •
   <a href="#updating">Updating</a> •
   <a href="#features">Features</a> •
@@ -42,6 +43,12 @@ Allows you to fully or selectively limit the player to use any chat (voice, gene
 Modular system, allows you to use only the necessary tasks capabilities, thereby saving server resources.
 Rich API capabilities allow the system to connect any functionality (work with player statistics, automation of decisions on blocking).
 
+## Requirements
+- HLDS installed;
+- [ReGameDLL](https://github.com/s1lentq/ReGameDLL_CS) installed;
+- Installed AMXModX ([`v1.9`](https://www.amxmodx.org/downloads-new.php) or [`v1.10`](https://www.amxmodx.org/downloads-new.php?branch=master));
+    - Installed [ReAPI](https://github.com/s1lentq/reapi) module; 
+      
 ## Installation
 - [Download the latest](https://github.com/ChatAdditions/ChatAdditions_AMXX/releases/latest) stable version from the release section.
 - Extract the `cstrike` folder to the root folder of the HLDS server;
