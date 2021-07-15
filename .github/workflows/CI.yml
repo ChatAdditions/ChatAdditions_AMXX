@@ -46,7 +46,7 @@ jobs:
 
       - name: Setup latest AMXModX
         env:
-          AMXMODX_VERSION_MINOR: "1.9"
+          AMXMODX_VERSION_MINOR: "1.10"
         run: |
           LAST_VERSION_NAME=$( \
             curl \
