@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Parse SemVer string
+      - name: Parse SemVer string (release)
         id: semver_parser
         if: |
           github.event_name == 'release' &&
