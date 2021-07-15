@@ -57,7 +57,7 @@ Rich API capabilities allow the system to connect any functionality (work with p
 - Make sure that all plugins are running and in the correct order, using the `amxx list` command.
 
 ## Updating
-- Put new plugins (`plugins/*.amxx`) into `amxmodx/plugins/` folder on the HLDS server;
+- Put new plugins and lang-files (`plugins/*.amxx` & `data/lang/*.txt`) into `amxmodx/` folder on the HLDS server;
 - Restart the server (command `restart` or change the map);
 - Make sure that the versions of the plugins are up to date with the command `amxx list`.
 
