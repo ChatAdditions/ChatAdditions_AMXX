@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - "**.md"
+
+  pull_request:
+    types: [opened, reopened, synchronize]
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: "Build"
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.declare_sha.outputs.sha }}
+      semver: ${{ steps.declare_sha.outputs.semver }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Parse SemVer string
+        id: semver_parser
+        if: |
+          github.event_name == 'release' &&
+          github.event.action == 'published' &&
+          startsWith(github.ref, 'refs/tags/')
+        uses: booxmedialtd/ws-action-parse-semver@v1
+        with:
+          input_string: ${{ github.ref }}
+          version_extractor_regex: '\/v(.*)$'
+
+      - name: Declare SHA & package name
+        id: declare_sha
+        shell: bash
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          echo "COMMIT_SHA=${SHA}" >> $GITHUB_ENV
+          echo "::set-output name=sha::$SHA"
+          echo "::set-output name=semver::${{ steps.semver_parser.outputs.fullversion }}"
+
+      - name: Setup latest AMXModX
+        env:
+          AMXMODX_VERSION_MINOR: "1.9"
+        run: |
+          LAST_VERSION_NAME=$( \
+            curl \
+              --silent \
+              https://www.amxmodx.org/amxxdrop/$AMXMODX_VERSION_MINOR/amxmodx-latest-base-linux \
+          )
+
+          curl \
+            --remote-name \
+            --remote-header-name \
+            https://www.amxmodx.org/amxxdrop/$AMXMODX_VERSION_MINOR/$LAST_VERSION_NAME
+
+          tar xzf *.tar.gz
+
+      - name: Setup latest ReAPI includes
+        env:
+          REPO: "s1lentq/reapi"
+        run: |
+          curl \
+            --silent \
+            https://api.github.com/repos/$REPO/releases/latest | \
+            grep "browser_download_url" | \
+            grep -Eo 'https://[^\"]*' | \
+            xargs wget
+
+          7z x *.zip
+
+      - name: Clean compiler
+        run: |
+          mkdir -p compiler/compiled
+          cp -Rf addons/amxmodx/scripting/* compiler/
+          rm -rf compiler/*.sma
+          rm -rf compiler/testsuite/
+
+          rm -rf addons/
+
+      - name: Update versions for plugins (release)
+        if: |
+          github.event_name == 'release' &&
+          github.event.action == 'published' &&
+          startsWith(github.ref, 'refs/tags/')
+        env:
+          PLUGIN_VERSION: "v${{ steps.semver_parser.outputs.fullversion }}"
+        run: |
+          cd cstrike/addons/amxmodx/scripting/include/
+          sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
+
+      - name: Update versions for plugins
+        env:
+          PLUGIN_VERSION: "${{ env.COMMIT_SHA }}"
+        run: |
+          cd cstrike/addons/amxmodx/scripting/include/
+          sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
+
+      - name: Build
+        env:
+          COMPILER_PATH: "compiler"
+        run: |
+          cp -Rf cstrike/addons/amxmodx/scripting/* compiler/
+          cd compiler
+
+          for sourcefile in *.sma;
+          do
+            amxxfile="`echo $sourcefile | sed -e 's/\.sma$/.amxx/'`"
+            echo -n "Compiling $sourcefile ..."
+            ./amxxpc $sourcefile -ocompiled/$amxxfile >> temp.txt
+            echo "done"
+          done
+
+          cat temp.txt
+          rm temp.txt
+
+      - name: Move files
+        run: |
+          mkdir publish
+          mv cstrike/ publish/
+          mv compiler/compiled/ publish/cstrike/addons/amxmodx/plugins/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ChatAdditions-${{ env.COMMIT_SHA }}-dev
+          path: publish/*
+
+  publish:
+    name: "Publish"
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: |
+      github.event_name == 'release' &&
+      github.event.action == 'published' &&
+      startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ChatAdditions-${{needs.build.outputs.sha}}-dev
+
+      - name: Packaging binaries
+        id: packaging
+        run: 7z a -mm=Deflate -mfb=258 -mpass=15 -r ChatAdditions-v${{needs.build.outputs.semver}}.zip cstrike/
+
+      - name: Publish artifacts
+        uses: softprops/action-gh-release@v1
+        id: publish-job
+        if: |
+          startsWith(github.ref, 'refs/tags/') &&
+          steps.packaging.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            *.zip
