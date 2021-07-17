@@ -17,9 +17,9 @@
     <a href="https://www.amxmodx.org/downloads-new.php">
     <img src="https://img.shields.io/badge/AMXModX-%3E%3D1.9.0-blue?style=flat-square"
          alt="AMXModX dependency">
-    <a href="https://github.com/wopox1337/ChatsAdditions_AMXX/discussions">
-    <img src="https://img.shields.io/badge/discussions-on%20github-informational?style=flat-square&logo=googlechat"
-         alt="Discussions">
+    <a href="https://gitter.im/ChatAdditions/Development?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge">
+    <img src="https://img.shields.io/badge/discussions-on%20gitter-informational?style=flat-square&logo=googlechat"
+         alt="Gitter">
 </p>
       
 <p align="center">
