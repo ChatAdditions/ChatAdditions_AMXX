@@ -84,30 +84,28 @@ jobs:
           rm -rf addons/
 
       - name: Update versions for plugins (release)
+        working-directory: cstrike/addons/amxmodx/scripting/include/
         if: |
           github.event_name == 'release' &&
           github.event.action == 'published' &&
           startsWith(github.ref, 'refs/tags/')
         env:
           PLUGIN_VERSION: "v${{ steps.semver_parser.outputs.fullversion }}"
-        run: |
-          cd cstrike/addons/amxmodx/scripting/include/
-          sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
+        run: sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
 
-      - name: Update versions for plugins
+      - name: Update versions for plugins (only for artifacts builds)
+        working-directory: cstrike/addons/amxmodx/scripting/include/
         env:
           PLUGIN_VERSION: "${{ env.COMMIT_SHA }}"
-        run: |
-          cd cstrike/addons/amxmodx/scripting/include/
-          sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
+        run: sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
 
-      - name: Build
-        env:
-          COMPILER_PATH: "compiler"
+      - name: Copy src files to compiler
         run: |
           cp -Rf cstrike/addons/amxmodx/scripting/* compiler/
-          cd compiler
 
+      - name: Compile AMXX plugins
+        working-directory: compiler/
+        run: |
           for sourcefile in *.sma;
           do
             amxxfile="`echo $sourcefile | sed -e 's/\.sma$/.amxx/'`"
