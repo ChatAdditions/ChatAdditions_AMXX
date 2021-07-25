@@ -44,27 +44,13 @@ jobs:
           echo "::set-output name=sha::$SHA"
           echo "::set-output name=semver::${{ steps.semver_parser.outputs.fullversion }}"
 
-      - name: Setup latest AMXModX
-        env:
-          AMXMODX_VERSION_MINOR: "1.10"
-        run: |
-          LAST_VERSION_NAME=$( \
-            curl \
-              --silent \
-              https://www.amxmodx.org/amxxdrop/$AMXMODX_VERSION_MINOR/amxmodx-latest-base-linux \
-          )
-
-          curl \
-            --remote-name \
-            --remote-header-name \
-            https://www.amxmodx.org/amxxdrop/$AMXMODX_VERSION_MINOR/$LAST_VERSION_NAME
-
-          tar xzf *.tar.gz
-
       - name: Setup latest ReAPI includes
         env:
           REPO: "s1lentq/reapi"
         run: |
+          mkdir -p dep/reapi
+          cd dep/reapi
+
           curl \
             --silent \
             https://api.github.com/repos/$REPO/releases/latest | \
@@ -74,14 +60,7 @@ jobs:
 
           7z x *.zip
 
-      - name: Clean compiler
-        run: |
-          mkdir -p compiler/compiled
-          cp -Rf addons/amxmodx/scripting/* compiler/
-          rm -rf compiler/*.sma
-          rm -rf compiler/testsuite/
-
-          rm -rf addons/
+          echo "REAPI_INCLUDE_PATH=$(pwd)/addons/amxmodx/scripting/include" >> $GITHUB_ENV
 
       - name: Update versions for plugins (release)
         working-directory: cstrike/addons/amxmodx/scripting/include/
@@ -99,29 +78,32 @@ jobs:
           PLUGIN_VERSION: "${{ env.COMMIT_SHA }}"
         run: sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
 
-      - name: Copy src files to compiler
-        run: |
-          cp -Rf cstrike/addons/amxmodx/scripting/* compiler/
+      - name: Setup AMXXPawn Compiler
+        uses: wopox1337/setup-amxxpawn@v1
+        with:
+          version: "1.10.5428"
 
       - name: Compile AMXX plugins
-        working-directory: compiler/
+        working-directory: cstrike/addons/amxmodx/scripting/
+        env:
+          REAPI_INCLUDE: ${{env.REAPI_INCLUDE_PATH}}
         run: |
+          mkdir ../plugins/
+
           for sourcefile in *.sma;
           do
             amxxfile="`echo $sourcefile | sed -e 's/\.sma$/.amxx/'`"
-            echo -n "Compiling $sourcefile ..."
-            ./amxxpc $sourcefile -ocompiled/$amxxfile >> temp.txt
-            echo "done"
-          done
+            echo -n "Compiling $sourcefile ... "
 
-          cat temp.txt
-          rm temp.txt
+            amxxpc $sourcefile -o"../plugins/$amxxfile" \
+              -i"include" \
+              -i"$REAPI_INCLUDE"
+          done
 
       - name: Move files
         run: |
           mkdir publish
           mv cstrike/ publish/
-          mv compiler/compiled/ publish/cstrike/addons/amxmodx/plugins/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
