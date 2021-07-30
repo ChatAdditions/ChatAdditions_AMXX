@@ -2,7 +2,7 @@ name: "Verify type labels"
 
 on:
   pull_request:
-    types: [opened, labeled, unlabeled, synchronize]
+    types: [labeled, unlabeled]
 
 jobs:
   triage:
@@ -10,4 +10,4 @@ jobs:
     steps:
       - uses: zwaldowski/match-label-action@v2
         with:
-          allowed: "bug, feature, core plugin, gag plugin"
+          allowed: "bug, fix, feature, maintenance"
