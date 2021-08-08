@@ -14,6 +14,7 @@ new Float: g_nextUse[MAX_PLAYERS + 1]
 new Float: ca_mute_use_delay
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
+
 enum {
   ITEM_NOT_ENOUTH_PLAYERS = -2,
   ITEM_MUTE_ALL = -1
@@ -28,6 +29,7 @@ public stock const PluginDescription[] = "Players can choose who they can hear."
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
+
   register_dictionary("CA_Mute.txt")
   register_dictionary("common.txt")
 
@@ -40,6 +42,7 @@ public plugin_init() {
   )
 
   new const CMDS_Mute[][] = { "mute" }
+
   for(new i; i < sizeof(CMDS_Mute); i++) {
     register_trigger_clcmd(CMDS_Mute[i], "ClCmd_Mute", ADMIN_ALL, .FlagManager = false)
   }
@@ -73,6 +76,7 @@ static MenuShow_PlayersList(const id) {
   new menu = menu_create(fmt("%L", id, "Mute_MenuTitle"), "MenuHandler_PlayersList")
 
   static callback
+
   if(!callback) {
     callback = menu_makecallback("MenuCallback_PlayersList")
   }
@@ -119,6 +123,7 @@ public MenuCallback_PlayersList(const id, const menu, const item) {
   menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
 
   new userID = strtol(g_itemInfo)
+
   if(userID == ITEM_NOT_ENOUTH_PLAYERS) {
     return ITEM_DISABLED
   }
@@ -129,6 +134,7 @@ public MenuCallback_PlayersList(const id, const menu, const item) {
   }
 
   new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
+
   if(CA_PlayerHasBlockedPlayer(id, target)) {
     return ITEM_DISABLED
   }
@@ -145,6 +151,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
 
   new Float: gametime = get_gametime()
+
   if(g_nextUse[id] > gametime) {
     client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_UseTooOften")
 
@@ -156,6 +163,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   g_nextUse[id] = gametime + ca_mute_use_delay
 
   new userID = strtol(g_itemInfo)
+
   if(userID == ITEM_MUTE_ALL) {
     g_globalMute[id] ^= true
 
@@ -171,6 +179,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   }
 
   new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
+
   if(player == 0) {
     client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_PlayerNotConnected")
 
@@ -180,6 +189,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   }
 
   g_playersMute[id][player] ^= true
+
   client_print_color(id, print_team_default, "%L %L \3%n\1", id, "Mute_prefix",
     id, g_playersMute[id][player] ? "Mute_YouMutePlayer" : "Mute_YouUnmutePlayer", player
   )

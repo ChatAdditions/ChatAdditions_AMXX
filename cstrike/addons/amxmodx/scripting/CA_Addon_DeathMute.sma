@@ -24,7 +24,7 @@ enum NotifyType_s: {
   notify_HUD
 }
 
-new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1] = { false, ... }
+new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1]
 
 new g_syncHudOj
 
@@ -36,6 +36,7 @@ public stock const PluginDescription[] = "Alive players don't hear dead players 
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
+
   register_dictionary("CA_Addon_DeathMute.txt")
 
   Register_CVars()
@@ -126,6 +127,7 @@ Register_CVars() {
 
 public client_disconnected(id) {
   g_canSpeakWithAlive[id] = false
+
   if(task_exists(id)) {
     remove_task(id)
   }
@@ -133,6 +135,7 @@ public client_disconnected(id) {
 
 public CBasePlayer_Spawn(const id) {
   g_canSpeakWithAlive[id] = true
+
   if(task_exists(id)) {
     remove_task(id)
   }
