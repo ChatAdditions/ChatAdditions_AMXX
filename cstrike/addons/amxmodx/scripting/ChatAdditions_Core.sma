@@ -85,7 +85,7 @@ Register_CVars() {
     ca_log_type
   )
 
-  bind_pcvar_num(create_cvar("ca_log_level", "3",
+  bind_pcvar_num(create_cvar("ca_log_level", "1",
       .description = "Log level\n 0 = disable logs\n 1 = add info messages logs\n 2 = add warinigs info\n 3 = add debug messages",
       .has_min = true, .min_val = 0.0,
       .has_max = true, .max_val = float(logLevel_Debug)

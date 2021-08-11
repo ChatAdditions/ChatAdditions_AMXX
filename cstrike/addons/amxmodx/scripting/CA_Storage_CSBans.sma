@@ -136,7 +136,7 @@ public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], 
   }
 
   if(queueCounter) {
-    CA_Log(logLevel_Info, "Loaded %i queue gags from DB (slow DB connection issue)", queueCounter)
+    CA_Log(logLevel_Warning, "Loaded %i queue gags from DB (slow DB connection issue)", queueCounter)
     queueCounter = 0
   }
 
@@ -153,7 +153,7 @@ public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], 
   }
 
   if(queueCounter) {
-    CA_Log(logLevel_Info, "Saved %i queue gags to DB (slow DB connection issue)", queueCounter)
+    CA_Log(logLevel_Warning, "Saved %i queue gags to DB (slow DB connection issue)", queueCounter)
     queueCounter = 0
   }
 }
