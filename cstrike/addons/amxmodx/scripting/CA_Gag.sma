@@ -89,7 +89,7 @@ public plugin_precache() {
 public plugin_init() {
   set_task_ex(GAG_THINKER_FREQ, "Gags_Thinker", .flags = SetTask_Repeat)
 
-  new accessFlagsHig        = read_flags(ca_gag_access_flags_high)
+  new accessFlagsHigh       = read_flags(ca_gag_access_flags_high)
   new accessFlags           = read_flags(ca_gag_access_flags)
   new accessFlagsOwnReason  = read_flags(ca_gag_access_flags_own_reason)
   new accessFlagsOwnTime    = read_flags(ca_gag_access_flags_own_time)
