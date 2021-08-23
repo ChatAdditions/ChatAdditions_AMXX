@@ -43,6 +43,7 @@ public stock const PluginDescription[] = "A core plugin for control different ty
 
 public plugin_precache() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
+
   create_cvar("ChatAdditions_version", PluginVersion, (FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED))
 
   GetLogsFilePath(g_logsPath, .dir = LOG_FOLDER)
@@ -53,19 +54,19 @@ public plugin_precache() {
 }
 
 public plugin_init() {
-  register_clcmd("say", "ClCmd_Say", ADMIN_ALL)
-  register_clcmd("say_team", "ClCmd_SayTeam", ADMIN_ALL)
+  register_clcmd("say",       "ClCmd_Say",      ADMIN_ALL)
+  register_clcmd("say_team",  "ClCmd_SayTeam",  ADMIN_ALL)
 
-  RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer, "CSGameRules_CanPlayerHearPlayer", .post = false)
-  RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName, "CBasePlayer_SetClientUserInfoName", .post = false)
+  RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer,     "CSGameRules_CanPlayerHearPlayer",    .post = false)
+  RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName,   "CBasePlayer_SetClientUserInfoName",  .post = false)
 
-  register_clcmd("VModEnable", "ClCmd_VModEnable", ADMIN_ALL, .FlagManager = false)
-  register_clcmd("vban", "ClCmd_vban", ADMIN_ALL, .FlagManager = false)
+  register_clcmd("VModEnable",  "ClCmd_VModEnable",   ADMIN_ALL, .FlagManager = false)
+  register_clcmd("vban",        "ClCmd_vban",         ADMIN_ALL, .FlagManager = false)
 
-  g_fwdClientSay = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL)
-  g_fwdClientSayTeam = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL)
-  g_fwdClientVoice = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
-  g_fwdClientChangeName = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
+  g_fwdClientSay          = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL)
+  g_fwdClientSayTeam      = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL)
+  g_fwdClientVoice        = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
+  g_fwdClientChangeName   = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
 
   CA_Log(logLevel_Debug, "Chat Additions: Core initialized!")
 }
@@ -164,11 +165,13 @@ public bool: native_CA_Log(const plugin_id, const argc) {
   enum { arg_level = 1, arg_msg, arg_format }
 
   new logLevel_s: level = logLevel_s: get_param(arg_level)
+
   if(ca_log_level < level) {
     return false
   }
 
-  new msg[2048]; vdformat(msg, charsmax(msg), arg_msg, arg_format)
+  new msg[2048];
+  vdformat(msg, charsmax(msg), arg_msg, arg_format)
 
   new pluginName[32]
   get_plugin(plugin_id, pluginName, charsmax(pluginName))
@@ -178,8 +181,9 @@ public bool: native_CA_Log(const plugin_id, const argc) {
   new logsPath[PLATFORM_MAX_PATH]
   formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
 
-  if(!dir_exists(logsPath))
+  if(!dir_exists(logsPath)) {
     mkdir(logsPath)
+  }
 
   new year, month, day
   date(year, month, day)
@@ -188,8 +192,8 @@ public bool: native_CA_Log(const plugin_id, const argc) {
   formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
 
   switch(ca_log_type) {
-    case _LogToDir: log_to_file(logsFile, msg)
-    case _Default: log_amx(msg)
+    case _LogToDir:   log_to_file(logsFile, msg)
+    case _Default:    log_amx(msg)
   }
 
   return true
@@ -198,8 +202,9 @@ public bool: native_CA_Log(const plugin_id, const argc) {
 public bool: native_CA_PlayerHasBlockedPlayer(const plugin_id, const argc) {
   enum { arg_receiver = 1, arg_sender }
 
-  new receiver = get_param(arg_receiver)
-  new sender = get_param(arg_sender)
+  new receiver  = get_param(arg_receiver)
+  new sender    = get_param(arg_sender)
+
   if(CVoiceGameMgr__PlayerHasBlockedPlayer(receiver, sender)) {
     return true
   }

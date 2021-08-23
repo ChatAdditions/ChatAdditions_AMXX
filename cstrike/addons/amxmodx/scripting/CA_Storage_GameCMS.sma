@@ -52,12 +52,14 @@ public plugin_init() {
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
   g_queueSave = QueueCreate(gagData_s)
 }
+
 public OnConfigsExecuted() {
   g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname)
   SQL_SetCharset(g_tuple, "utf8")
 
   Storage_Create()
 }
+
 public plugin_end() {
   if(g_tuple != Empty_Handle) {
     SQL_FreeHandle(g_tuple)
@@ -66,9 +68,11 @@ public plugin_end() {
   QueueDestroy(g_queueLoad)
   QueueDestroy(g_queueSave)
 }
+
 public plugin_natives() {
   RegisterNatives()
 }
+
 public plugin_cfg() {
   RegisterForwards()
 }
@@ -124,6 +128,7 @@ Storage_Create() {
 
   SQL_ThreadQuery(g_tuple, "handle_StorageCreated", g_query)
 }
+
 public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
   if(IsSQLQueryFailed(failstate, query, error, errnum)) {
     return
@@ -199,6 +204,7 @@ Storage_Save(const name[], const authID[], const IP[],
 
   SQL_ThreadQuery(g_tuple, "handle_Saved", g_query)
 }
+
 public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
   if(IsSQLQueryFailed(failstate, query, error, errnum)) {
     return
@@ -208,6 +214,7 @@ public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Flo
     name,authid,reason,\
     admin_nick,\
     created,expired,type")
+
   strcat(g_query, fmt(" FROM %s", SQL_TBL_GAGS), charsmax(g_query))
   strcat(g_query, fmt(" WHERE bid=%i;", SQL_GetInsertId(query)), charsmax(g_query))
 
@@ -224,18 +231,18 @@ public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], siz
     res_created_at, res_expire_at, res_flags
   }
 
-  new name[MAX_NAME_LENGTH]; SQL_ReadResult(query, res_name, name, charsmax(name))
-  new authID[MAX_AUTHID_LENGTH]; SQL_ReadResult(query, res_authid, authID, charsmax(authID))
-  new IP[MAX_IP_LENGTH]; /* SQL_ReadResult(query, res_ip, IP, charsmax(IP)) */
-  new reason[MAX_REASON_LENGTH]; SQL_ReadResult(query, res_reason, reason, charsmax(reason))
+  new name[MAX_NAME_LENGTH];            SQL_ReadResult(query, res_name, name, charsmax(name))
+  new authID[MAX_AUTHID_LENGTH];        SQL_ReadResult(query, res_authid, authID, charsmax(authID))
+  new IP[MAX_IP_LENGTH];                /* SQL_ReadResult(query, res_ip, IP, charsmax(IP)) */
+  new reason[MAX_REASON_LENGTH];        SQL_ReadResult(query, res_reason, reason, charsmax(reason))
 
-  new adminName[MAX_NAME_LENGTH]; SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
-  new adminAuthID[MAX_AUTHID_LENGTH];/*  SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID)) */
-  new adminIP[MAX_IP_LENGTH]; /* SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP)) */
+  new adminName[MAX_NAME_LENGTH];       SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
+  new adminAuthID[MAX_AUTHID_LENGTH];   /*  SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID)) */
+  new adminIP[MAX_IP_LENGTH];           /* SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP)) */
 
-  new createdAt = SQL_ReadResult(query, res_created_at)
-  new expireAt = SQL_ReadResult(query, res_expire_at)
-  new flags = GCMS_FlagsTo_CAGAGFlags(SQL_ReadResult(query, res_flags))
+  new createdAt   = SQL_ReadResult(query, res_created_at)
+  new expireAt    = SQL_ReadResult(query, res_expire_at)
+  new flags       = GCMS_FlagsTo_CAGAGFlags(SQL_ReadResult(query, res_flags))
 
   CA_Log(logLevel_Debug, "Player gag saved {'%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i} (queryTime: '%.3f' sec)", \
     name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags,\
@@ -265,6 +272,7 @@ Storage_Load(const authID[]) {
 
   SQL_ThreadQuery(g_tuple, "handle_Loaded", g_query)
 }
+
 public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
   if(IsSQLQueryFailed(failstate, query, error, errnum)) {
     return
@@ -276,22 +284,23 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
   }
 
   new bool: found = (SQL_NumResults(query) != 0)
+
   if(!found) {
     return;
   }
 
-  new name[MAX_NAME_LENGTH]; SQL_ReadResult(query, res_name, name, charsmax(name))
-  new authID[MAX_AUTHID_LENGTH]; SQL_ReadResult(query, res_authid, authID, charsmax(authID))
-  new IP[MAX_IP_LENGTH]; /* SQL_ReadResult(query, res_ip, IP, charsmax(IP)) */
-  new reason[MAX_REASON_LENGTH]; SQL_ReadResult(query, res_reason, reason, charsmax(reason))
+  new name[MAX_NAME_LENGTH];            SQL_ReadResult(query, res_name, name, charsmax(name))
+  new authID[MAX_AUTHID_LENGTH];        SQL_ReadResult(query, res_authid, authID, charsmax(authID))
+  new IP[MAX_IP_LENGTH];                /* SQL_ReadResult(query, res_ip, IP, charsmax(IP)) */
+  new reason[MAX_REASON_LENGTH];        SQL_ReadResult(query, res_reason, reason, charsmax(reason))
 
-  new adminName[MAX_NAME_LENGTH]; SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
-  new adminAuthID[MAX_AUTHID_LENGTH]; /* SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID)) */
-  new adminIP[MAX_IP_LENGTH]; /* SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP)) */
+  new adminName[MAX_NAME_LENGTH];       SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
+  new adminAuthID[MAX_AUTHID_LENGTH];   /* SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID)) */
+  new adminIP[MAX_IP_LENGTH];           /* SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP)) */
 
-  new createdAt = SQL_ReadResult(query, res_created_at)
-  new expireAt = SQL_ReadResult(query, res_expire_at)
-  new flags = GCMS_FlagsTo_CAGAGFlags(SQL_ReadResult(query, res_flags))
+  new createdAt   = SQL_ReadResult(query, res_created_at)
+  new expireAt    = SQL_ReadResult(query, res_expire_at)
+  new flags       = GCMS_FlagsTo_CAGAGFlags(SQL_ReadResult(query, res_flags))
 
   CA_Log(logLevel_Debug, "Player gag loaded {'%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i} (queryTime: '%.3f' sec)", \
     name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags,\
@@ -320,6 +329,7 @@ Storage_Remove(const authID[]) {
 
   SQL_ThreadQuery(g_tuple, "handle_Removed", g_query)
 }
+
 public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
   if(IsSQLQueryFailed(failstate, query, error, errnum)) {
     return
@@ -333,8 +343,6 @@ public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, F
 }
 
 
-
-
 GameCMS_GetServerID() {
   new net_address[64]; get_cvar_string("net_address", net_address, charsmax(net_address))
   new serverAddress[2][32]; explode_string(net_address, ":", serverAddress, sizeof(serverAddress), charsmax(serverAddress[]))
@@ -345,6 +353,7 @@ GameCMS_GetServerID() {
 
   SQL_ThreadQuery(g_tuple, "handle_GetServerID", g_query)
 }
+
 public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
   if(IsSQLQueryFailed(failstate, query, error, errnum)) {
     return
@@ -352,6 +361,7 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
 
   new bool: found = bool: (SQL_NumResults(query) != 0)
   new net_address[64]; get_cvar_string("net_address", net_address, charsmax(net_address))
+
   if(!found) {
     set_fail_state("Server `%s` not found on db.", net_address)
 
@@ -366,6 +376,7 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
 
   // Load prepared data from storage
   new queueCounter
+
   for(new i, len = QueueSize(g_queueLoad); i < len; i++) {
     new authID[MAX_AUTHID_LENGTH]; QueuePopString(g_queueLoad, authID, charsmax(authID))
     Storage_Load(authID)
