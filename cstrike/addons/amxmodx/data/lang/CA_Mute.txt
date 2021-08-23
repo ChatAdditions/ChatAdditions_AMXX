@@ -85,3 +85,25 @@ Mute_PlayerNowMutedAll = Du hörst NIEMANDEN!
 Mute_PlayerNowUnmutedAll = Du hörst ALLE!
 
 Mute_prefix = [^3MUTE^1]
+
+[pl]
+Mute_MenuTitle = Menu mutowania graczy:
+Mute_MuteAll = Zmutuj wszystkich
+
+Mute_YouMutePlayer = Zmutowales
+Mute_YouUnmutePlayer = Odmutowales 
+
+Mute_NotEnoughPlayers = ^4Brak graczy, ktorych mozesz zmutowac!
+Mute_PlayerNotConnected = ^3Gracz nie jest polaczony!
+
+Mute_PlayerMutedYou = Zmutowany
+
+Mute_PlayerNowMutedYou = Zmutowal Cie.
+Mute_PlayerNowUnmutedYou = Odmutowal Cie
+
+Mute_UseTooOften = ^3Bardzo czesto tego uzywasz
+
+Mute_PlayerNowMutedAll = Zmutowales wszystkich!
+Mute_PlayerNowUnmutedAll = Odmutowales wszystkich
+
+Mute_prefix = [^3MUTE^1]

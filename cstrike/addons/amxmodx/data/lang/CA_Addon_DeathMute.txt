@@ -17,3 +17,8 @@ DeathMute_prefix = [^3Death mute^1]
 DeathMute_ChatMessage = ^3%.0f Sekunden^1 für die Team-Kommunikation, anschliessend kann Dich ^3niemand mehr hören^1.
 DeathMute_YouMuted = Lebende Spieler können Dich ^3nicht hören^1.
 DeathMute_prefix = [^3Death mute^1]
+
+[pl]
+DeathMute_ChatMessage = Masz ^3%.0f sekund^1 na podanie informacji kolegom z druzyny, ^3pozniej Cie nie uslysza.^1.
+DeathMute_YouMuted =  Zywi gracze Cie^3 nie slysza^1.
+DeathMute_prefix = [^3Death mute^1]

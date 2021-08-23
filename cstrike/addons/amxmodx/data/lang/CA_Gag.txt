@@ -193,3 +193,52 @@ Gag_NotValidTimeEntered = ^3Die Dauer stimmt nicht:^1
 Gag_NotifyPlayer_BlockedChat = ^3Dein ^1Chat ^3wurde blockeriert.
 
 Gag_prefix = [^3GAG^1]
+
+[pl]
+Gag_MenuTitle_PlayersList = Zgaguj gracza
+Gag_MenuTitle_SelectReason = Wybrany gracz:
+Gag_MenuTitle_SelectTime = Wybierz czas:
+Gag_MenuItem_RemoveGag = \rUsun\w
+Gag_MenuItem_EditGag = Edytuj
+Gag_MenuItem_ShowGag = Zgagowany gracz [\r%s\y]:
+Gag_MenuItem_PropSay = Czat:
+Gag_MenuItem_PropSayTeam = Team czat:
+Gag_MenuItem_PropVoice = Voice czat:
+Gag_MenuItem_Time = Czas:
+Gag_MenuItem_Confirm = Potwierdz!
+Gag_MenuItem_Reason = Powod:
+Gag_MenuItem_Resolution =  Czas:\y %s\w (powod:\y %s\w)
+Gag_MenuItem_Admin = Admin:
+Gag_MenuItem_Type = Typ:
+Gag_MenuItem_Length = Czas trwania:
+Gag_MenuItem_Expire = Wygasa:
+Gag_MenuItem_Left = Pozostalo:
+
+Gag_SelectFlags = Flagi gagowania: [\r %n\y]
+Gag_EnterReason = Podaj powod gaga ->\n
+Gag_EnterTime = Podaj czas gaga ->
+
+Gag_Immunity = Immunitet
+Gag_Gagged = *GAG*
+
+Gag_ChatMsg_Reason = ^4Powod:^1
+Gag_NotSet = Nie wybrano
+Gag_Permanent = permanentny
+
+Gag_AdminGagPlayer = Zgagowany gracz %s
+Gag_AdminUngagPlayer = Odgagowal gracza %s
+Gag_PlayerNotConnected = ^3Gracz nie jest polaczony!
+Gag_PlayerAlreadyRemoved = ^3Gracz ^4%n^1 zostal juz usuniety!^1
+Gag_PlayerExpiredGag = ^3Graczowi ^4%n^1 wlasnie wygasla blokada.
+
+Gag_NotEnoughPlayers = ^4Na serwerze nie ma nikogo^1, kogo bys mogl zgagowac!
+Gag_NoTemplatesAvailable_Reasons = Brak powodow
+Gag_NoTemplatesAvailable_Times = Brak czasow.
+
+Gag_YouSetManual_Time = ^4Ustawiles wlasny czas:^3
+Gag_YouSetManual_Reason = ^3Ustawiles wlasny powod:^3
+Gag_NotValidTimeEntered = ^3Wprowadzony czas jest nieprawidlowy:^1
+
+Gag_NotifyPlayer_BlockedChat = ^3Zostales zgagowany^1!
+
+Gag_prefix = [^3GAG^1]
