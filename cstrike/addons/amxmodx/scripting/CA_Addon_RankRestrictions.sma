@@ -42,10 +42,10 @@ public native_filter(const name[], index, trap) {
 }
 
 static Register_CVars() {
-  bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "2",
-    .description = "Restrictions Types \n\
-      0 - Disable restrictions \n\
-      1 - Level restrictions \n\
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "1",
+    .description = "Restrictions Types\n\
+      0 - Disable restrictions\n\
+      1 - Level restrictions\n\
       2 - Kills count restrictions",
     .has_min = true, .min_val = 0.0,
     .has_max = true, .max_val = 2.0
@@ -59,9 +59,9 @@ static Register_CVars() {
   )
 
   bind_pcvar_num(create_cvar("ca_rankrestrictions_type_level", "1",
-    .description = "Level System Types \n\
-      0 - Advanced Experience System \n\
-      1 - Army Ranks Ultimate \n\
+    .description = "Level System Types\n\
+      0 - Advanced Experience System\n\
+      1 - Army Ranks Ultimate\n\
       2 - OciXCrom's Rank System",
     .has_min = true, .min_val = 0.0,
     .has_max = true, .max_val = 2.0
