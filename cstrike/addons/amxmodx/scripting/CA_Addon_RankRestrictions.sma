@@ -3,12 +3,19 @@
 
 #pragma ctrlchar '\'
 
+// Natives
 native aes_get_player_level(const player)
 native ar_get_user_level(const player, rankName[] = "", len = 0)
 native crxranks_get_user_level(const player)
 
-static ca_rankrestrictions_min_level,
+native csstats_get_user_stats(const player, const stats[22])
+//
+
+
+static ca_rankrestrictions_type,
+  ca_rankrestrictions_min_kills,
   ca_rankrestrictions_type_level,
+  ca_rankrestrictions_min_level,
   ca_rankrestrictions_immunity_flag[16]
 
 public stock const PluginName[] = "CA Addon: Rank restrictions"
@@ -27,13 +34,23 @@ public plugin_init() {
 }
 
 static Register_CVars() {
-  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_level", "2",
-    .description = "Min Level to access voice & text chat",
-    .has_min = true, .min_val = 0.0
-    ), ca_rankrestrictions_min_level
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "2",
+    .description = "Restrictions Types \n\
+      0 - Disable restrictions \n\
+      1 - Level restrictions \n\
+      2 - Kills count restrictions",
+    .has_min = true, .min_val = 0.0,
+    .has_max = true, .max_val = 2.0
+    ), ca_rankrestrictions_type
   )
 
-  bind_pcvar_num(create_cvar("ca_rankrestrictions_type_level", "2",
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_kills", "10",
+    .description = "Min kills count to access voice & text chat",
+    .has_min = true, .min_val = 0.0
+    ), ca_rankrestrictions_min_kills
+  )
+
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_type_level", "1",
     .description = "Level System Types \n\
       0 - Advanced Experience System \n\
       1 - Army Ranks Ultimate \n\
@@ -41,6 +58,12 @@ static Register_CVars() {
     .has_min = true, .min_val = 0.0,
     .has_max = true, .max_val = 2.0
     ), ca_rankrestrictions_type_level
+  )
+
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_level", "2",
+    .description = "Min Level to access voice & text chat",
+    .has_min = true, .min_val = 0.0
+    ), ca_rankrestrictions_min_level
   )
 
   bind_pcvar_string(create_cvar("ca_rankrestrictions_immunity_flag", "a",
@@ -52,9 +75,6 @@ static Register_CVars() {
 
 public CA_Client_Say(const player) {
   if(!CanCommunicate(player)) {
-    client_print_color(player, print_team_default, "%L",
-      player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level
-    )
     return CA_SUPERCEDE
   }
 
@@ -63,9 +83,6 @@ public CA_Client_Say(const player) {
 
 public CA_Client_SayTeam(const player) {
   if(!CanCommunicate(player)) {
-    client_print_color(player, print_team_default, "%L",
-      player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level
-    )
     return CA_SUPERCEDE
   }
 
@@ -74,18 +91,41 @@ public CA_Client_SayTeam(const player) {
 
 public CA_Client_Voice(const listener, const sender) {
   // need chat notification?
-  return CanCommunicate(sender) ? CA_CONTINUE : CA_SUPERCEDE
+  return CanCommunicate(sender, false) ? CA_CONTINUE : CA_SUPERCEDE
 }
 
-static bool: CanCommunicate(const player) {
+static bool: CanCommunicate(const player, const bool: print = true) {
+  if(ca_rankrestrictions_type <= 0)
+    return true
+
   // check is gagged?
   if(get_user_flags(player) & read_flags(ca_rankrestrictions_immunity_flag))
     return true
 
-  return (getUserLevel(player) >= ca_rankrestrictions_min_level)
+  if(ca_rankrestrictions_type == 1 && GetUserLevel(player) < ca_rankrestrictions_min_level) {
+    if(print) {
+      client_print_color(player, print_team_red, "%L",
+        player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level
+      )
+    }
+
+    return false
+  }
+
+  if(ca_rankrestrictions_type == 2 && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills) {
+    if(print) {
+      client_print_color(player, print_team_red, "%L",
+        player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills
+      )
+    }
+
+    return false
+  }
+
+  return true
 }
 
-static getUserLevel(const player) {
+static GetUserLevel(const player) {
   switch(ca_rankrestrictions_type_level) {
     case 0: return aes_get_player_level(player)
     case 1: return ar_get_user_level(player)
@@ -93,4 +133,13 @@ static getUserLevel(const player) {
   }
 
   return 0
+}
+
+static GetUserFragsFromStats(const player) {
+  enum { stats_Frags/* , stats_Deaths, stats_Rounds = 16 */ }
+
+  new stats[22]
+  csstats_get_user_stats(player, stats)
+
+  return stats[stats_Frags]
 }
