@@ -33,6 +33,14 @@ public plugin_init() {
   AutoExecConfig(true, "CA_Addon_RankRestrictions", "ChatAdditions")
 }
 
+public plugin_natives() {
+  set_native_filter("native_filter")
+}
+
+public native_filter(const native[], index, trap) {
+  return trap ? PLUGIN_CONTINUE : PLUGIN_HANDLED
+}
+
 static Register_CVars() {
   bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "2",
     .description = "Restrictions Types \n\
