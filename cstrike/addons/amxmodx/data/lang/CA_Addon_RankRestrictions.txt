@@ -1,0 +1,5 @@
+[ru]
+RankRestrictions_Warning_MinLevel = ^4* ^1Доступ к чату запрещен! Необходимо получить %i уровень.
+
+[en]
+RankRestrictions_Warning_MinLevel = ^4* ^1Chat access denied! It is necessary to get %i level.
