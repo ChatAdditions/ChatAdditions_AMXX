@@ -37,7 +37,7 @@ public plugin_natives() {
   set_native_filter("native_filter")
 }
 
-public native_filter(const native[], index, trap) {
+public native_filter(const name[], index, trap) {
   return trap ? PLUGIN_CONTINUE : PLUGIN_HANDLED
 }
 
