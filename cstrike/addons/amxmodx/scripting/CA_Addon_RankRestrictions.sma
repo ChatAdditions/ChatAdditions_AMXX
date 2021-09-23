@@ -73,7 +73,7 @@ static Register_CVars() {
   )
 }
 
-public CA_Client_Say(const player) {
+public CA_Client_Say(player) {
   if(!CanCommunicate(player)) {
     return CA_SUPERCEDE
   }
@@ -81,7 +81,7 @@ public CA_Client_Say(const player) {
   return CA_CONTINUE
 }
 
-public CA_Client_SayTeam(const player) {
+public CA_Client_SayTeam(player) {
   if(!CanCommunicate(player)) {
     return CA_SUPERCEDE
   }
