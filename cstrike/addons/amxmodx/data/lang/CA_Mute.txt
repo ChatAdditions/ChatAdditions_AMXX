@@ -5,7 +5,7 @@ Mute_MuteAll = Заглушить всех
 Mute_YouMutePlayer = Вы НЕ слышите игрока
 Mute_YouUnmutePlayer = Вы снова слышите игрока
 
-Mute_NotEnoughPlayers = ^3Не достаточно игроков!
+Mute_NotEnoughPlayers = ^3Недостаточно игроков!
 Mute_PlayerNotConnected = ^3Игрок не подключен!
 
 Mute_PlayerMutedYou = Не слышит вас
