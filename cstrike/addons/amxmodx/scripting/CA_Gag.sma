@@ -1379,6 +1379,10 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
 
   new admin = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), adminAuthID)
 
+  CA_Log(logLevel_Debug, "CA_Storage_Saved(): find_player_ex()=%i(%N), adminName=`%s`, adminAuthID=`%s`",
+    admin, admin, adminName, adminAuthID
+  )
+
   if(is_user_connected(admin)) {
     UTIL_SendAudio(admin, ca_gag_sound_ok)
   }
