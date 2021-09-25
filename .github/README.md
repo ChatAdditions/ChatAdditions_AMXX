@@ -63,7 +63,7 @@ Rich API capabilities allow the system to connect any functionality (work with p
 
 ## Downloads
 - [Release builds](https://github.com/ChatAdditions/ChatAdditions_AMXX/releases)
-- [Dev builds](https://github.com/ChatAdditions/ChatAdditions_AMXX/actions/workflows/build.yml)
+- [Dev builds](https://github.com/ChatAdditions/ChatAdditions_AMXX/actions/workflows/CI.yml)
       
 ## Features
 - Compatibility with any chat manager;
