@@ -31,7 +31,7 @@ Gag_Permanent = *НАВСЕГДА*
 
 Gag_AdminGagPlayer = заглушил игрока %s
 Gag_AdminUngagPlayer = снял заглушку с игрока %s
-Gag_PlayerNotConnected = ^3Игрок не доступен!^1
+Gag_PlayerNotConnected = ^3Игрок недоступен!^1
 Gag_PlayerAlreadyRemoved = ^3Игрок ^4%n^1 уже удалён!^1
 Gag_PlayerExpiredGag = ^3У игрока ^4%n^1 истекло время заглушки.
 
@@ -41,7 +41,7 @@ Gag_NoTemplatesAvailable_Times = ^3Нет шаблонов выбора врем
 
 Gag_YouSetManual_Time = ^3Вы установили своё время:^1
 Gag_YouSetManual_Reason = ^3Вы установили причину заглушки:^1
-Gag_NotValidTimeEntered = ^3Время указано не верно:^1
+Gag_NotValidTimeEntered = ^3Время указано неверно:^1
 
 Gag_NotifyPlayer_BlockedChat = ^3Вам заблокировали ^1чат^3.
 
