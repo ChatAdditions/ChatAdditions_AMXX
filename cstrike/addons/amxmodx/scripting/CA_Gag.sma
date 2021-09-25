@@ -1219,17 +1219,15 @@ public ConCmd_amx_gag(const id, const level, const cid) {
 public SrvCmd_AddReason() {
   enum any: args_s { arg_cmd, arg_reason, arg_flags, arg_time }
 
+  if(read_argc() < 2){
+    server_print("\tUsage: ca_gag_add_reason <reason> [flags] [time]")
+    return
+  }
+
   new args[args_s][256]
 
   for(new arg = arg_cmd; arg < sizeof(args); arg++) {
     read_argv(arg, args[arg], charsmax(args[]))
-  }
-
-  new argsCount = read_argc()
-
-  if(argsCount < 2){
-    server_print("\tUsage: ca_gag_add_reason <reason> [flags] [time]")
-    return
   }
 
   new reason[reason_s]
