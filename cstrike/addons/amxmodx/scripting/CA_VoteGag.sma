@@ -1,4 +1,6 @@
 #include <amxmodx>
+#include <CA_GAG_API>
+
 #if AMXX_VERSION_NUM < 183
 	#define client_disconnected client_disconnect
 	#include <colorchat>
@@ -6,7 +8,7 @@
 
 
 /* ======== SETTINGS ======== */
-#define PREFIX 		"UCC: VoteGAG" 	// Префикс сообщений в чате
+#define PREFIX 		"CA: VoteGAG" 	// Префикс сообщений в чате
 #define REPEAT_VOTE_MIN	2		// Частота повторных голосований
 #define PERCENT_VOTE_OK	60		// Процент голосов для успешного голосования
 #define BLOCK_TIME_MIN	180		// Время GAG'a игрока
@@ -39,14 +41,10 @@ new g_iVotingIndex, g_iVotingLasttime;
 new g_arrPlayers[MAX_PLAYERS], g_iPnum;
 new bool:g_bPlayerVoted[MAX_PLAYERS + 1], g_iPlayersVotedCount;
 
-const REASON_LENGTH = 64;
-new expired, reason[REASON_LENGTH];
-native ucc_is_client_gaged(index, &expired_time, gag_reason[REASON_LENGTH]);
-native ucc_set_client_gag(index, admin_index, block_time, gag_reason[REASON_LENGTH]);
 
 public plugin_init()
 {
-	register_plugin("UCC Addon: VoteGAG", "1.2", "neygomon");
+	register_plugin("CA: VoteGAG", "1.0.0-alpha", "Sergey Shorokhov");
 
 	register_clcmd("say /votegag", "clcmd_VoteGag");
 	register_clcmd("say_team /votegag", "clcmd_VoteGag");
@@ -116,7 +114,7 @@ public players_callback(id, menu, item)
 	new index = str_to_num(item_data);
 	if(!is_user_connected(index))
 		return ITEM_DISABLED;
-	if(ucc_is_client_gaged(index, expired, reason))
+	if(ca_has_user_gag(index))
 		return ITEM_DISABLED;
 	if(get_user_flags(index) & IMMUNITY_FLAGS)
 		return ITEM_DISABLED;
@@ -186,7 +184,7 @@ public task__CheckVotes(id)
 	{
 		if(is_user_connected(g_iVotingIndex))
 		{
-			ucc_set_client_gag(g_iVotingIndex, id, BLOCK_TIME_MIN, PREFIX);
+      ca_set_user_gag(g_iVotingIndex, PREFIX, (BLOCK_TIME_MIN / 60), (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
 
 			new szName[32];
 			get_user_name(g_iVotingIndex, szName, charsmax(szName));
