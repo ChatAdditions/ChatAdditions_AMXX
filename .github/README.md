@@ -94,6 +94,7 @@ Reach out to me at one of the following places:
 - Github issues;
 - Github discussions;
 - [Telegram](https://t.me/ShorokhovSergey);
+- [Telegram group](https://t.me/ChatAdditions_group);
 - E-Mail;
 
 ## License
