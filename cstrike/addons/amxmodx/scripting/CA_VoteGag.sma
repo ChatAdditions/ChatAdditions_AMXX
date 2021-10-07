@@ -184,7 +184,7 @@ public task__CheckVotes(id)
 	{
 		if(is_user_connected(g_iVotingIndex))
 		{
-      ca_set_user_gag(g_iVotingIndex, PREFIX, (BLOCK_TIME_MIN / 60), (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
+			ca_set_user_gag(g_iVotingIndex, PREFIX, (BLOCK_TIME_MIN / 60), (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
 
 			new szName[32];
 			get_user_name(g_iVotingIndex, szName, charsmax(szName));
