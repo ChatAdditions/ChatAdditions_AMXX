@@ -1,10 +1,9 @@
+/*
+ * The plugin is based on an existing plugin from UCC by neygomon.
+ */
+
 #include <amxmodx>
 #include <CA_GAG_API>
-
-#if AMXX_VERSION_NUM < 183
-	#define client_disconnected client_disconnect
-	#include <colorchat>
-#endif
 
 
 /* ======== SETTINGS ======== */
