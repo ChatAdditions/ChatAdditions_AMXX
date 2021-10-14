@@ -120,11 +120,7 @@ stock GagData_GetPersonalData(const admin = 0, const target, buffer[gagData_s]) 
 
   // get's admin data
   buffer[gd_admin] = admin;
-  if(admin == 0) {
-    copy(buffer[gd_adminName], charsmax(buffer[gd_adminName]), "CONSOLE")
-  } else {
-    get_user_name(admin, buffer[gd_adminName], charsmax(buffer[gd_adminName]));
-  }
+  get_user_name(admin, buffer[gd_adminName], charsmax(buffer[gd_adminName]));
   get_user_authid(admin, buffer[gd_adminAuthID], charsmax(buffer[gd_adminAuthID]));
   get_user_ip(admin, buffer[gd_adminIP], charsmax(buffer[gd_adminIP]), .without_port = true);
 }
