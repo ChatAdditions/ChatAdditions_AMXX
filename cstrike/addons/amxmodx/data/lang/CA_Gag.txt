@@ -29,8 +29,8 @@ Gag_ChatMsg_Reason = ^4Причина:^1
 Gag_NotSet = Не задано
 Gag_Permanent = *НАВСЕГДА*
 
-Gag_AdminGagPlayer = заглушил игрока %s
-Gag_AdminUngagPlayer = снял заглушку с игрока %s
+Gag_AdminGagPlayer = ^3заглушил ^1игрока ^4%s^1
+Gag_AdminUngagPlayer = ^3снял ^1заглушку с игрока ^4%s^1
 Gag_PlayerNotConnected = ^3Игрок недоступен!^1
 Gag_PlayerAlreadyRemoved = ^3Игрок ^4%n^1 уже удалён!^1
 Gag_PlayerExpiredGag = ^3У игрока ^4%n^1 истекло время заглушки.
@@ -78,8 +78,8 @@ Gag_ChatMsg_Reason = ^4Reason:^1
 Gag_NotSet = Not selected
 Gag_Permanent = *PERMANENT*
 
-Gag_AdminGagPlayer = gag player %s
-Gag_AdminUngagPlayer = remove gag from player %s
+Gag_AdminGagPlayer = ^3gag ^1player ^4%s^1
+Gag_AdminUngagPlayer = ^3remove ^1gag from player ^4%s^1
 Gag_PlayerNotConnected = ^3Player not connected!
 Gag_PlayerAlreadyRemoved = ^3Player ^4%n^1 already removed!^1
 Gag_PlayerExpiredGag = ^3Player ^4%n^1 has expired gag.
@@ -127,8 +127,8 @@ Gag_ChatMsg_Reason = ^4Motivo:^1
 Gag_NotSet = No Definido
 Gag_Permanent = Permanente
 
-Gag_AdminGagPlayer = silencio a jugador %s
-Gag_AdminUngagPlayer = quito silencio a jugador %s
+Gag_AdminGagPlayer = ^3silencio ^1a jugador ^4%s^1
+Gag_AdminUngagPlayer = ^3quito ^1silencio a jugador ^4%s^1
 Gag_PlayerNotConnected = ^3Jugador no conectado!
 Gag_PlayerAlreadyRemoved = ^3Jugador ^4%n^1 ya quitado!^1
 Gag_PlayerExpiredGag = ^3Jugador ^4%n^1 ha expirado el silencio.
@@ -176,8 +176,8 @@ Gag_ChatMsg_Reason = ^4Grund:^1
 Gag_NotSet = N/A
 Gag_Permanent = Permanent
 
-Gag_AdminGagPlayer = Mute %s
-Gag_AdminUngagPlayer = Mute von %s aufheben
+Gag_AdminGagPlayer = ^3Mute ^4%s^1
+Gag_AdminUngagPlayer = ^3Mute ^1von ^4%s^1 aufheben
 Gag_PlayerNotConnected = ^3Spieler nicht verbunden!
 Gag_PlayerAlreadyRemoved = ^3Spieler ^4%n^1 bereits entfernt!
 Gag_PlayerExpiredGag = ^3Mute des Spielers ^4%n^1 abgelaufen.
@@ -225,8 +225,8 @@ Gag_ChatMsg_Reason = ^4Powod:^1
 Gag_NotSet = Nie wybrano
 Gag_Permanent = permanentny
 
-Gag_AdminGagPlayer = Zgagowany gracz %s
-Gag_AdminUngagPlayer = Odgagowal gracza %s
+Gag_AdminGagPlayer = ^3Zgagowany ^1gracz ^4%s^1
+Gag_AdminUngagPlayer = ^3Odgagowal ^1gracza ^4%s^1
 Gag_PlayerNotConnected = ^3Gracz nie jest polaczony!
 Gag_PlayerAlreadyRemoved = ^3Gracz ^4%n^1 zostal juz usuniety!^1
 Gag_PlayerExpiredGag = ^3Graczowi ^4%n^1 wlasnie wygasla blokada.
