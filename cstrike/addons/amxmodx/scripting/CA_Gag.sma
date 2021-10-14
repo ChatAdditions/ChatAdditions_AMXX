@@ -1018,6 +1018,14 @@ public MenuHandler_EditGag(const id, const menu, const item) {
 
     new expireAt          = timeChanged ? 0 : g_adminTempData[id][gd_expireAt]
 
+    new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, time))
+
+    CA_Log(logLevel_Info, "Gag: \"%s\" edit gag for \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+      g_adminTempData[id][gd_adminName], g_adminTempData[id][gd_name], \
+      bits_to_flags(gag_flags_s: g_adminTempData[id][gd_reason][r_flags]), \
+      gagTimeStr, g_adminTempData[id][gd_reason][r_name] \
+    )
+
     Gag_Save(id, target, time, flags, expireAt)
 
     GagData_Reset(g_adminTempData[id])
