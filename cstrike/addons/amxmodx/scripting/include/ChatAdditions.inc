@@ -141,22 +141,22 @@ stock show_activity_ex(const actorId, const actorName[], const message[], any: .
 
     switch(get_pcvar_num(_amx_show_activity)) {
       case 1: { // Hide name for all
-        client_print(i, print_chat, "%L %s", i, prefix, buffer);
+        client_print_color(i, i, "%L %s", i, prefix, buffer);
       }
       case 2: { // Show name to all
-        client_print(i, print_chat, "%L %s: %s", i, prefix, actorName, buffer);
+        client_print_color(i, i, "%L %s: %s", i, prefix, actorName, buffer);
       }
       case 3: { // show name only to admins, hide name from normal users
-        client_print(i, print_chat, "%L %s: %s", i, prefix, isAdmin ? actorName : "", buffer);
+        client_print_color(i, i, "%L %s: %s", i, prefix, isAdmin ? actorName : "", buffer);
       }
       case 4: { // show name only to admins, show nothing to normal users
         if(isAdmin) {
-          client_print(i, print_chat, "%L %s: %s", i, prefix, actorName, buffer);
+          client_print_color(i, i, "%L %s: %s", i, prefix, actorName, buffer);
         }
       }
       case 5: { // show only to admins without actor name
         if(isAdmin) {
-          client_print(i, print_chat, "%L: %s", i, prefix, buffer);
+          client_print_color(i, i, "%L: %s", i, prefix, buffer);
         }
       }
     }
