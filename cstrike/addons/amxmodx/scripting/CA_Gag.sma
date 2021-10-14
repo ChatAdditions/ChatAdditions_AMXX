@@ -1386,6 +1386,9 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
   new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, gagTime))
 
   new admin = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), adminAuthID)
+  if(!admin) {
+    admin = find_player_ex((FindPlayer_MatchName | FindPlayer_ExcludeBots), adminName) // HACK: GameCMS bad DB struct
+  }
 
   if(is_user_connected(admin)) {
     UTIL_SendAudio(admin, ca_gag_sound_ok)
