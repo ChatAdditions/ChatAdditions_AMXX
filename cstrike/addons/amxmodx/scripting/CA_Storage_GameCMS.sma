@@ -240,6 +240,17 @@ public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], siz
   new adminAuthID[MAX_AUTHID_LENGTH];   /*  SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID)) */
   new adminIP[MAX_IP_LENGTH];           /* SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP)) */
 
+  // HACK: for bad DB struct
+  new target = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), authID)
+  if(target)
+    get_user_ip(target, IP, charsmax(IP), true)
+
+  new admin = find_player_ex((FindPlayer_MatchName | FindPlayer_ExcludeBots), adminName)
+  if(admin) {
+    get_user_authid(admin, adminAuthID, charsmax(adminAuthID))
+    get_user_ip(admin, adminIP, charsmax(adminIP), true)
+  }
+
   new createdAt   = SQL_ReadResult(query, res_created_at)
   new expireAt    = SQL_ReadResult(query, res_expire_at)
   new flags       = GCMS_FlagsTo_CAGAGFlags(SQL_ReadResult(query, res_flags))
@@ -297,6 +308,17 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
   new adminName[MAX_NAME_LENGTH];       SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
   new adminAuthID[MAX_AUTHID_LENGTH];   /* SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID)) */
   new adminIP[MAX_IP_LENGTH];           /* SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP)) */
+
+  // HACK: for bad DB struct
+  new target = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), authID)
+  if(target)
+    get_user_ip(target, IP, charsmax(IP), true)
+
+  new admin = find_player_ex((FindPlayer_MatchName | FindPlayer_ExcludeBots), adminName)
+  if(admin) {
+    get_user_authid(admin, adminAuthID, charsmax(adminAuthID))
+    get_user_ip(admin, adminIP, charsmax(adminIP), true)
+  }
 
   new createdAt   = SQL_ReadResult(query, res_created_at)
   new expireAt    = SQL_ReadResult(query, res_expire_at)
