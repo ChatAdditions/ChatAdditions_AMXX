@@ -38,7 +38,19 @@ public plugin_natives() {
 }
 
 public native_filter(const name[], index, trap) {
-  return trap ? PLUGIN_CONTINUE : PLUGIN_HANDLED
+  if(strcmp(name, "aes_get_player_level"))
+    return  PLUGIN_HANDLED
+
+  if(strcmp(name, "ar_get_user_level"))
+    return  PLUGIN_HANDLED
+
+  if(strcmp(name, "crxranks_get_user_level"))
+    return  PLUGIN_HANDLED
+
+  if(strcmp(name, "csstats_get_user_stats"))
+    return  PLUGIN_HANDLED
+
+  return PLUGIN_CONTINUE
 }
 
 static Register_CVars() {
