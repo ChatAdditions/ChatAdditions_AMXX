@@ -1,4 +1,4 @@
-name-template: "Release v$RESOLVED_VERSION"
+name-template: "v$RESOLVED_VERSION"
 tag-template: "v$RESOLVED_VERSION"
 categories:
   - title: "🚀 Features"
@@ -38,7 +38,3 @@ template: |
   ## What's Changed
 
   $CHANGES
-
-  ### Contributors
-
-  $CONTRIBUTORS
