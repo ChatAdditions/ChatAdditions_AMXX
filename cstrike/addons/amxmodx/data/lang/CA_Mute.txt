@@ -107,3 +107,25 @@ Mute_PlayerNowMutedAll = Zmutowales wszystkich!
 Mute_PlayerNowUnmutedAll = Odmutowales wszystkich
 
 Mute_prefix = [^3MUTE^1]
+
+[ua]
+Mute_MenuTitle = Заглушити гравця: 
+Mute_MuteAll = Заглушити всіх
+
+Mute_YouMutePlayer = Ви НЕ чуєте гравця
+Mute_YouUnmutePlayer = Ви знову чуєте гравця
+
+Mute_NotEnoughPlayers = ^3Недостатньо гравців!
+Mute_PlayerNotConnected = ^3Гравець не підключений!
+
+Mute_PlayerMutedYou = Не чує Вас
+
+Mute_PlayerNowMutedYou = тепер НЕ чує Вас.
+Mute_PlayerNowUnmutedYou = знову чує Вас.
+
+Mute_UseTooOften = ^3Ви використовуєте занадто часто!
+
+Mute_PlayerNowMutedAll = тепер НЕ чує нікого!
+Mute_PlayerNowUnmutedAll = знову чує всіх.
+
+Mute_prefix = [^3MUTE^1]
