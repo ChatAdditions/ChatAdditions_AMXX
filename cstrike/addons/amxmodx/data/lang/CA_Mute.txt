@@ -8,10 +8,10 @@ Mute_YouUnmutePlayer = Вы снова слышите игрока
 Mute_NotEnoughPlayers = ^3Недостаточно игроков!
 Mute_PlayerNotConnected = ^3Игрок не подключен!
 
-Mute_PlayerMutedYou = Не слышит вас
+Mute_PlayerMutedYou = Не слышит Вас
 
-Mute_PlayerNowMutedYou = теперь НЕ слышит вас.
-Mute_PlayerNowUnmutedYou = вновь слышит вас.
+Mute_PlayerNowMutedYou = теперь НЕ слышит Вас.
+Mute_PlayerNowUnmutedYou = вновь слышит Вас.
 
 Mute_UseTooOften = ^3Вы используете слишком часто!
 
