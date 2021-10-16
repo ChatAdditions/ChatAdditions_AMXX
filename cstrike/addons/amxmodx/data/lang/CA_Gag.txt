@@ -242,3 +242,52 @@ Gag_NotValidTimeEntered = ^3Wprowadzony czas jest nieprawidlowy:^1
 Gag_NotifyPlayer_BlockedChat = ^3Zostales zgagowany^1!
 
 Gag_prefix = [^3GAG^1]
+
+[ua]
+Gag_MenuTitle_PlayersList = Заглушити гравця
+Gag_MenuTitle_SelectReason = Оберіть причину:
+Gag_MenuTitle_SelectTime = Оберіть час для заглушки:
+Gag_MenuItem_RemoveGag = \rЗняти\w
+Gag_MenuItem_EditGag = Редагувати
+Gag_MenuItem_ShowGag = Заглушка гравця [\r%s\y]:
+Gag_MenuItem_PropSay = Чат:
+Gag_MenuItem_PropSayTeam = Командний чат:
+Gag_MenuItem_PropVoice = Голосове спілкування:
+Gag_MenuItem_Time = Час:
+Gag_MenuItem_Confirm = Підтвердити!
+Gag_MenuItem_Reason = Причина:
+Gag_MenuItem_Resolution = Час: \y%s\w (причина: \y%s\w)
+Gag_MenuItem_Admin = Призначив:
+Gag_MenuItem_Type = Тип:
+Gag_MenuItem_Length = Тривалість:
+Gag_MenuItem_Expire = Спливає:
+Gag_MenuItem_Left = Залишилося:
+
+Gag_SelectFlags = Параметри заглушки гравця: [ \r%n\y ]
+Gag_EnterReason = Ввести свою ->\n
+Gag_EnterTime = Вказати час ->
+
+Gag_Immunity = Іммунітет
+Gag_Gagged = *МОЛЧУН*
+
+Gag_ChatMsg_Reason = ^4Причина:^1
+Gag_NotSet = Не задано
+Gag_Permanent = *НАЗАВЖДИ*
+
+Gag_AdminGagPlayer = ^3заглушив ^1гравця ^4%s^1
+Gag_AdminUngagPlayer = ^3зняв ^1заглушку із гравця ^4%s^1
+Gag_PlayerNotConnected = ^3Гравець недоступний!^1
+Gag_PlayerAlreadyRemoved = ^3Гравець ^4%n^1 вже видалений!^1
+Gag_PlayerExpiredGag = ^3У гравця ^4%n^1 сплив час заглушки.
+
+Gag_NotEnoughPlayers = ^3Недостатньо гравців, щоб відкрити меню!
+Gag_NoTemplatesAvailable_Reasons = ^3Не має шаблонів вибору причин.
+Gag_NoTemplatesAvailable_Times = ^3Не має шаблонів вибору часу.
+
+Gag_YouSetManual_Time = ^3Ви встановили свій час:^1
+Gag_YouSetManual_Reason = ^3Ви встановили причину заглушки:^1
+Gag_NotValidTimeEntered = ^3Час вказаний невірно:^1
+
+Gag_NotifyPlayer_BlockedChat = ^3Вам заблокували ^1чат^3.
+
+Gag_prefix = [^3GAG^1]

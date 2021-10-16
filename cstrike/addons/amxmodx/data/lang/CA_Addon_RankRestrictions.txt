@@ -5,3 +5,7 @@ RankRestrictions_Warning_MinKills = ^4* ^1Доступ к чату запрещ�
 [en]
 RankRestrictions_Warning_MinLevel = ^4* ^1Chat access denied! It is necessary to get ^4%i ^1level.
 RankRestrictions_Warning_MinKills = ^4* ^1Chat access denied! You must kill ^4%i ^1opponents.
+
+[ua]
+RankRestrictions_Warning_MinLevel = ^4* ^1Доступ до чату заборонений! Необхідно отримати ^4%i ^1рівень.
+RankRestrictions_Warning_MinKills = ^4* ^1Доступ до чату заборонений! Необхідно вбити ^4%i ^1супротивників.
