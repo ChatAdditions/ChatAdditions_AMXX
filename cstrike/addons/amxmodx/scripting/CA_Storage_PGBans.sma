@@ -312,7 +312,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
 
 Storage_Remove(const authID[])
 {
-	if(g_storageInitialized || g_tuple == Empty_Handle)
+	if(!g_storageInitialized || g_tuple == Empty_Handle)
 	{
 		CA_Log(logLevel_Warning, "Storage_Remove(): Storage connection not initialized. Query not executed. (g_storageInitialized=%i, g_tuple=%i)", g_storageInitialized, g_tuple);
 		return;
