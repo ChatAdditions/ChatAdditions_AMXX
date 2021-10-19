@@ -5,7 +5,7 @@
 <p align="center">AMXModX plugin chat control tool with rich functionality and API.</p>
 
 <p align="center">
-  <a href="https://github.com/ChatAdditions/ChatAdditions_AMXX/releases/latest">
+    <a href="https://github.com/ChatAdditions/ChatAdditions_AMXX/releases/latest">
     <img src="https://img.shields.io/github/downloads/ChatAdditions/ChatAdditions_AMXX/total?label=Download%40latest&style=flat-square&logo=github&logoColor=white"
          alt="Build status">
     <a href="https://github.com/wopox1337/ChatsAdditions_AMXX/actions">
@@ -17,9 +17,9 @@
     <a href="https://www.amxmodx.org/downloads-new.php">
     <img src="https://img.shields.io/badge/AMXModX-%3E%3D1.9.0-blue?style=flat-square"
          alt="AMXModX dependency">
-    <a href="https://gitter.im/ChatAdditions/Development?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge">
-    <img src="https://img.shields.io/badge/discussions-on%20gitter-informational?style=flat-square&logo=googlechat"
-         alt="Gitter">
+    <a href="https://t.me/ChatAdditions_group">
+    <img src="https://img.shields.io/badge/discussions-on%20Telegram%20group-informational?style=flat-square&logo=googlechat"
+         alt="Telegram">
 </p>
       
 <p align="center">
