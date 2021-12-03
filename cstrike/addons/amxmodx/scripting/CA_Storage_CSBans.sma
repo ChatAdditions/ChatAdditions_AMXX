@@ -51,7 +51,7 @@ public plugin_init() {
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
   g_queueSave = QueueCreate(gagData_s)
 
-  set_task_ex(7.274, "_OnConfigsExecuted")
+  set_task_ex(6.274, "_OnConfigsExecuted")
 }
 
 public _OnConfigsExecuted() {
