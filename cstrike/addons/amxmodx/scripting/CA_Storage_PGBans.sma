@@ -1,4 +1,5 @@
 #include <amxmodx>
+#include <amxmisc>
 #include <sqlx>
 #include <cellqueue>
 #include <ChatAdditions>
@@ -46,9 +47,11 @@ public plugin_init()
 
 	g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH);
 	g_queueSave = QueueCreate(gagData_s);
+
+  set_task_ex(6.274, "_OnConfigsExecuted")
 }
 
-public OnConfigsExecuted()
+public _OnConfigsExecuted()
 {
 	g_tuple = SQL_MakeDbTuple(pgb_storage_host, pgb_storage_user, pgb_storage_pass, pgb_storage_dbname);
 
