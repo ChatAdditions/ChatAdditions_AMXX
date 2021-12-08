@@ -272,7 +272,7 @@ static CheckUpdate() {
 
   if(is_module_loaded("grip") == -1) {
     CA_Log(logLevel_Warning, "The `GRip` module is not loaded! The new version cannot be verified.")
-    CA_Log(logLevel_Warning, "Please install GRip: `https://github.com/In-line/grip` or disable update checks.")
+    CA_Log(logLevel_Warning, "Please install GRip: `https://github.com/In-line/grip` or disable update checks (`ca_update_notify `0`).")
 
     return
   }
