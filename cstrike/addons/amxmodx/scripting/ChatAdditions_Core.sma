@@ -1,10 +1,13 @@
 #include <amxmodx>
+#include <amxmisc>
 #include <reapi>
 
+#include <grip>
 #include <ChatAdditions>
 
 #pragma ctrlchar '\'
 #pragma tabsize 2
+#pragma dynamic (8192 + 4096)
 
 
 enum logType_s {
@@ -14,7 +17,8 @@ enum logType_s {
 
 new logType_s: ca_log_type,
   logLevel_s: ca_log_level = logLevel_Debug,
-  g_logsPath[PLATFORM_MAX_PATH]
+  g_logsPath[PLATFORM_MAX_PATH],
+  bool: ca_update_notify
 
 new const LOG_FOLDER[] = "ChatAdditions"
 
@@ -34,6 +38,9 @@ new bool: g_PlayerModEnable[MAX_PLAYERS + 1]
 // These are indexed as clients and each bit represents a client (so player entity is bit + 1).
 new g_BanMasks[MAX_PLAYERS + 1]
 
+new const g_versionLink[] = "https://api.github.com/repos/"
+  + "ChatAdditions/ChatAdditions_AMXX"
+  + "/releases/latest"
 
 public stock const PluginName[] = "ChatAdditions: Core"
 public stock const PluginVersion[] = CA_VERSION
@@ -69,12 +76,18 @@ public plugin_init() {
   g_fwdClientChangeName   = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
 
   CA_Log(logLevel_Debug, "Chat Additions: Core initialized!")
+
+  set_task_ex(6.274, "_OnConfigsExecuted")
 }
 
 public plugin_end() {
   DestroyForward(g_fwdClientSay)
   DestroyForward(g_fwdClientSayTeam)
   DestroyForward(g_fwdClientVoice)
+}
+
+public _OnConfigsExecuted() {
+  CheckUpdate()
 }
 
 Register_CVars() {
@@ -93,15 +106,33 @@ Register_CVars() {
     ),
     ca_log_level
   )
+
+  bind_pcvar_num(create_cvar("ca_update_notify", "1",
+      .description = "Enable update check?\n 0 = disable update checks",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = 1.0
+    ),
+    ca_update_notify
+  )
 }
 
 public plugin_natives() {
   register_library("ChatAdditions_Core")
 
+  set_module_filter("ModuleFilter")
+  set_native_filter("NativeFilter")
+
   register_native("CA_Log", "native_CA_Log")
   register_native("CA_PlayerHasBlockedPlayer", "native_CA_PlayerHasBlockedPlayer")
 }
 
+public ModuleFilter(const library[], LibType: type) {
+  return strcmp("grip", library) == 0 ? PLUGIN_HANDLED : PLUGIN_CONTINUE
+}
+
+public NativeFilter(const nativeName[], index, trap) {
+  return strncmp(nativeName, "grip_", 5) == 0 ? PLUGIN_HANDLED : PLUGIN_CONTINUE
+}
 
 public ClCmd_Say(const id) {
   ExecuteForward(g_fwdClientSay, g_retVal, id)
@@ -230,4 +261,100 @@ static bool: CVoiceGameMgr__PlayerHasBlockedPlayer(const receiver, const sender)
   }
 
   return bool: !CanPlayerHearPlayer(receiver, sender)
+}
+
+static CheckUpdate() {
+  if(!ca_update_notify)
+    return
+
+  if(strcmp(CA_VERSION, "CA_VERSION") == 0 || contain(CA_VERSION, ".") == -1) // ignore custom builds
+    return
+
+  if(is_module_loaded("grip") == -1) {
+    CA_Log(logLevel_Warning, "The `GRip` module is not loaded! The new version cannot be verified.")
+    CA_Log(logLevel_Warning, "Please install GRip: `https://github.com/In-line/grip` or disable update checks (`ca_update_notify `0`).")
+
+    return
+  }
+
+  RequestNewVersion(g_versionLink)
+}
+
+static RequestNewVersion(const link[]) {
+  new GripRequestOptions: options = grip_create_default_options()
+  new GripBody: body = grip_body_from_string("")
+
+  grip_request(
+    link,
+    body,
+    GripRequestTypeGet,
+    "@RequestHandler",
+    options
+  )
+
+  grip_destroy_body(body)
+  grip_destroy_options(options)
+}
+
+@RequestHandler() {
+  new response[8192]
+  grip_get_response_body_string(response, charsmax(response))
+
+  if(contain(response, "tag_name") == -1) {
+    CA_Log(logLevel_Warning, " > Wrong response! (don't contain `tag_name`). res=`%s`", response)
+    return
+  }
+
+  static errorBuffer[1024]
+  new GripJSONValue: json = grip_json_parse_string(response, errorBuffer, charsmax(errorBuffer))
+
+  if(json == Invalid_GripJSONValue) {
+    CA_Log(logLevel_Warning, " > Can't parse response JSON! (error=`%s`)", errorBuffer)
+    goto END
+  }
+
+  new tag_name[32]
+  grip_json_object_get_string(json, "tag_name", tag_name, charsmax(tag_name))
+
+  if(CmpVersions(CA_VERSION, tag_name) >= 0)
+    goto END
+
+  new html_url[256]
+  grip_json_object_get_string(json, "html_url", html_url, charsmax(html_url))
+
+  NotifyUpdate(tag_name, html_url)
+
+  END:
+  grip_destroy_json_value(json)
+}
+
+static NotifyUpdate(const newVersion[], const URL[]) {
+  CA_Log(logLevel_Info, "\n\t ChatAdditions (%s) has update! New version `%s`.\n\
+    Download link: `%s`", CA_VERSION, newVersion, URL
+  )
+}
+
+static stock CmpVersions(const a[], const b[]) {
+  new segmentsA[32][32]
+  new segmentsB[32][32]
+
+  new countA = explode_string(
+    a[!isdigit(a[0]) ? 1 : 0],
+    ".",
+    segmentsA, sizeof segmentsA, charsmax(segmentsA[])
+  )
+
+  new countB = explode_string(
+    b[!isdigit(b[0]) ? 1 : 0],
+    ".",
+    segmentsB, sizeof segmentsB, charsmax(segmentsB[])
+  )
+
+  for(new i, l = min(countA, countB); i < l; i++) {
+    new diff = strtol(segmentsA[i]) - strtol(segmentsB[i])
+    if(diff)
+      return diff
+  }
+
+  return countA - countB
 }
