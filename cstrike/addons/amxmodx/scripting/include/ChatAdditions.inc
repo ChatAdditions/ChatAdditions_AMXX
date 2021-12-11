@@ -19,6 +19,8 @@
   #define CA_VERSION "%CA_VERSION%"
 #endif
 
+const CA_MAX_MESSAGE_SIZE 188
+
 /**
 * Return types
 */
@@ -241,7 +243,7 @@ native bool: CA_PlayerHasBlockedPlayer(const receiver, const sender);
  * @return      CA_CONTINUE to allow send message
  *              CA_SUPERCEDE or higher to prevent message
  */
-forward CA_Client_Say(index);
+forward CA_Client_Say(index, const message[]);
 
 /**
  * Called when player say to team chat.
@@ -251,7 +253,7 @@ forward CA_Client_Say(index);
  * @return      CA_CONTINUE to allow send message
  *              CA_SUPERCEDE or higher to prevent message
  */
-forward CA_Client_SayTeam(index);
+forward CA_Client_SayTeam(index, const message[]);
 
 
 /**
