@@ -238,7 +238,8 @@ native bool: CA_PlayerHasBlockedPlayer(const receiver, const sender);
 /**
  * Called when player say to chat.
  *
- * @param index   Client index.
+ * @param index     Client index.
+ * @param message   Client message.
  *
  * @return      CA_CONTINUE to allow send message
  *              CA_SUPERCEDE or higher to prevent message
@@ -248,7 +249,8 @@ forward CA_Client_Say(index, const message[]);
 /**
  * Called when player say to team chat.
  *
- * @param index   Client index.
+ * @param index     Client index.
+ * @param message   Client message.
  *
  * @return      CA_CONTINUE to allow send message
  *              CA_SUPERCEDE or higher to prevent message
