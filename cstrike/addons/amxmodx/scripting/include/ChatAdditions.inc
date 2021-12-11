@@ -19,7 +19,7 @@
   #define CA_VERSION "%CA_VERSION%"
 #endif
 
-const CA_MAX_MESSAGE_SIZE 188
+const CA_MAX_MESSAGE_SIZE = 188
 
 /**
 * Return types
