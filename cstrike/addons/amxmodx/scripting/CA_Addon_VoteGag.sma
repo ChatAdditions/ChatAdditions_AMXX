@@ -10,7 +10,7 @@
 #define PREFIX 		"CA: VoteGAG" 	// Префикс сообщений в чате
 #define REPEAT_VOTE_MIN	2		// Частота повторных голосований
 #define PERCENT_VOTE_OK	60		// Процент голосов для успешного голосования
-#define BLOCK_TIME_MIN	180		// Время GAG'a игрока
+#define BLOCK_TIME_MIN	3		// Время GAG'a игрока
 #define CHECK_VOTE_TIME	15.0		// Продолжительность голосования
 const IMMUNITY_FLAGS = ADMIN_IMMUNITY; 	// Иммунитет к функциям VoteGAG'а
 /* ======== LANG ======== */
@@ -183,7 +183,7 @@ public task__CheckVotes(id)
 	{
 		if(is_user_connected(g_iVotingIndex))
 		{
-			ca_set_user_gag(g_iVotingIndex, PREFIX, (BLOCK_TIME_MIN / 60), (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
+			ca_set_user_gag(g_iVotingIndex, PREFIX, BLOCK_TIME_MIN, (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
 
 			new szName[32];
 			get_user_name(g_iVotingIndex, szName, charsmax(szName));

@@ -1,4 +1,5 @@
 #include <amxmodx>
+#include <amxmisc>
 #include <sqlx>
 
 #include <cellqueue>
@@ -51,9 +52,11 @@ public plugin_init() {
 
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
   g_queueSave = QueueCreate(gagData_s)
+
+  set_task_ex(6.274, "_OnConfigsExecuted")
 }
 
-public OnConfigsExecuted() {
+public _OnConfigsExecuted() {
   g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname)
   SQL_SetCharset(g_tuple, "utf8")
 
