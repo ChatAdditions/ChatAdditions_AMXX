@@ -5,6 +5,8 @@ RequestUnGag_Requested = ^4* ^1Игрок ^4%n ^1просит снять гаг.
 RequestUnGag_YouRequested = ^4* ^1Вы попросили снять гаг.
 RequestUnGag_Unblocked = ^4* ^1Вы успешно сняли гаг с игрока ^4%n^1
 RequestUnGag_NonUnblocked = ^4* ^1Не удалось снять гаг с игрока ^4%n^1
+RequestUnGag_NotFound = ^4* ^3Игрок %i не найден!
+RequestUnGag_NotGagged = ^4* ^3Игрок %i не имеет гага!
 
 [en]
 RequestUnGag_NoAccess = ^4* ^1You don't have a chat block.
@@ -13,3 +15,5 @@ RequestUnGag_Requested = ^4* ^1The player ^4%n ^1asks to remove the gag. To remo
 RequestUnGag_YouRequested = ^4* ^1You asked to take off the gag.
 RequestUnGag_Unblocked = ^4* ^1You successfully removed the gag from the player ^4%n^1
 RequestUnGag_NonUnblocked = ^4* ^1Failed to remove gag from player ^4%n^1
+RequestUnGag_NotFound = ^4* ^3Player %i not found!
+RequestUnGag_NotGagged = ^4* ^3Player %i has no gag!
