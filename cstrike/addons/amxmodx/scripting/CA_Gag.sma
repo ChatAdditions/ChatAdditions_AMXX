@@ -1724,7 +1724,7 @@ public bool: native_ca_has_user_gag(const plugin_id, const argc) {
 public bool: native_ca_remove_user_gag(const plugin_id, const argc) {
   enum { arg_target = 1, arg_admin }
 
-  new target = get_param(arg_target);
+  new target = get_param(arg_target)
   new gag_flags_s: flags = g_currentGags[target][gd_reason][r_flags]
 
   if(flags == gagFlag_Removed) {
@@ -1734,7 +1734,6 @@ public bool: native_ca_remove_user_gag(const plugin_id, const argc) {
   GagData_Copy(g_adminTempData[0], g_currentGags[target])
   g_adminTempData[0][gd_target] = target
 
-  new admin = get_param(arg_admin);
-  // add range checks
+  new admin = get_param(arg_admin)
   return Gag_Remove(admin, target)
 }

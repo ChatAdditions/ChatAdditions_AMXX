@@ -1,131 +1,120 @@
 #include <amxmodx>
-#include <ChatAdditions>
-#include <CA_GAG_API>
 #include <amxmisc>
 
+#include <ChatAdditions>
+#include <CA_GAG_API>
+
 #pragma ctrlchar '\'
+#pragma tabsize 2
 
-new Float: g_flUserRequestTimeout[MAX_PLAYERS + 1];
+static Float: g_userNextRequestTime[MAX_PLAYERS + 1]
 
-static cvar_ca_requestungag_command[32],
-	cvar_ca_requestungag_admin_flag[16],
-	Float: cvar_ca_requestungag_delay;
+static ca_requestungag_cmd[32],
+  ca_requestungag_admin_flag[16],
+  Float: ca_requestungag_delay
 
 public stock const PluginName[] = "CA Addon: Request UnGAG"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "steelzzz"
 public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
-public stock const PluginDescription[] = "Edit me";
+public stock const PluginDescription[] = "A player can apologize to the administration"
 
-public plugin_init()
-{
-	register_plugin(PluginName, PluginVersion, PluginAuthor);
-	register_dictionary("CA_Addon_RequestUngag.txt");
-	
-	Register_CVars();
-	AutoExecConfig(true, "CA_Addon_RequestUnGag", "ChatAdditions");
+public plugin_init() {
+  register_plugin(PluginName, PluginVersion, PluginAuthor)
+  register_dictionary("CA_Addon_RequestUngag.txt")
 
-	register_clcmd(cvar_ca_requestungag_command, "Command_RequestUngag");
+  Register_CVars()
+  AutoExecConfig(true, "CA_Addon_RequestUnGag", "ChatAdditions")
 
-	new accessFlag = read_flags(cvar_ca_requestungag_admin_flag);
-	register_clcmd("say", "Hook_Say", accessFlag, .FlagManager = false);
+  register_clcmd(ca_requestungag_cmd, "Command_RequestUngag")
+
+  new accessFlag = read_flags(ca_requestungag_admin_flag)
+  register_clcmd("say", "Hook_Say", accessFlag, .FlagManager = false)
 }
 
-public Register_CVars()
-{
-	bind_pcvar_string(create_cvar("ca_requestungag_command", "say /sorry",
-		.description = "Request ungag command"),
-		cvar_ca_requestungag_command, charsmax(cvar_ca_requestungag_command)
-	);
-	
-	bind_pcvar_string(create_cvar("ca_requestungag_admin_flag", "a",
-		.description = "Admin Flag"),
-		cvar_ca_requestungag_admin_flag, charsmax(cvar_ca_requestungag_admin_flag)
-  );
+public Register_CVars() {
+  bind_pcvar_string(create_cvar("ca_requestungag_cmd", "say /sorry",
+      .description = "Request ungag command"),
+    ca_requestungag_cmd, charsmax(ca_requestungag_cmd)
+  )
 
-	bind_pcvar_float(create_cvar("ca_requestungag_delay", "5.0",
-		.description = "delay time request ungag",
-		.has_min = true, .min_val = 1.0), 
-	cvar_ca_requestungag_delay);
+  bind_pcvar_string(create_cvar("ca_requestungag_admin_flag", "a",
+      .description = "Admin Flag"),
+    ca_requestungag_admin_flag, charsmax(ca_requestungag_admin_flag)
+  )
+
+  bind_pcvar_float(create_cvar("ca_requestungag_delay", "5.0",
+      .description = "delay time request ungag",
+      .has_min = true, .min_val = 1.0),
+    ca_requestungag_delay
+  )
 }
 
-public Command_RequestUngag(iPlayer)
-{
-	if(!ca_has_user_gag(iPlayer))
-	{
-		client_print_color(iPlayer, print_team_default, "^4* ^1У вас нет мута.");
-		return PLUGIN_HANDLED;
-	}
+public Command_RequestUngag(const player) {
+  if(!ca_has_user_gag(player)) {
+    client_print_color(player, print_team_default, "%L", player, "RequestUnGag_NoAccess")
 
-	if(g_flUserRequestTimeout[iPlayer] > get_gametime())
-	{
-		client_print_color(iPlayer, print_team_default, "^4* ^1Попробуйте через %d сек.", floatround(g_flUserRequestTimeout[iPlayer] - get_gametime()));
-		return PLUGIN_HANDLED;
-	}
+    return PLUGIN_HANDLED
+  }
 
-	for(new i = 1; i <= MaxClients; i++)
-	{
-		if(!is_user_connected(i) || is_user_hltv(i) || is_user_bot(i))
-		{
-			continue;
-		}
+  new Float: gametime = get_gametime()
 
-		if(~get_user_flags(i) & read_flags(cvar_ca_requestungag_admin_flag))
-		{
-			continue;
-		}
+  if(g_userNextRequestTime[player] > gametime) {
+    new timeLeft = floatround(g_userNextRequestTime[player] - gametime, floatround_ceil)
+    client_print_color(player, print_team_default, "%L", player, "RequestUnGag_TimeOut", timeLeft)
 
-		client_print_color(i, print_team_default, "^4* ^1Игрок ^4%n ^1просит снять мут, чтобы снять мут, напишите /unmute %d", iPlayer, iPlayer);
-	}
+    return PLUGIN_HANDLED
+  }
 
-	g_flUserRequestTimeout[iPlayer] = get_gametime() + cvar_ca_requestungag_delay;
+  new userID = get_user_userid(player)
 
-	client_print_color(iPlayer, print_team_default, "^4* ^1Вы попросили снять гаг.");
-	return PLUGIN_HANDLED;
+  new players[MAX_PLAYERS], count
+  get_players_ex(players, count, (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV))
+
+  for(new i; i < count; i++) {
+    if(!(get_user_flags(i) & read_flags(ca_requestungag_admin_flag)))
+      continue
+
+    client_print_color(i, print_team_default, "%L",
+      player, "RequestUnGag_Requested",
+      player, userID
+    )
+  }
+
+  g_userNextRequestTime[player] = gametime + ca_requestungag_delay
+
+  client_print_color(player, print_team_default, "%L", player, "RequestUnGag_YouRequested")
+  return PLUGIN_HANDLED
 }
 
-public Hook_Say(iPlayer, iAccessLevel, iCid)
-{
-	if(!cmd_access(iPlayer, iAccessLevel, iCid, 1))
-	{
-		return PLUGIN_CONTINUE;
-	}
+public Hook_Say(const player, const accessLevel, const cid) {
+  if(!cmd_access(player, accessLevel, cid, true))
+    return PLUGIN_CONTINUE
 
-	new sArgs[20];
-	read_args(sArgs, charsmax(sArgs));
+  new args[20]
+  read_args(args, charsmax(args))
+  remove_quotes(args)
 
-	remove_quotes(sArgs);
+  new const strFind[] = "/unmute"
+  if(strncmp(args, strFind, charsmax(strFind)) != 0)
+    return PLUGIN_CONTINUE
 
-	/*if(containi(sArgs[1], "unmute") == -1)
-	{
-		return PLUGIN_CONTINUE;
-	}
+  new targetStr[3]
+  copy(targetStr, charsmax(targetStr), args[charsmax(strFind)]) // TODO: do it better later
 
-	replace(sArgs, charsmax(sArgs), "/unmute", "");*/
-	new const strFind[] = "unmute";
+  new target = find_player_ex(FindPlayer_MatchUserId | FindPlayer_ExcludeBots, strtol(targetStr))
 
-	if(strncmp(sArgs[1], strFind, charsmax(strFind)) != 0)
-	{
-		return PLUGIN_CONTINUE
-  	}
+  if(!is_user_connected(target))
+    return PLUGIN_CONTINUE
 
-	new sUserId[3];
-	copy(sUserId, charsmax(sUserId), sArgs[8]);
+  if(!ca_has_user_gag(target))
+    return PLUGIN_CONTINUE
 
-	new iUserId = str_to_num(sUserId);
+  new ret = ca_remove_user_gag(target, player)
 
-	if(!is_user_connected(iUserId))
-	{
-		return PLUGIN_CONTINUE;
-	}
+  client_print_color(player, print_team_default, "%L", player,
+    ret ? "RequestUnGag_Unblocked" : "RequestUnGag_NonUnblocked", target
+  )
 
-	if(!ca_has_user_gag(iUserId))
-	{
-		return PLUGIN_CONTINUE;
-	}
-
-	ca_remove_user_gag(iUserId, iPlayer);
-	client_print_color(iPlayer, print_team_default, "^4* ^1Вы успешно сняли мут с игрока %n", iUserId);
-
-	return PLUGIN_CONTINUE;
+  return PLUGIN_CONTINUE
 }
