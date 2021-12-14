@@ -54,6 +54,7 @@ new const g_adminChatCmds[][] = {
 }
 
 new const g_gagCmd[] = "gag"
+new const g_unGagCmd[] = "ungag"
 
 public stock const PluginName[] = "CA: Gag"
 public stock const PluginVersion[] = CA_VERSION
@@ -1656,10 +1657,36 @@ static bool: CmdRouter(const player, const message[]) {
     return true
   }
 
+  if(strncmp(cmd, g_unGagCmd, charsmax(g_unGagCmd), true) == 0) {
+    new targetUserID = strtol(token)
+    if(targetUserID == 0)
+      return false
+
+    UnGag_ByUserID(player, targetUserID)
+    return true
+  }
 
   return false
 }
 
+static UnGag_ByUserID(const admin, const targetUserID) {
+  new target = find_player_ex(FindPlayer_MatchUserId | FindPlayer_ExcludeBots, targetUserID)
+  if(!is_user_connected(target)) {
+      client_print_color(admin, print_team_red, "%L %L", admin, "Gag_prefix", admin, "Gag_PlayerNotConnected")
+      return
+    }
+
+  new bool: hasBlock = g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed
+  if(!hasBlock) {
+    client_print_color(admin, print_team_red, "%L %L", admin, "Gag_prefix", admin, "Gag_PlayerExpiredGag", target)
+    return
+  }
+
+  GagData_Copy(g_adminTempData[admin], g_currentGags[target])
+  g_adminTempData[admin][gd_target] = target
+
+  Gag_Remove(admin, target)
+}
 
 Register_Forwards() {
   g_fwd_gag_setted = CreateMultiForward("CA_gag_setted", ET_STOP,
