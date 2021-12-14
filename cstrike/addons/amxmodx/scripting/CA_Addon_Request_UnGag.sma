@@ -67,11 +67,12 @@ public CA_Client_Say(player, const message[]) {
     get_players_ex(players, count, (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV))
 
     for(new i; i < count; i++) {
-      if(!(get_user_flags(i) & read_flags(ca_requestungag_admin_flag)))
+      new receiver = players[i]
+      if(!(get_user_flags(receiver) & read_flags(ca_requestungag_admin_flag)))
         continue
 
-      client_print_color(i, print_team_default, "%L",
-        player, "RequestUnGag_Requested",
+      client_print_color(receiver, print_team_default, "%L",
+        receiver, "RequestUnGag_Requested",
         player, userID
       )
     }
