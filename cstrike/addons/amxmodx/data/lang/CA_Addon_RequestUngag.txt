@@ -1,7 +1,7 @@
 [ru]
 RequestUnGag_NoAccess = ^4* ^1У вас не заблокирован чат.
 RequestUnGag_TimeOut = ^4* ^1Попробуйте через %i сек.
-RequestUnGag_Requested = ^4* ^1Игрок ^4%n ^1просит снять гаг. Чтобы снять гаг, напишите: ^4/unmute %d^1
+RequestUnGag_Requested = ^4* ^1Игрок ^4%n ^1просит снять гаг. Чтобы снять гаг, напишите: ^4/ungag %d^1
 RequestUnGag_YouRequested = ^4* ^1Вы попросили снять гаг.
 RequestUnGag_Unblocked = ^4* ^1Вы успешно сняли гаг с игрока ^4%n^1
 RequestUnGag_NonUnblocked = ^4* ^1Не удалось снять гаг с игрока ^4%n^1
@@ -11,7 +11,7 @@ RequestUnGag_NotGagged = ^4* ^3Игрок %i не имеет гага!
 [en]
 RequestUnGag_NoAccess = ^4* ^1You don't have a chat block.
 RequestUnGag_TimeOut = ^4* ^1Try it in %i seconds.
-RequestUnGag_Requested = ^4* ^1The player ^4%n ^1asks to remove the gag. To remove it write: ^4/unmute %i^1
+RequestUnGag_Requested = ^4* ^1The player ^4%n ^1asks to remove the gag. To remove it write: ^4/ungag %i^1
 RequestUnGag_YouRequested = ^4* ^1You asked to take off the gag.
 RequestUnGag_Unblocked = ^4* ^1You successfully removed the gag from the player ^4%n^1
 RequestUnGag_NonUnblocked = ^4* ^1Failed to remove gag from player ^4%n^1

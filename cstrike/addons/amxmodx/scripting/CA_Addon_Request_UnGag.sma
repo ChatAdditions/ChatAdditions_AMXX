@@ -83,7 +83,7 @@ public CA_Client_Say(player, const message[]) {
     return PLUGIN_HANDLED
   }
 
-  new const strFind[] = "/unmute"
+  new const strFind[] = "/ungag"
   if(strncmp(message, strFind, charsmax(strFind)) == 0) {
     if(!(get_user_flags(player) & read_flags(ca_requestungag_admin_flag)))
       return PLUGIN_CONTINUE
