@@ -9,7 +9,9 @@
 
 static Float: g_userNextRequestTime[MAX_PLAYERS + 1]
 
-static ca_requestungag_cmd[32], Float: ca_requestungag_delay
+static ca_requestungag_cmd[32],
+  Float: ca_requestungag_delay
+
 static ca_gag_access_flags_high[32], ca_gag_access_flags[32]
 
 public stock const PluginName[] = "CA Addon: Request UnGAG"
@@ -27,7 +29,7 @@ public plugin_init() {
 }
 
 public Register_CVars() {
-  bind_pcvar_string(create_cvar("ca_requestungag_cmd", "say /sorry",
+  bind_pcvar_string(create_cvar("ca_requestungag_cmd", "/sorry",
       .description = "Request ungag command"),
     ca_requestungag_cmd, charsmax(ca_requestungag_cmd)
   )
@@ -48,7 +50,7 @@ public Register_CVars() {
 }
 
 public CA_Client_Say(player, const message[]) {
-  if(strcmp(message, ca_requestungag_cmd[4]) != 0)
+  if(strcmp(message, ca_requestungag_cmd) != 0)
     return PLUGIN_CONTINUE
 
   if(!ca_has_user_gag(player)) {
