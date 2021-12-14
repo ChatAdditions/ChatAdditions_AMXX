@@ -1731,9 +1731,9 @@ public bool: native_ca_remove_user_gag(const plugin_id, const argc) {
     return false
   }
 
-  GagData_Copy(g_adminTempData[0], g_currentGags[target])
-  g_adminTempData[0][gd_target] = target
-
   new admin = get_param(arg_admin)
+  GagData_Copy(g_adminTempData[admin], g_currentGags[target])
+  g_adminTempData[admin][gd_target] = target
+
   return Gag_Remove(admin, target)
 }
