@@ -9,9 +9,8 @@
 
 static Float: g_userNextRequestTime[MAX_PLAYERS + 1]
 
-static ca_requestungag_cmd[32],
-  ca_requestungag_admin_flag[16],
-  Float: ca_requestungag_delay
+static ca_requestungag_cmd[32], Float: ca_requestungag_delay
+static ca_gag_access_flags_high[32], ca_gag_access_flags[32]
 
 public stock const PluginName[] = "CA Addon: Request UnGAG"
 public stock const PluginVersion[] = CA_VERSION
@@ -33,15 +32,18 @@ public Register_CVars() {
     ca_requestungag_cmd, charsmax(ca_requestungag_cmd)
   )
 
-  bind_pcvar_string(create_cvar("ca_requestungag_admin_flag", "a",
-      .description = "Admin Flag"),
-    ca_requestungag_admin_flag, charsmax(ca_requestungag_admin_flag)
-  )
-
   bind_pcvar_float(create_cvar("ca_requestungag_delay", "5.0",
       .description = "delay time request ungag",
       .has_min = true, .min_val = 1.0),
     ca_requestungag_delay
+  )
+
+  bind_pcvar_string(get_cvar_pointer("ca_gag_access_flags_high"),
+    ca_gag_access_flags_high, charsmax(ca_gag_access_flags_high)
+  )
+
+  bind_pcvar_string(get_cvar_pointer("ca_gag_access_flags"),
+    ca_gag_access_flags, charsmax(ca_gag_access_flags)
   )
 }
 
@@ -68,9 +70,12 @@ public CA_Client_Say(player, const message[]) {
   new players[MAX_PLAYERS], count
   get_players_ex(players, count, (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV))
 
+  new accessFlagsHigh       = read_flags(ca_gag_access_flags_high)
+  new accessFlags           = read_flags(ca_gag_access_flags)
+
   for(new i; i < count; i++) {
     new receiver = players[i]
-    if(!(get_user_flags(receiver) & read_flags(ca_requestungag_admin_flag)))
+    if(!(get_user_flags(receiver) & (accessFlags | accessFlagsHigh)))
       continue
 
     client_print_color(receiver, print_team_default, "%L",
