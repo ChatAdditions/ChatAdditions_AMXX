@@ -34,7 +34,7 @@ public Register_CVars() {
     ca_requestungag_cmd, charsmax(ca_requestungag_cmd)
   )
 
-  bind_pcvar_float(create_cvar("ca_requestungag_delay", "15.0",
+  bind_pcvar_float(create_cvar("ca_requestungag_delay", "40.0",
       .description = "delay time request ungag",
       .has_min = true, .min_val = 1.0),
     ca_requestungag_delay
