@@ -49,6 +49,7 @@ public Register_CVars() {
   )
 }
 
+// TODO: Create `_PRE` hook forward instead this.
 public CA_Client_Say(player, const message[]) {
   if(strcmp(message, ca_requestungag_cmd) != 0)
     return PLUGIN_CONTINUE
