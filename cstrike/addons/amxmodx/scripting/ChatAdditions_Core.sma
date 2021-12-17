@@ -45,7 +45,7 @@ new const g_versionLink[] = "https://api.github.com/repos/"
 public stock const PluginName[] = "ChatAdditions: Core"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "https://Dev-CS.ru/"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "A core plugin for control different types of chat."
 
 public plugin_precache() {

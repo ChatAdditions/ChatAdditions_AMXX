@@ -24,7 +24,7 @@ new Handle: g_tuple = Empty_Handle
 public stock const PluginName[] = "ChatAdditions: SQLite storage"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "https://Dev-CS.ru/"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "SQLite storage provider for ChatAdditions"
 
 public plugin_init() {

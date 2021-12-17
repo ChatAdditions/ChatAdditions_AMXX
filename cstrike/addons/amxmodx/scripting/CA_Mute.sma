@@ -24,7 +24,7 @@ enum {
 public stock const PluginName[] = "CA: Mute"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "https://Dev-CS.ru/"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "Players can choose who they can hear."
 
 public plugin_init() {
