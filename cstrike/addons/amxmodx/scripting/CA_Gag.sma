@@ -53,6 +53,9 @@ new const g_adminChatCmds[][] = {
   "amx_tsay2"
 }
 
+new const g_gagCmd[] = "gag"
+new const g_unGagCmd[] = "ungag"
+
 public stock const PluginName[] = "CA: Gag"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
@@ -106,7 +109,6 @@ public plugin_init() {
   }
 
   register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh), .FlagManager = false)
-  register_clcmd("say", "ClCmd_Say", (accessFlags | accessFlagsHigh), .FlagManager = false)
 
   for(new i; i < sizeof g_adminChatCmds; i++)
     register_clcmd(g_adminChatCmds[i], "ClCmd_adminSay", ADMIN_CHAT);
@@ -1062,28 +1064,6 @@ public ClCmd_Gag(const id, const level, const cid) {
   return PLUGIN_HANDLED
 }
 
-public ClCmd_Say(const id, const level, const cid) {
-  new args[128]; read_args(args, charsmax(args))
-  trim(args); remove_quotes(args)
-
-  new const strFind[] = "gag"
-
-  if(strncmp(args[1], strFind, charsmax(strFind)) != 0) {
-    return PLUGIN_CONTINUE
-  }
-
-  if(!cmd_access(id, level, cid, 1)) {
-    return PLUGIN_CONTINUE
-  }
-
-  new nickname[32]
-  copy(nickname, charsmax(nickname), args[5])
-
-  MenuShow_PlayersList(id, nickname)
-
-  return PLUGIN_HANDLED
-}
-
 public ClCmd_EnterGagReason(const id, const level, const cid) {
   if(!cmd_access(id, level, cid, 1)) {
     return PLUGIN_HANDLED
@@ -1315,7 +1295,10 @@ public CA_Client_Voice(const listener, const sender) {
   return CA_SUPERCEDE
 }
 
-public CA_Client_SayTeam(id) {
+public CA_Client_SayTeam(id, const message[]) {
+  if(CmdRouter(id, message))
+    return PLUGIN_CONTINUE
+
   new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam)
 
   if(!hasBlock) {
@@ -1328,7 +1311,10 @@ public CA_Client_SayTeam(id) {
   return CA_SUPERCEDE
 }
 
-public CA_Client_Say(id) {
+public CA_Client_Say(id, const message[]) {
+  if(CmdRouter(id, message))
+    return PLUGIN_CONTINUE
+
   new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
 
   if(!hasBlock) {
@@ -1659,6 +1645,48 @@ static Gag_Expired(const id) {
   client_print_color(0, print_team_default, "%L %L", LANG_PLAYER, "Gag_prefix", LANG_PLAYER, "Gag_PlayerExpiredGag", id)
 }
 
+static bool: CmdRouter(const player, const message[]) {
+  if(!(get_user_flags(player) & (read_flags(ca_gag_access_flags) | read_flags(ca_gag_access_flags_high))))
+    return false
+
+  new cmd[32], token[32]
+  strtok2(message[1], cmd, charsmax(cmd), token, charsmax(token), .trim = true)
+
+  if(strncmp(cmd, g_gagCmd, charsmax(g_gagCmd), true) == 0) {
+    MenuShow_PlayersList(player, token)
+    return true
+  }
+
+  if(strncmp(cmd, g_unGagCmd, charsmax(g_unGagCmd), true) == 0) {
+    new targetUserID = strtol(token)
+    if(targetUserID == 0)
+      return false
+
+    UnGag_ByUserID(player, targetUserID)
+    return true
+  }
+
+  return false
+}
+
+static UnGag_ByUserID(const admin, const targetUserID) {
+  new target = find_player_ex(FindPlayer_MatchUserId | FindPlayer_ExcludeBots, targetUserID)
+  if(!is_user_connected(target)) {
+      client_print_color(admin, print_team_red, "%L %L", admin, "Gag_prefix", admin, "Gag_PlayerNotConnected")
+      return
+    }
+
+  new bool: hasBlock = g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed
+  if(!hasBlock) {
+    client_print_color(admin, print_team_red, "%L %L", admin, "Gag_prefix", admin, "Gag_PlayerExpiredGag", target)
+    return
+  }
+
+  GagData_Copy(g_adminTempData[admin], g_currentGags[target])
+  g_adminTempData[admin][gd_target] = target
+
+  Gag_Remove(admin, target)
+}
 
 Register_Forwards() {
   g_fwd_gag_setted = CreateMultiForward("CA_gag_setted", ET_STOP,
@@ -1722,17 +1750,18 @@ public bool: native_ca_has_user_gag(const plugin_id, const argc) {
 }
 
 public bool: native_ca_remove_user_gag(const plugin_id, const argc) {
-  enum { arg_index = 1 }
+  enum { arg_target = 1, arg_admin }
 
-  new target = get_param(arg_index)
+  new target = get_param(arg_target)
   new gag_flags_s: flags = g_currentGags[target][gd_reason][r_flags]
 
   if(flags == gagFlag_Removed) {
     return false
   }
 
-  GagData_Copy(g_adminTempData[0], g_currentGags[target])
-  g_adminTempData[0][gd_target] = target
+  new admin = get_param(arg_admin)
+  GagData_Copy(g_adminTempData[admin], g_currentGags[target])
+  g_adminTempData[admin][gd_target] = target
 
-  return Gag_Remove(0, target)
+  return Gag_Remove(admin, target)
 }

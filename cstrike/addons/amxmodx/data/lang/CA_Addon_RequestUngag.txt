@@ -1,0 +1,11 @@
+[ru]
+RequestUnGag_NoAccess = ^4* ^1У вас не заблокирован чат.
+RequestUnGag_TimeOut = ^4* ^1Попробуйте через %i сек.
+RequestUnGag_Requested = ^4* ^1Игрок ^4%n ^1просит снять гаг. Чтобы снять гаг, напишите: ^4/ungag %d^1
+RequestUnGag_YouRequested = ^4* ^1Вы попросили снять гаг.
+
+[en]
+RequestUnGag_NoAccess = ^4* ^1You don't have a chat block.
+RequestUnGag_TimeOut = ^4* ^1Try it in %i seconds.
+RequestUnGag_Requested = ^4* ^1The player ^4%n ^1asks to remove the gag. To remove it write: ^4/ungag %i^1
+RequestUnGag_YouRequested = ^4* ^1You asked to take off the gag.

@@ -174,14 +174,15 @@ native bool: ca_has_user_gag(const index);
 /**
  * Remove client's gag data..
  *
- * @param index         Client index
+ * @param target        Target Index
+ * @param admin         Admin Index (0 - server)
  *
  * @return				      True if gag has been removed.
  * @error               If the client index is not within the range of 1 to
  *                      MaxClients, or the client is not connected, an error
  *                      will be thrown.
  */
-native bool: ca_remove_user_gag(const index);
+native bool: ca_remove_user_gag(const target, admin = 0);
 
 /**
  * Called on Gag save.
