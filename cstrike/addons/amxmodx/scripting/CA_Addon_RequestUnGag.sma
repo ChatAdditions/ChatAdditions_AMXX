@@ -80,6 +80,9 @@ public CA_Client_Say(player, const message[]) {
     if(!(get_user_flags(receiver) & (accessFlags | accessFlagsHigh)))
       continue
 
+    if(receiver == player)
+      continue
+
     client_print_color(receiver, print_team_default, "%L",
       receiver, "RequestUnGag_Requested",
       player, userID
