@@ -77,10 +77,11 @@ public CA_Client_Say(player, const message[]) {
 
   for(new i; i < count; i++) {
     new receiver = players[i]
-    if(!(get_user_flags(receiver) & (accessFlags | accessFlagsHigh)))
-      continue
 
     if(receiver == player)
+      continue
+
+    if(!(get_user_flags(receiver) & (accessFlags | accessFlagsHigh)))
       continue
 
     client_print_color(receiver, print_team_default, "%L",
