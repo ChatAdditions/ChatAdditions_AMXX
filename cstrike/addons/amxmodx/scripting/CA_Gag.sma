@@ -646,10 +646,12 @@ static MenuShow_SelectFlags(const id) {
     (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-"),
     fmt("%i", gagFlag_Say)
   )
-  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
-    (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
-    fmt("%i", gagFlag_SayTeam)
-  )
+  if(!ca_gag_common_chat_block) {
+    menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
+      (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
+      fmt("%i", gagFlag_SayTeam)
+    )
+  }
   menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
     (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"),
     fmt("%i", gagFlag_Voice)
@@ -726,7 +728,9 @@ public MenuHandler_SelectFlags(const id, const menu, const item) {
   new itemIndex = strtol(g_itemInfo)
 
   switch(itemIndex) {
-    case gagFlag_Say:     g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Say
+    case gagFlag_Say: {
+      g_adminTempData[id][gd_reason][r_flags] ^= (!ca_gag_common_chat_block ? gagFlag_Say : (gagFlag_Say | gagFlag_SayTeam))
+    }
     case gagFlag_SayTeam: g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_SayTeam
     case gagFlag_Voice:   g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Voice
 
@@ -918,11 +922,15 @@ static MenuShow_EditGag(const id) {
     ),
     fmt("%i", gagFlag_Say)
   )
-  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
-      (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"
-    ),
-    fmt("%i", gagFlag_SayTeam)
-  )
+
+  if(!ca_gag_common_chat_block) {
+    menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
+        (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"
+      ),
+      fmt("%i", gagFlag_SayTeam)
+    )
+  }
+
   menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
       (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"
     ),
@@ -1307,7 +1315,7 @@ public CA_Client_SayTeam(id, const message[]) {
   if(CmdRouter(id, message))
     return PLUGIN_CONTINUE
 
-  new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam)
+  new bool: hasBlock = bool: (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_SayTeam : gagFlag_Say))
 
   if(!hasBlock) {
     return CA_CONTINUE
