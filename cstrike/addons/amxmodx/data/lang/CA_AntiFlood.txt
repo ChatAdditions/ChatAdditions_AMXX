@@ -1,0 +1,17 @@
+[en]
+CA_ANTIFLOOD_CHAT_PREFIX            = ^1[^4AntiFlood^1]
+
+CA_ANTIFLOOD_CHAT_STOP_FLOODING     = ^1Stop ^3flooding.
+CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE     = ^1Your message ^3is repeated! ^4Exercise your imagination.
+
+CA_ANTIFLOOD_CVAR_TIME              = Time between messages^n0.0 - no limit
+CA_ANTIFLOOD_CVAR_EQUAL_MESSAGES    = How many identical messages can be written in a row^n0 - no limit
+
+[ru]
+CA_ANTIFLOOD_CHAT_PREFIX            = ^1[^4AntiFlood^1]
+
+CA_ANTIFLOOD_CHAT_STOP_FLOODING     = ^1Прекратите ^3флудить.
+CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE     = ^1Сообщение ^3повторяется! ^4Проявите фантазию.
+
+CA_ANTIFLOOD_CVAR_TIME              = Время между сообщениями^n0.0 - без ограничений
+CA_ANTIFLOOD_CVAR_EQUAL_MESSAGES    = Сколько одинаковых сообщений можно написать подряд^n0 - без ограничений
