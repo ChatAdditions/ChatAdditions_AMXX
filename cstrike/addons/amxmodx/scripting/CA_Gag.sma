@@ -1558,7 +1558,7 @@ static bool: IsTargetHasImmunity(const id, const target) {
   return false
 }
 
-static Get_GagFlags_Names(const gag_flags_s: flags) {
+static Get_GagFlags_Names(gag_flags_s: flags) {
   // TODO: ML this
 
   new buffer[64]
@@ -1566,8 +1566,8 @@ static Get_GagFlags_Names(const gag_flags_s: flags) {
     "Chat", "Team chat", "Voice"
   }
 
-  if(ca_gag_common_chat_block && bool: (flags & gagFlag_SayTeam))
-    flags &= ~gagFlag_SayTeam
+  if(ca_gag_common_chat_block && (flags & gagFlag_SayTeam))
+    flags ^= gagFlag_SayTeam
 
   for(new i = 0; i < sizeof(GAG_FLAGS_STR); i++) {
     if(flags & gag_flags_s: (1 << i)) {
