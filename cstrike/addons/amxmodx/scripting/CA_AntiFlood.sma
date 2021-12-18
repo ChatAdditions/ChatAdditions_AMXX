@@ -72,7 +72,7 @@ CheckMessage(id, const szMessage[])
     {
         if(++iEqualMessage[id] >= g_pCvarValue[ca_equal_messages])
         {
-            client_print_color(id, print_team_red, "%L %L", LANG_PLAYER, "CA_ANTIFLOOD_CHAT_PREFIX", LANG_PLAYER, "CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE");
+            client_print_color(id, print_team_red, "%L %L", id, "CA_ANTIFLOOD_CHAT_PREFIX", id, "CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE");
 
             return CA_SUPERCEDE;
         }        
