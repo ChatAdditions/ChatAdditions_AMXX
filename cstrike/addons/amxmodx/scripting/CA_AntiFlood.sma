@@ -16,7 +16,7 @@ new g_pCvarValue[Cvars];
 public stock const PluginName[] = "CA: Anti Flood";
 public stock const PluginVersion[] = CA_VERSION;
 public stock const PluginAuthor[] = "Nordic Warrior";
-public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX";
+public stock const PluginURL[] = "https://github.com/ChatAdditions";
 public stock const PluginDescription[] = "Antiflood for chat";
 
 public plugin_init()
@@ -62,17 +62,15 @@ CheckMessage(id, const szMessage[])
 
     if(flNextMessage[id] > flNextSay)
     {
-        client_print_color(id, print_team_red, "%L %L", LANG_PLAYER, "CA_ANTIFLOOD_CHAT_PREFIX", LANG_PLAYER, "CA_ANTIFLOOD_CHAT_STOP_FLOODING");
+        client_print_color(id, print_team_red, "%L %L", id, "CA_ANTIFLOOD_CHAT_PREFIX", id, "CA_ANTIFLOOD_CHAT_STOP_FLOODING");
         flNextMessage[id] = flNextSay + g_pCvarValue[ca_anti_flood_time];
 
         return CA_SUPERCEDE;
     }
 
-    if(equali(szMessage, g_szOldMessage[id]))
+    if(strcmp(szMessage, g_szOldMessage[id], true) == 0)
     {
-        iEqualMessage[id]++;
-
-        if(iEqualMessage[id] >= g_pCvarValue[ca_equal_messages])
+        if(++iEqualMessage[id] >= g_pCvarValue[ca_equal_messages])
         {
             client_print_color(id, print_team_red, "%L %L", LANG_PLAYER, "CA_ANTIFLOOD_CHAT_PREFIX", LANG_PLAYER, "CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE");
 
