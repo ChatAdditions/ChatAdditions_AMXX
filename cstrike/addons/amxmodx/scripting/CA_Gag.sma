@@ -32,7 +32,8 @@ new ca_gag_times[64],
   ca_gag_sound_ok[128],
   ca_gag_sound_error[128],
   bool: ca_gag_block_nickname_change,
-  bool: ca_gag_block_admin_chat
+  bool: ca_gag_block_admin_chat,
+  bool: ca_gag_common_chat_block
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 
@@ -206,6 +207,13 @@ Register_CVars() {
         0 = no restrictions"
     ),
     ca_gag_block_admin_chat
+  )
+
+  bind_pcvar_num(create_cvar("ca_gag_common_chat_block", "1",
+      .description = "Don't separate `say` & `say_team` chats\n \
+        0 = disabled"
+    ),
+    ca_gag_common_chat_block
   )
 }
 
@@ -638,10 +646,12 @@ static MenuShow_SelectFlags(const id) {
     (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-"),
     fmt("%i", gagFlag_Say)
   )
-  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
-    (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
-    fmt("%i", gagFlag_SayTeam)
-  )
+  if(!ca_gag_common_chat_block) {
+    menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
+      (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
+      fmt("%i", gagFlag_SayTeam)
+    )
+  }
   menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
     (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"),
     fmt("%i", gagFlag_Voice)
@@ -718,7 +728,9 @@ public MenuHandler_SelectFlags(const id, const menu, const item) {
   new itemIndex = strtol(g_itemInfo)
 
   switch(itemIndex) {
-    case gagFlag_Say:     g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Say
+    case gagFlag_Say: {
+      g_adminTempData[id][gd_reason][r_flags] ^= (!ca_gag_common_chat_block ? gagFlag_Say : (gagFlag_Say | gagFlag_SayTeam))
+    }
     case gagFlag_SayTeam: g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_SayTeam
     case gagFlag_Voice:   g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Voice
 
@@ -910,11 +922,15 @@ static MenuShow_EditGag(const id) {
     ),
     fmt("%i", gagFlag_Say)
   )
-  menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
-      (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"
-    ),
-    fmt("%i", gagFlag_SayTeam)
-  )
+
+  if(!ca_gag_common_chat_block) {
+    menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
+        (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"
+      ),
+      fmt("%i", gagFlag_SayTeam)
+    )
+  }
+
   menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
       (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"
     ),
@@ -1299,7 +1315,7 @@ public CA_Client_SayTeam(id, const message[]) {
   if(CmdRouter(id, message))
     return PLUGIN_CONTINUE
 
-  new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_SayTeam)
+  new bool: hasBlock = bool: (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_SayTeam : gagFlag_Say))
 
   if(!hasBlock) {
     return CA_CONTINUE
@@ -1542,13 +1558,16 @@ static bool: IsTargetHasImmunity(const id, const target) {
   return false
 }
 
-static Get_GagFlags_Names(const gag_flags_s: flags) {
+static Get_GagFlags_Names(gag_flags_s: flags) {
   // TODO: ML this
 
   new buffer[64]
   new const GAG_FLAGS_STR[][] = {
     "Chat", "Team chat", "Voice"
   }
+
+  if(ca_gag_common_chat_block && (flags & gagFlag_SayTeam))
+    flags ^= gagFlag_SayTeam
 
   for(new i = 0; i < sizeof(GAG_FLAGS_STR); i++) {
     if(flags & gag_flags_s: (1 << i)) {
