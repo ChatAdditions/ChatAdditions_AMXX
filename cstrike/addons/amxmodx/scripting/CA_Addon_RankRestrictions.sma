@@ -7,7 +7,7 @@
 native aes_get_player_level(const player)
 native ar_get_user_level(const player, rankName[] = "", len = 0)
 native crxranks_get_user_level(const player)
-
+native cmsranks_get_user_level(id, szLevel[] = "", len = 0)
 native csstats_get_user_stats(const player, const stats[22])
 //
 
@@ -50,6 +50,9 @@ public native_filter(const name[], index, trap) {
   if(strcmp(name, "csstats_get_user_stats"))
     return  PLUGIN_HANDLED
 
+  if(strcmp(name, "cmsranks_get_user_level"))
+    return  PLUGIN_HANDLED;
+
   return PLUGIN_CONTINUE
 }
 
@@ -74,9 +77,10 @@ static Register_CVars() {
     .description = "Level System Types\n\
       0 - Advanced Experience System\n\
       1 - Army Ranks Ultimate\n\
-      2 - OciXCrom's Rank System",
+      2 - OciXCrom's Rank System\n\
+      3 - CMSStats Ranks",
     .has_min = true, .min_val = 0.0,
-    .has_max = true, .max_val = 2.0
+    .has_max = true, .max_val = 3.0
     ), ca_rankrestrictions_type_level
   )
 
@@ -150,6 +154,7 @@ static GetUserLevel(const player) {
     case 0: return aes_get_player_level(player)
     case 1: return ar_get_user_level(player)
     case 2: return crxranks_get_user_level(player)
+    case 3: return cmsranks_get_user_level(player)
   }
 
   return 0
