@@ -1,224 +1,418 @@
-/*
- * The plugin is based on an existing plugin from UCC by neygomon.
- */
 
-#include <amxmodx>
+#include <amxmisc>
+#include <ChatAdditions>
 #include <CA_GAG_API>
 
+const INVALID_ACCESS = (-1 ^ (-1 << 29));
 
-/* ======== SETTINGS ======== */
-#define PREFIX 		"CA: VoteGAG" 	// Префикс сообщений в чате
-#define REPEAT_VOTE_MIN	2		// Частота повторных голосований
-#define PERCENT_VOTE_OK	60		// Процент голосов для успешного голосования
-#define BLOCK_TIME_MIN	3		// Время GAG'a игрока
-#define CHECK_VOTE_TIME	15.0		// Продолжительность голосования
-const IMMUNITY_FLAGS = ADMIN_IMMUNITY; 	// Иммунитет к функциям VoteGAG'а
-/* ======== LANG ======== */
-#define MSG_PLMENU_TITLE "\d[\rVoteGag\d] \yВыберите игрока"
-#define MSG_VMENU_TITLE "\d[\rVoteGag\d] \yЗаткнуть игрока \r%s\y?"
-#define MSG_MENU_YES 	"\rДа"
-#define MSG_MENU_NO 	"\yНет"
-#define MSG_MENU_NEXT 	"\yДалее"
-#define MSG_MENU_BACK	"\rНазад"
-#define MSG_MENU_EXIT	"\rВыход"
+enum _:CVARS
+{
+	CMDS[512],
+	REASON[128],
+	TIME,
+	PERCENTAGE,
+	MAX_VOTES,
+	MIN_PLAYERS,
+	SAMPLE_OK[MAX_RESOURCE_PATH_LENGTH],
+	SAMPLE_ERROR[MAX_RESOURCE_PATH_LENGTH],
 
-#define MSG_VOTE_EXISTS		"^1[^4%s^1] ^4Голосование за ^1gag ^4игрока ^3уже запужено!"
-#define MSG_VOTE_BLOCK		"^1[^4%s^1] ^4Голосование будет доступно через ^3%d сек."
-#define MSG_VOTING_FAIL 	"^1[^4%s^1] ^4Голосование завершилось ^3неудачно^4. Недостаточно голосов ^1[^3%d^1/^3%d^1]"
-#define MSG_VOTING_OK_ALL	"^1[^4%s^1] ^4Голосование завершилось ^3удачно^4. Игрок ^3%s ^4GAG'нут на ^3%d ^4мин."
-#define MSG_VOTING_OK_PL 	"^1[^4%s^1] ^4Голосование за Ваш GAG завершилось ^3удачно^4. Вам отключены чаты на ^3%d ^4мин."
-#define MSG_VOTING_DISC 	"^1[^4%s^1] ^4Игрок, за которого Вы запускали GAG голосование, покинул сервер"
-/* ======== EndLANG ======== */
+};	new CVAR[CVARS];
 
-
-#if !defined MAX_PLAYERS
-	const MAX_PLAYERS = 32;
-#endif
-
-new g_VotingMenu;
-new g_iVotingIndex, g_iVotingLasttime;
-new g_arrPlayers[MAX_PLAYERS], g_iPnum;
-new bool:g_bPlayerVoted[MAX_PLAYERS + 1], g_iPlayersVotedCount;
-
+new bool:g_bVotedPlayers[MAX_PLAYERS + 1][MAX_PLAYERS + 1];
 
 public plugin_init()
 {
 	register_plugin("CA: VoteGAG", "1.0.0-alpha", "Sergey Shorokhov");
-
-	register_clcmd("say /votegag", "clcmd_VoteGag");
-	register_clcmd("say_team /votegag", "clcmd_VoteGag");
-	register_clcmd("votegag", "clcmd_VoteGag")
-}
-
-public plugin_cfg()
-{
-	g_VotingMenu = menu_create("Title", "voting_handler");
-	menu_setprop(g_VotingMenu, MPROP_EXIT, MEXIT_NEVER);
-	menu_additem(g_VotingMenu, MSG_MENU_YES, "1");
-	menu_additem(g_VotingMenu, MSG_MENU_NO, "0");
+	
+	register_dictionary("CA_VoteGag.txt");
+	register_dictionary("time.txt");
+	
+/*
+	static const CMDS[][] = { "votegag" };
+	for (new i; i < sizeof(CMDS); i++)
+		register_trigger_clcmd(CMDS[i], "clcmd_votegag");
+*/
+	
+	Register_CVars();
+	
+	new szName[32];
+	
+	while (argbreak(CVAR[CMDS], szName, charsmax(szName), CVAR[CMDS], charsmax(CVAR[CMDS])) != -1)
+	{
+		if (szName[0] == '/' || szName[0] == '!' || szName[0] == '.')
+		{
+			register_clcmd(fmt("say %s", szName), "clcmd_votegag");
+			register_clcmd(fmt("say_team %s", szName), "clcmd_votegag");
+		}
+		else
+			register_clcmd(szName, "clcmd_votegag");
+	}
+	
+	CA_Log(logLevel_Debug, "[CA]: Vote Gag initialized!");
 }
 
 public client_disconnected(id)
 {
-	if(g_bPlayerVoted[id])
-	{
-		g_bPlayerVoted[id] = false;
-		g_iPlayersVotedCount--;
-	}
+	arrayset(g_bVotedPlayers[id], false, sizeof(g_bVotedPlayers[]));
+	
+	for (new i, aSize = sizeof(g_bVotedPlayers[]); i < aSize; i++) g_bVotedPlayers[i][id] = false;
 }
 
-public clcmd_VoteGag(id)
+public clcmd_votegag(id)
 {
-	if(g_iVotingIndex)
+	if (get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < CVAR[MIN_PLAYERS])
 	{
-		ChatColor(id, 0, MSG_VOTE_EXISTS, PREFIX);
-		return PLUGIN_HANDLED;
+		client_print_color(id, print_team_red, "%L %L", id, "VoteGag_prefix", id, "VoteGag_NotEnoughtPlayers");
+		
+		UTIL_SendAudio(id, CVAR[SAMPLE_ERROR]);
 	}
-	new time = g_iVotingLasttime + REPEAT_VOTE_MIN * 60 - get_systime();
-	if(time > 0)
-	{
-		ChatColor(id, 0, MSG_VOTE_BLOCK, PREFIX, time % 60);
-		return PLUGIN_HANDLED;
-	}
-
-	new szName[32], num[3], menu, callback;
-	menu = menu_create(MSG_PLMENU_TITLE, "players_handler");
-	callback = menu_makecallback("players_callback");
-
-	menu_setprop(menu, MPROP_NEXTNAME, MSG_MENU_NEXT);
-	menu_setprop(menu, MPROP_BACKNAME, MSG_MENU_BACK);
-	menu_setprop(menu, MPROP_EXITNAME, MSG_MENU_EXIT);
-
-	get_players(g_arrPlayers, g_iPnum, "h");
-
-	for(new i; i < g_iPnum; i++)
-	{
-		if(g_arrPlayers[i] == id)
-			continue;
-
-		get_user_name(g_arrPlayers[i], szName, charsmax(szName));
-		num_to_str(g_arrPlayers[i], num, charsmax(num));
-		menu_additem(menu, szName, num, .callback = callback);
-	}
-
-	menu_display(id, menu);
+	else
+		_show_votegag_menu(id);
+	
 	return PLUGIN_HANDLED;
 }
 
-public players_callback(id, menu, item)
-{
-	new _access, item_data[3], callback;
-	menu_item_getinfo(menu, item, _access, item_data, charsmax(item_data), .callback = callback);
-
-	new index = str_to_num(item_data);
-	if(!is_user_connected(index))
-		return ITEM_DISABLED;
-	if(ca_has_user_gag(index))
-		return ITEM_DISABLED;
-	if(get_user_flags(index) & IMMUNITY_FLAGS)
-		return ITEM_DISABLED;
-
-	return ITEM_ENABLED;
+_show_votegag_menu(id)
+{	
+	new votes = GetVotesByPlayer(id);
+	
+	if (votes)
+	{
+		new menu = menu_create(fmt("%L", id, "VoteGag_MaimMenu"), "menu_votegag_handler");
+		
+		if (votes < CVAR[MAX_VOTES])
+			menu_additem(menu, fmt("%L", id, "VoteGag_MakeVote", votes, CVAR[MAX_VOTES]));
+		else
+			menu_additem(menu, fmt("%L %L", id, "VoteGag_MakeVote", id, "VoteGag_LimitReached"), .paccess = INVALID_ACCESS);
+		
+		menu_additem(menu, fmt("%L", id, "Gag_RemoveVote"));
+		
+		menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"));
+		
+		menu_display(id, menu);
+	}
+	else
+		_show_make_gag_menu(id);
 }
 
-public players_handler(id, menu, item)
+public menu_votegag_handler(id, menu, item)
 {
-	if(item == MENU_EXIT)
+	menu_destroy(menu);
+	
+	if (item == 1)
+		_show_remove_gag_menu(id);
+	else if (item == 0)
+		_show_make_gag_menu(id);
+	
+	return PLUGIN_HANDLED;
+}
+
+_show_make_gag_menu(id)
+{
+	new menu = menu_create(NULL_STRING, "make_votegag_handler");
+	
+	for (new i = 1; i <= MaxClients; i++)
 	{
+		if (!is_user_connected(i))
+			continue;
+		
+		if (is_user_bot(i))
+			continue;
+		
+		if (i == id)
+			continue;
+		
+		if (g_bVotedPlayers[id][i])
+			continue;
+		
+		if (ca_has_user_gag(i))
+			continue;
+		
+		menu_additem(menu,
+			fmt("%n \%c(%i%%)",
+				i,
+				GetPercentageOfVotes(i) > CVAR[PERCENTAGE] / 2 ? 'r' : 'w',
+				GetPercentageOfVotes(i)),
+				fmt("%i", get_user_userid(i)
+			)
+		);
+		
+	/*
+		if (++pNum % 6 == 0)
+		{
+			menu_addblank(menu, .slot = false);
+			menu_additem(menu, fmt("%L %L", id, "VoteGag_Reason")
+		}
+	*/
+	}
+	
+	new pNum = menu_items(menu);
+	
+	if (pNum < 1)
+	{
+		client_print_color(id, print_team_red, "%L %L", id, "VoteGag_prefix", id, "VoteGag_NotEnoughtPlayers");
+		UTIL_SendAudio(id, CVAR[SAMPLE_ERROR]);
+		menu_destroy(menu);
+		return;
+	}
+	
+	// menu_setprop(menu, MPROP_PERPAGE, 6);
+	menu_setprop(menu, MPROP_SHOWPAGE, false);
+	menu_setprop(menu, MPROP_TITLE, fmt("%L", id, "VoteGag_MakeVote", pNum));
+	menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "NEXT"));
+	menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"));
+	menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"));
+	
+	menu_display(id, menu);
+}
+
+public make_votegag_handler(id, menu, item)
+{
+	if (item == MENU_EXIT)
+	{
+		menu_destroy(menu);
+		
+		//if (is_user_connected(id))
+			//_show_votegag_menu(id);
+		
+		return PLUGIN_HANDLED;
+	}
+	
+	if (get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < CVAR[MIN_PLAYERS])
+	{
+		client_print_color(id, print_team_red, "%L %L", id, "VoteGag_prefix", id, "VoteGag_NotEnoughtPlayers");
+		UTIL_SendAudio(id, CVAR[SAMPLE_ERROR]);
 		menu_destroy(menu);
 		return PLUGIN_HANDLED;
 	}
-
-	new _access, item_data[3], callback;
-	menu_item_getinfo(menu, item, _access, item_data, charsmax(item_data), .callback = callback);
-	g_iVotingIndex = str_to_num(item_data);
+	
+	new szName[64];
+	
+	menu_item_getinfo(menu, item, _, szName, charsmax(szName), _, _, _);
 	menu_destroy(menu);
-
-	new szTitle[128], szName[32];
-	get_user_name(g_iVotingIndex, szName, charsmax(szName));
-
-	formatex(szTitle, charsmax(szTitle), MSG_VMENU_TITLE, szName);
-	menu_setprop(g_VotingMenu, MPROP_TITLE, szTitle);
-
-	for(new i; i < g_iPnum; i++)
+	
+	new pPlayer = find_player_ex(FindPlayer_MatchUserId, str_to_num(szName));
+	
+	if (pPlayer == 0 || ca_has_user_gag(pPlayer))
 	{
-		if(g_arrPlayers[i] == g_iVotingIndex)
-			continue;
-
-		if(is_user_connected(g_arrPlayers[i]))
-			menu_display(g_arrPlayers[i], g_VotingMenu);
-	}
-
-	set_task(CHECK_VOTE_TIME, "task__CheckVotes", id);
-	return PLUGIN_HANDLED;
-}
-
-public voting_handler(id, menu, item)
-{
-	if(item == MENU_EXIT)
-		return PLUGIN_HANDLED;
-
-	new _access, item_data[3], callback;
-	menu_item_getinfo(menu, item, _access, item_data, charsmax(item_data), .callback = callback);
-
-	if(str_to_num(item_data))
-	{
-		g_iPlayersVotedCount++;
-		g_bPlayerVoted[id] = true;
-	}
-	return PLUGIN_HANDLED;
-}
-
-public task__CheckVotes(id)
-{
-	for(new i; i < g_iPnum; i++)
-	{
-		if(is_user_connected(g_arrPlayers[i]))
-			show_menu(g_arrPlayers[i], 0, "^n");
-	}
-
-	new iVoteCount = floatround(g_iPnum  * PERCENT_VOTE_OK / 100.0);
-
-	if(g_iPlayersVotedCount >= iVoteCount)
-	{
-		if(is_user_connected(g_iVotingIndex))
-		{
-			ca_set_user_gag(g_iVotingIndex, PREFIX, BLOCK_TIME_MIN, (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
-
-			new szName[32];
-			get_user_name(g_iVotingIndex, szName, charsmax(szName));
-			ChatColor(0, g_iVotingIndex, MSG_VOTING_OK_ALL, PREFIX, szName, BLOCK_TIME_MIN);
-			ChatColor(g_iVotingIndex, 0, MSG_VOTING_OK_PL, PREFIX, BLOCK_TIME_MIN);
-		}
-		else	ChatColor(id, 0, MSG_VOTING_DISC, PREFIX);
-	}
-	else	ChatColor(0, g_iVotingIndex, MSG_VOTING_FAIL, PREFIX, g_iPlayersVotedCount, iVoteCount);
-
-	arrayset(g_bPlayerVoted, false, sizeof g_bPlayerVoted);
-	g_iPlayersVotedCount = 0;
-	g_iVotingIndex = 0;
-	g_iVotingLasttime = get_systime();
-}
-
-stock ChatColor(id, id2, const szMessage[], any:...)
-{
-	new szMsg[190];
-	vformat(szMsg, charsmax(szMsg), szMessage, 4);
-
-	if(id)
-	{
-		client_print_color(id, print_team_default, szMsg);
+		client_print_color(id, print_team_red, "%L %L", id, "VoteGag_prefix", id, "VoteGag_AccessDenid");
+		
+		UTIL_SendAudio(id, CVAR[SAMPLE_ERROR]);
 	}
 	else
 	{
-		new players[32], pnum;
-		get_players(players, pnum, "c");
-		for(new i; i < pnum; ++i)
+		exec_gag(id, pPlayer);
+		
+		UTIL_SendAudio(id, CVAR[SAMPLE_OK]);
+	}
+	
+	return PLUGIN_HANDLED;
+}
+
+_show_remove_gag_menu(id)
+{
+	new menu = menu_create(NULL_STRING, "remove_votegag_handler");
+	
+	for (new i = 1; i <= MaxClients; i++)
+	{
+		if (!is_user_connected(i))
+			continue;
+		
+		if (!g_bVotedPlayers[id][i])
+			continue;
+		
+		menu_additem(menu, fmt("%n \d[\r%d\d]", i, GetVotes(i)), fmt("%i", get_user_userid(i)));
+	}
+	
+	if (menu_items(menu) < 1)
+	{
+		client_print_color(id, print_team_red, "%L %L", id, "VoteGag_prefix", id, "VoteGag_NotEnoughtPlayers");
+		UTIL_SendAudio(id, CVAR[SAMPLE_ERROR]);
+		menu_destroy(menu);
+		return;
+	}
+	
+	menu_setprop(menu, MPROP_SHOWPAGE, false);
+	menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "NEXT"));
+	menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"));
+	menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"));
+	
+	menu_display(id, menu);
+}
+
+public remove_votegag_handler(id, menu, item)
+{
+	if (item == MENU_EXIT)
+	{
+		menu_destroy(menu);
+		
+		//if (is_user_connected(id))
+			//_show_votegag_menu(id);
+		
+		return PLUGIN_HANDLED;
+	}
+	
+	new szName[64];
+	
+	menu_item_getinfo(menu, item, _, szName, charsmax(szName), _, _, _);
+	menu_destroy(menu);
+	
+	new pPlayer = find_player_ex(FindPlayer_MatchUserId, str_to_num(szName));
+	
+	if (pPlayer == 0)
+	{
+		client_print_color(id, print_team_red, "%L %L", id, "VoteGag_prefix", id, "VoteGag_AccessDenid");
+		
+		UTIL_SendAudio(id, CVAR[SAMPLE_ERROR]);
+	}
+	else
+	{
+		g_bVotedPlayers[id][pPlayer] = false;
+		
+		for (new i = 1; i <= MaxClients; i++)
 		{
-			if(players[i] != id2)
-			{
-				client_print_color(players[i], print_team_default, szMsg);
-			}
+			if (!is_user_connected(i))
+				continue;
+			
+			if (i == pPlayer)
+				continue;
+			
+			client_print_color(i, pPlayer, "%L %L", i, "VoteGag_prefix", i, "VoteGag_RemoveVote", id, pPlayer);
 		}
+		
+		CA_Log(logLevel_Info, "[CA]: %N убрал свой голос против %N", id, pPlayer);
+	}
+	
+	return PLUGIN_HANDLED;
+}
+
+exec_gag(pIniciator, pBanned)
+{
+	g_bVotedPlayers[pIniciator][pBanned] = true;
+	
+	for (new i = 1; i <= MaxClients; i++)
+	{
+		if (!is_user_connected(i))
+			continue;
+		
+		if (i == pBanned)
+			continue;
+		
+		client_print_color(i, pBanned, "%L %L", i, "VoteGag_prefix", i, "VoteGag_Vote", pIniciator, pBanned);
+	}
+	
+	CA_Log(logLevel_Info, "[CA]: %N проголосовал за гаг против %N", pIniciator, pBanned);
+	
+	if (GetPercentageOfVotes(pBanned) > CVAR[PERCENTAGE])
+	{
+		ca_set_user_gag(pBanned, CVAR[REASON], CVAR[TIME], gagFlag_Voice);
+		
+		CA_Log(logLevel_Info, "[CA]: %N был заткнут вотегагом на %i минут, голосов против него: %i", pBanned, GetVotes(pBanned));
 	}
 }
+
+public CA_gag_setted(const id, reason[], minutes, gag_flags_s: flags)
+{
+	if (~flags & gagFlag_Voice)
+		return;
+	
+	for (new i, aSize = sizeof(g_bVotedPlayers[]); i < aSize; i++)
+		g_bVotedPlayers[i][id] = false;
+}
+
+GetVotesByPlayer(id)
+{
+	new iVotes;
+	
+	for (new i, aSize = sizeof(g_bVotedPlayers[]); i < aSize; i++)
+	{
+		if (g_bVotedPlayers[id][i])
+		{
+			iVotes++;
+		}
+	}
+	
+	return iVotes;
+}
+
+GetVotes(id)
+{
+	new iVotes;
+	
+	for (new i, aSize = sizeof(g_bVotedPlayers[]); i < aSize; i++)
+	{
+		if (g_bVotedPlayers[i][id])
+		{
+			iVotes++;
+		}
+	}
+	
+	return iVotes;
+}
+
+GetPercentageOfVotes(id)
+{
+	return floatround(
+		GetVotes(id) * 100.0 / get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV)
+	);
+}
+
+Register_CVars()
+{
+	bind_pcvar_string(create_cvar(
+		"ca_votegag_commands",
+		"votegag /votegag /мщеупфп",
+		.description = "Команды для открытия меню"),
+		CVAR[CMDS], charsmax(CVAR[CMDS])
+	);
+	
+	bind_pcvar_string(create_cvar(
+		"ca_votegag_reason",
+		"VoteGAG",
+		.description = "Причина вотегага"),
+		CVAR[REASON], charsmax(CVAR[REASON])
+	);
+	
+	bind_pcvar_num(create_cvar(
+		"ca_votegag_time",
+		"30",
+		.description = "Время вотегага"),
+		CVAR[TIME]
+	);
+	
+	bind_pcvar_num(create_cvar(
+		"ca_votegag_percentage",
+		"60",
+		.description = "Сколько необходимо набрать процентов голосов для реализации гага"),
+		CVAR[PERCENTAGE]
+	);
+	
+	bind_pcvar_num(create_cvar(
+		"ca_votegag_max_votes",
+		"60",
+		.description = "Сколько максимально может своершить голосов один игрок"),
+		CVAR[MAX_VOTES]
+	);
+	
+	bind_pcvar_num(create_cvar(
+		"ca_votegag_min_players",
+		"60",
+		.description = "Минимальное допустимое кол-во игроков на сервере"),
+		CVAR[MIN_PLAYERS]
+	);
+	
+	// Выстави его в '^0' при не найденном звуке
+	bind_pcvar_string(get_cvar_pointer(
+		"ca_gag_sound_ok"),
+		CVAR[SAMPLE_OK], charsmax(CVAR[SAMPLE_OK])
+	)
+	
+	bind_pcvar_string(get_cvar_pointer(
+		"ca_gag_sound_error"),
+		CVAR[SAMPLE_ERROR], charsmax(CVAR[SAMPLE_ERROR])
+	)
+	
+	AutoExecConfig(true, "CA_VoteGag", "ChatAdditions");
+}
+
+
