@@ -6,13 +6,8 @@
 
 new g_OldMessage[MAX_PLAYERS + 1][CA_MAX_MESSAGE_SIZE]
 
-enum _:Cvars
-{
-  Float:ca_anti_flood_time,
+new Float: ca_anti_flood_time,
   ca_equal_messages
-}
-
-new g_pCvarValue[Cvars]
 
 public stock const PluginName[] = "CA: Anti Flood"
 public stock const PluginVersion[] = CA_VERSION
@@ -25,7 +20,7 @@ public plugin_init() {
 
   register_dictionary("CA_AntiFlood.txt")
 
-  CreateCvars()
+  CreateCVars()
   AutoExecConfig(true, "CA_AntiFlood", "ChatAdditions")
 }
 
@@ -56,13 +51,13 @@ CheckMessage(id, const message[]) {
 
   if(nextMessage[id] > nextSay) {
     client_print_color(id, print_team_red, "%L %L", id, "CA_ANTIFLOOD_CHAT_PREFIX", id, "CA_ANTIFLOOD_CHAT_STOP_FLOODING")
-    nextMessage[id] = nextSay + g_pCvarValue[ca_anti_flood_time]
+    nextMessage[id] = nextSay + ca_anti_flood_time
 
     return CA_SUPERCEDE
   }
 
   if(strcmp(message, g_OldMessage[id], true) == 0) {
-    if(++equalMessage[id] >= g_pCvarValue[ca_equal_messages]) {
+    if(++equalMessage[id] >= ca_equal_messages) {
       client_print_color(id, print_team_red, "%L %L", id, "CA_ANTIFLOOD_CHAT_PREFIX", id, "CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE")
 
       return CA_SUPERCEDE
@@ -72,7 +67,7 @@ CheckMessage(id, const message[]) {
     equalMessage[id] = 0
   }
 
-  nextMessage[id] = nextSay + g_pCvarValue[ca_anti_flood_time]
+  nextMessage[id] = nextSay + ca_anti_flood_time
   copy(g_OldMessage[id], charsmax(g_OldMessage[]), message)
 
   return CA_CONTINUE
@@ -82,7 +77,7 @@ public client_disconnected(id) {
   g_OldMessage[id][0] = EOS
 }
 
-CreateCvars() {
+CreateCVars() {
   bind_pcvar_float(
     create_cvar(
       .name = "ca_anti_flood_time",
@@ -92,7 +87,7 @@ CreateCvars() {
       .min_val = 0.0
     ),
 
-    g_pCvarValue[ca_anti_flood_time]
+    ca_anti_flood_time
   )
 
   bind_pcvar_num(
@@ -104,6 +99,6 @@ CreateCvars() {
       .min_val = 0.0
     ),
 
-    g_pCvarValue[ca_equal_messages]
+    ca_equal_messages
   )
 }
