@@ -140,3 +140,15 @@ jobs:
         with:
           files: |
             *.zip
+
+      - name: Generate release hashes
+        uses: MCJack123/ghaction-generate-release-hashes@v2
+        with:
+          hash-type: sha1
+          file-name: hashes.txt
+
+      - name: Upload release hashes
+        uses: actions/upload-artifact@v2
+        with:
+          name: Asset Hashes
+          path: hashes.txt
