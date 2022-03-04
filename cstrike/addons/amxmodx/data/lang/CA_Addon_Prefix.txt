@@ -1,0 +1,21 @@
+[ru]
+CA_PrefixDead = * ТРУП *
+CA_PrefixTEAM_CT = ( KT )
+CA_PrefixTEAM_T = ( TEPPOP )
+CA_PrefixTEAM_SPEC = ( 3PИTEЛЬ )
+CA_PrefixADMIN_RCON = [!gГлaвный aдмин!n]
+CA_PrefixADMIN_BAN = [!gAдмин!n]
+CA_PrefixADMIN_KICK = [!gмл.Aдмин!n]
+CA_PrefixADMIN_RESERV = [!gBИП!n]
+CA_PrefixFORMAT = %status%%team%%admin%%gamecms%%rank%%skill%%addons%!t%name%!n : !g%message%
+
+[en]
+CA_PrefixDead = * DEAD *
+CA_PrefixTEAM_CT = ( COUNTER-TERRORIST )
+CA_PrefixTEAM_T = ( TERRORIST )
+CA_PrefixTEAM_SPEC = ( SPECTATOR )
+CA_PrefixADMIN_RCON = [!gRoot Admin!n]
+CA_PrefixADMIN_BAN = [!gAdmin!n]
+CA_PrefixADMIN_KICK = [!gAdmin!n]
+CA_PrefixADMIN_RESERV = [!gVIP!n]
+CA_PrefixFORMAT = %status%%team%%admin%%gamecms%%rank%%skill%%addons%!t%name%!n : !g%message%
