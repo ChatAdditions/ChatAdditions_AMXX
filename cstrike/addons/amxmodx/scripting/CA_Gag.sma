@@ -40,7 +40,8 @@ new g_dummy, g_itemInfo[64], g_itemName[128]
 enum {
   ITEM_ENTER_GAG_REASON = -1,
   ITEM_ENTER_GAG_TIME = -2,
-  ITEM_CONFIRM = -3
+  ITEM_CONFIRM = -3,
+  ITEM_REASON = -4,
 }
 
 new g_fwd_gag_setted,
@@ -942,7 +943,7 @@ static MenuShow_EditGag(const id) {
   menu_additem(menu, fmt("%L [ \\r%s\\w ]", id, "Gag_MenuItem_Reason",
       Get_GagString_reason(id, target)
     ),
-    fmt("%i", 1)
+    fmt("%i", ITEM_REASON)
   )
   menu_addtext(menu, fmt("      %L [ \\r%s\\w ]", id, "Gag_MenuItem_Time",
       Get_TimeString_seconds(id, g_adminTempData[id][gd_reason][r_time])
@@ -996,8 +997,6 @@ public MenuCallback_EditGag(const id, const menu, const item) {
 }
 
 public MenuHandler_EditGag(const id, const menu, const item) {
-  enum { item_Say, item_SayTeam, item_Voice, item_Reason }
-
   if(item == MENU_EXIT || item < 0) {
     MenuShow_PlayersList(id)
 
@@ -1015,45 +1014,44 @@ public MenuHandler_EditGag(const id, const menu, const item) {
     return PLUGIN_HANDLED
   }
 
-  switch(item) {
-    case item_Say:      g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Say
-    case item_SayTeam:  g_adminTempData[id][gd_reason][r_flags] ^= (ca_gag_common_chat_block ? gagFlag_Voice : gagFlag_SayTeam)
-    case item_Voice:    g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Voice // not used when `ca_gag_common_chat_block` is 1
-    case item_Reason: {
+
+  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  new itemIndex = strtol(g_itemInfo)
+
+  switch(itemIndex) {
+    case gagFlag_Say:      g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Say
+    case gagFlag_SayTeam:  g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_SayTeam
+    case gagFlag_Voice:    g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Voice
+    case ITEM_REASON: {
       MenuShow_SelectReason(id)
 
       menu_destroy(menu)
       return PLUGIN_HANDLED
     }
-  }
+    case ITEM_CONFIRM: {
+      new time              = g_adminTempData[id][gd_reason][r_time]
+      new flags             = g_adminTempData[id][gd_reason][r_flags]
 
-  menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+      new bool: timeChanged = (g_currentGags[target][gd_reason][r_time] != time)
 
-  new itemIndex = strtol(g_itemInfo)
+      new expireAt          = timeChanged ? 0 : g_adminTempData[id][gd_expireAt]
 
-  if(itemIndex == ITEM_CONFIRM) {
-    new time              = g_adminTempData[id][gd_reason][r_time]
-    new flags             = g_adminTempData[id][gd_reason][r_flags]
+      new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, time))
 
-    new bool: timeChanged = (g_currentGags[target][gd_reason][r_time] != time)
+      CA_Log(logLevel_Info, "Gag: \"%s\" edit gag for \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+        g_adminTempData[id][gd_adminName], g_adminTempData[id][gd_name], \
+        bits_to_flags(gag_flags_s: g_adminTempData[id][gd_reason][r_flags]), \
+        gagTimeStr, g_adminTempData[id][gd_reason][r_name] \
+      )
 
-    new expireAt          = timeChanged ? 0 : g_adminTempData[id][gd_expireAt]
+      Gag_Save(id, target, time, flags, expireAt)
 
-    new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, time))
+      GagData_Reset(g_adminTempData[id])
+      g_inEditMenu[id] = false
 
-    CA_Log(logLevel_Info, "Gag: \"%s\" edit gag for \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
-      g_adminTempData[id][gd_adminName], g_adminTempData[id][gd_name], \
-      bits_to_flags(gag_flags_s: g_adminTempData[id][gd_reason][r_flags]), \
-      gagTimeStr, g_adminTempData[id][gd_reason][r_name] \
-    )
-
-    Gag_Save(id, target, time, flags, expireAt)
-
-    GagData_Reset(g_adminTempData[id])
-    g_inEditMenu[id] = false
-
-    menu_destroy(menu)
-    return PLUGIN_HANDLED
+      menu_destroy(menu)
+      return PLUGIN_HANDLED
+    }
   }
 
   MenuShow_EditGag(id)
