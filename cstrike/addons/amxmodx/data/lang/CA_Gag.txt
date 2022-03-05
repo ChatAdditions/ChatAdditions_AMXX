@@ -43,7 +43,7 @@ Gag_YouSetManual_Time = ^3Вы установили своё время:^1
 Gag_YouSetManual_Reason = ^3Вы установили причину заглушки:^1
 Gag_NotValidTimeEntered = ^3Время указано неверно:^1
 
-Gag_NotifyPlayer_BlockedChat = ^3Вам заблокировали ^1чат^3.
+Gag_NotifyPlayer_BlockedChat = ^1Вам ^3заблокировали чат^1.
 
 Gag_prefix = [^3GAG^1]
 
@@ -92,7 +92,7 @@ Gag_YouSetManual_Time = ^3You set custom time:^1
 Gag_YouSetManual_Reason = ^3You set custom reason:^1
 Gag_NotValidTimeEntered = ^3Entered time not valid:^1
 
-Gag_NotifyPlayer_BlockedChat = ^3Your ^1chat ^3has been blocked.
+Gag_NotifyPlayer_BlockedChat = ^1Your ^3chat has been blocked^1.
 
 Gag_prefix = [^3GAG^1]
 
@@ -141,7 +141,7 @@ Gag_YouSetManual_Time = ^3Tiempo Personalizado:^1
 Gag_YouSetManual_Reason = ^3Motivo Personalizado:^1
 Gag_NotValidTimeEntered = ^3Tiempo ingresado no es valido:^1
 
-Gag_NotifyPlayer_BlockedChat = ^3Tu ^1chat ^3ha sido bloqueado.
+Gag_NotifyPlayer_BlockedChat = ^1Tu ^3chat ha sido bloqueado^1.
 
 Gag_prefix = [^3GAG^1]
 
@@ -190,7 +190,7 @@ Gag_YouSetManual_Time = ^3Dauer:^1
 Gag_YouSetManual_Reason = ^3Grund für Muten:^1
 Gag_NotValidTimeEntered = ^3Die Dauer stimmt nicht:^1
 
-Gag_NotifyPlayer_BlockedChat = ^3Dein ^1Chat ^3wurde blockeriert.
+Gag_NotifyPlayer_BlockedChat = ^1Dein ^3Chat wurde blockeriert^1.
 
 Gag_prefix = [^3GAG^1]
 
@@ -239,7 +239,7 @@ Gag_YouSetManual_Time = ^4Ustawiles wlasny czas:^3
 Gag_YouSetManual_Reason = ^3Ustawiles wlasny powod:^3
 Gag_NotValidTimeEntered = ^3Wprowadzony czas jest nieprawidlowy:^1
 
-Gag_NotifyPlayer_BlockedChat = ^3Zostales zgagowany^1!
+Gag_NotifyPlayer_BlockedChat = ^3Zostales zgagowany^1.
 
 Gag_prefix = [^3GAG^1]
 
@@ -288,6 +288,6 @@ Gag_YouSetManual_Time = ^3Ви встановили свій час:^1
 Gag_YouSetManual_Reason = ^3Ви встановили причину заглушки:^1
 Gag_NotValidTimeEntered = ^3Час вказаний невірно:^1
 
-Gag_NotifyPlayer_BlockedChat = ^3Вам заблокували ^1чат^3.
+Gag_NotifyPlayer_BlockedChat = ^1Вам ^1заблокували чат^1.
 
 Gag_prefix = [^3GAG^1]
