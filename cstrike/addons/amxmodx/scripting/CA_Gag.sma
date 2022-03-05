@@ -956,6 +956,9 @@ static MenuShow_EditGag(const id) {
   menu_addblank2(menu)
   menu_addblank2(menu)
 
+  if(ca_gag_common_chat_block)
+    menu_addblank2(menu)
+
   menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), fmt("%i", ITEM_CONFIRM), .callback = callback)
 
   menu_setprop(menu, MPROP_PERPAGE, 0)
@@ -1014,8 +1017,8 @@ public MenuHandler_EditGag(const id, const menu, const item) {
 
   switch(item) {
     case item_Say:      g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Say
-    case item_SayTeam:  g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_SayTeam
-    case item_Voice:    g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Voice
+    case item_SayTeam:  g_adminTempData[id][gd_reason][r_flags] ^= (ca_gag_common_chat_block ? gagFlag_Voice : gagFlag_SayTeam)
+    case item_Voice:    g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Voice // not used when `ca_gag_common_chat_block` is 1
     case item_Reason: {
       MenuShow_SelectReason(id)
 
