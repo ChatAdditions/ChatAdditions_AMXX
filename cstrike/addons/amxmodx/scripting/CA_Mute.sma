@@ -87,8 +87,7 @@ static MenuShow_PlayersList(const id) {
   if(count < 2) {
     menu_additem(menu, fmt("\\r %L", id, "Mute_NotEnoughPlayers"), fmt("%i", ITEM_NOT_ENOUTH_PLAYERS), .callback = callback)
   } else {
-    menu_additem(menu, fmt("\\y %L %s", id, "Mute_MuteAll", g_globalMute[id] ? "\\w[ \\r+\\w ]" : ""), fmt("%i", ITEM_MUTE_ALL))
-    menu_addblank(menu, .slot = false)
+    menu_additem(menu, fmt("\\y %L %s\n", id, "Mute_MuteAll", g_globalMute[id] ? "\\w[ \\r+\\w ]" : ""), fmt("%i", ITEM_MUTE_ALL))
 
     new name[128]
     for(new i; i < count; i++) {
