@@ -956,6 +956,9 @@ static MenuShow_EditGag(const id) {
   menu_addblank2(menu)
   menu_addblank2(menu)
 
+  if(ca_gag_common_chat_block)
+    menu_addblank2(menu)
+
   menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), fmt("%i", ITEM_CONFIRM), .callback = callback)
 
   menu_setprop(menu, MPROP_PERPAGE, 0)
