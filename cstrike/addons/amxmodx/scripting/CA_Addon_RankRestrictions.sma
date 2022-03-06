@@ -191,7 +191,7 @@ static GetUserLevel(const player) {
     }
     case 6:
     {
-    	new iStats[STATSX_MAX_STATS], iHits[MAX_BODYHITS]
+			new iStats[STATSX_MAX_STATS], iHits[MAX_BODYHITS]
 			get_user_stats(player, iStats, iHits)
 			return iStats[STATSX_RANK]
     }
