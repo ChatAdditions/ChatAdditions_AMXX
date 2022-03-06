@@ -60,6 +60,9 @@ public native_filter(const name[], index, trap) {
   if(strcmp(name, "cmsstats_get_user_skill"))
   	return  PLUGIN_HANDLED;
 
+  if(strcmp(name, "get_user_stats"))
+  	return  PLUGIN_HANDLED;
+
   return PLUGIN_CONTINUE
 }
 
