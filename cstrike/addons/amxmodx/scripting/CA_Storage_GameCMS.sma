@@ -506,6 +506,6 @@ public handle_GetAdminID(failstate, Handle: query, error[], errnum, data[], size
     return
   }
 
-  g_gamecmsAdminId[data] = SQL_ReadResult(query, col_id)
-  CA_Log(logLevel_Debug, "Found admin `%N` in gameCMS DB. admins.id=%i", data, g_gamecmsAdminId[data])
+  g_gamecmsAdminId[data[0]] = SQL_ReadResult(query, col_id)
+  CA_Log(logLevel_Debug, "Found admin `%N` in gameCMS DB. admins.id=%i", data[0], g_gamecmsAdminId[data[0]])
 }
