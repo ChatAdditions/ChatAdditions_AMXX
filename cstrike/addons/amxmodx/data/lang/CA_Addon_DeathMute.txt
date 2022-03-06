@@ -27,3 +27,8 @@ DeathMute_prefix = [^3Death mute^1]
 DeathMute_ChatMessage = У Вас є ^3%.0f сек^1, щоб надати інформацію тіммейтам, далі живі Вас ^3не почують^1.
 DeathMute_YouMuted = Живі гравці Вас ^3не чують^1.
 DeathMute_prefix = [^3Death mute^1]
+
+[ro]
+DeathMute_ChatMessage = Ai la dispozitie ^3%.0f secunde^1 sa le dai informatii coechipierilor, dupa aceea, cei vii ^3nu te vor mai auzi^1.
+DeathMute_YouMuted =  Jucatorii in viata ^3nu te pot auzi^1.
+DeathMute_prefix = [^3Mut celor morti^1]

@@ -129,3 +129,25 @@ Mute_PlayerNowMutedAll = тепер НЕ чує нікого!
 Mute_PlayerNowUnmutedAll = знову чує всіх.
 
 Mute_prefix = [^3MUTE^1]
+
+[ro]
+Mute_MenuTitle = Meniul pentru mut al jucatorilor:
+Mute_MuteAll = Dezactiveaza tuturor
+
+Mute_YouMutePlayer = Nu mai auzi jucatorul
+Mute_YouUnmutePlayer = Auzi din nou jucatorul
+
+Mute_NotEnoughPlayers = ^3Nu sunt suficienti jucatori!
+Mute_PlayerNotConnected = ^3Jucatorul nu este conectat!
+
+Mute_PlayerMutedYou = Te-a restrictionat
+
+Mute_PlayerNowMutedYou = Nu te mai poate auzi.
+Mute_PlayerNowUnmutedYou = te poate auzi.
+
+Mute_UseTooOften = ^3Folosesti prea des!
+
+Mute_PlayerNowMutedAll = Nu poate auzi pe nimeni!
+Mute_PlayerNowUnmutedAll = poate sa ii auda pe toti.
+
+Mute_prefix = [^3MUTE^1]
