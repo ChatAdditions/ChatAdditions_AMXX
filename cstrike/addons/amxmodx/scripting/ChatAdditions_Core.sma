@@ -92,7 +92,7 @@ public _OnConfigsExecuted() {
 
 Register_CVars() {
   bind_pcvar_num(create_cvar("ca_log_type", "1",
-      .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER),
+      .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = silent log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER),
       .has_min = true, .min_val = 0.0,
       .has_max = true, .max_val = float(_LogToDir)
     ),
@@ -251,7 +251,6 @@ public bool: native_CA_PlayerHasBlockedPlayer(const plugin_id, const argc) {
   return false
 }
 
-
 static GetLogsFilePath(buffer[], len = PLATFORM_MAX_PATH, const dir[] = "ChatAdditions") {
   get_localinfo("amxx_logs", buffer, len)
   strcat(buffer, fmt("/%s", dir), len)
@@ -369,15 +368,10 @@ static stock CmpVersions(const a[], const b[]) {
 
 stock log_to_file_ex(const filepath[], message[])
 {
-  new logfile[128]
-  get_localinfo("amxx_logs", logfile, charsmax(logfile))
-
-  format(logfile, charsmax(logfile), "%s/%s", logfile, filepath)
-
   new iFile, bool:bFirstTime = true, szDate[32]
   format_time(szDate, charsmax(szDate), "%m/%d/%Y - %H:%M:%S")
   static szModName[15], szAmxVersion[15]
-  
+
   if(!szModName[0])
   {
     get_modname(szModName, charsmax(szModName))
@@ -388,15 +382,15 @@ stock log_to_file_ex(const filepath[], message[])
     get_amxx_verstring(szAmxVersion, charsmax(szAmxVersion))
   }
 
-  if((iFile = fopen(logfile, "r")))
+  if((iFile = fopen(filepath, "r")))
   {
     bFirstTime = false
     fclose(iFile)
   }
 
-  if(!(iFile = fopen(logfile, "at")))
+  if(!(iFile = fopen(filepath, "at")))
   {
-    log_error(AMX_ERR_GENERAL, "Can't open \"%s\" file for writing.", logfile)
+    log_error(AMX_ERR_GENERAL, "Can't open \"%s\" file for writing.", filepath)
     return PLUGIN_CONTINUE
   }
 
@@ -406,6 +400,7 @@ stock log_to_file_ex(const filepath[], message[])
   }
 
   fprintf(iFile, "L %s: %s\n", szDate, message);
+
   fclose(iFile)
 
   return PLUGIN_HANDLED
