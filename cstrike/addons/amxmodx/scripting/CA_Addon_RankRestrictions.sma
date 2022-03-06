@@ -9,6 +9,9 @@ native ar_get_user_level(const player, rankName[] = "", len = 0)
 native crxranks_get_user_level(const player)
 native cmsranks_get_user_level(id, szLevel[] = "", len = 0)
 native csstats_get_user_stats(const player, const stats[22])
+native Float:cmsstats_get_user_skill(index, skillname[] = "", namelen = 0, &skill_level = 0);
+native get_user_skill(player,&Float:skill)
+native get_user_stats(index,stats[STATSX_MAX_STATS],bodyhits[MAX_BODYHITS]);
 //
 
 
@@ -16,7 +19,8 @@ static ca_rankrestrictions_type,
   ca_rankrestrictions_min_kills,
   ca_rankrestrictions_type_level,
   ca_rankrestrictions_min_level,
-  ca_rankrestrictions_immunity_flag[16]
+  ca_rankrestrictions_immunity_flag[16],
+  ca_rankrestrictions_type_kills
 
 public stock const PluginName[] = "CA Addon: Rank restrictions"
 public stock const PluginVersion[] = CA_VERSION
@@ -53,6 +57,12 @@ public native_filter(const name[], index, trap) {
   if(strcmp(name, "cmsranks_get_user_level"))
     return  PLUGIN_HANDLED;
 
+  if(strcmp(name, "cmsstats_get_user_skill"))
+  	return  PLUGIN_HANDLED;
+
+  if(strcmp(name, "get_user_stats"))
+  	return  PLUGIN_HANDLED;
+
   return PLUGIN_CONTINUE
 }
 
@@ -78,9 +88,12 @@ static Register_CVars() {
       0 - Advanced Experience System\n\
       1 - Army Ranks Ultimate\n\
       2 - OciXCrom's Rank System\n\
-      3 - CMSStats Ranks",
+      3 - CMSStats Ranks\n\
+      4 - CMSStats MySQL\n\
+      5 - CSstatsX SQL\n\
+      6 - CSX Module",
     .has_min = true, .min_val = 0.0,
-    .has_max = true, .max_val = 3.0
+    .has_max = true, .max_val = 6.0
     ), ca_rankrestrictions_type_level
   )
 
@@ -94,6 +107,15 @@ static Register_CVars() {
     .description = "User immunity flag"
     ),
     ca_rankrestrictions_immunity_flag, charsmax(ca_rankrestrictions_immunity_flag)
+  )
+
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_type_kills", "1",
+  	.description = "Kill System Types\n\
+  	0 - CSStats MySQL\n\
+  	1 - CSX Module",
+  	.has_min = true, .min_val = 0.0,
+    .has_max = true, .max_val = 1.0
+    ), ca_rankrestrictions_type_kills
   )
 }
 
@@ -155,16 +177,47 @@ static GetUserLevel(const player) {
     case 1: return ar_get_user_level(player)
     case 2: return crxranks_get_user_level(player)
     case 3: return cmsranks_get_user_level(player)
+    case 4:
+    {
+			new iSkill
+			cmsstats_get_user_skill(player, .skill_level = iSkill)
+			return iSkill
+    }
+    case 5:
+    {
+    	new Float:iSkill
+    	get_user_skill(player, iSkill)
+    	return floatround(iSkill)
+    }
+    case 6:
+    {
+			new iStats[STATSX_MAX_STATS], iHits[MAX_BODYHITS]
+			get_user_stats(player, iStats, iHits)
+			return iStats[STATSX_RANK]
+    }
   }
 
   return 0
 }
 
 static GetUserFragsFromStats(const player) {
-  enum { stats_Frags/* , stats_Deaths, stats_Rounds = 16 */ }
+	enum { stats_Frags/* , stats_Deaths, stats_Rounds = 16 */ }
 
-  new stats[22]
-  csstats_get_user_stats(player, stats)
+	switch(ca_rankrestrictions_type_kills)
+	{
+		case 0:
+		{
+			new stats[22]
+			csstats_get_user_stats(player, stats)
+			return stats[stats_Frags]
+		}
+		case 1:
+		{
+			new iStats[STATSX_MAX_STATS], iHits[MAX_BODYHITS]
+			get_user_stats(player, iStats, iHits)
+			return iStats[STATSX_KILLS]
+		}
+	}
 
-  return stats[stats_Frags]
+	return 0
 }
