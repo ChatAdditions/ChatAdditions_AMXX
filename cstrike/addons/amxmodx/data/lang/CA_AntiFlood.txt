@@ -2,10 +2,16 @@
 CA_ANTIFLOOD_CHAT_PREFIX            = ^1[^4AntiFlood^1]
 
 CA_ANTIFLOOD_CHAT_STOP_FLOODING     = ^1Stop ^3flooding.
-CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE     = ^1Your message ^3is repeated! ^4Exercise your imagination.
+CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE     = ^1Your message ^3is repeated! ^4Exercise your imagination^1.
 
 [ru]
 CA_ANTIFLOOD_CHAT_PREFIX            = ^1[^4AntiFlood^1]
 
 CA_ANTIFLOOD_CHAT_STOP_FLOODING     = ^1Прекратите ^3флудить.
-CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE     = ^1Сообщение ^3повторяется! ^4Проявите фантазию.
+CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE     = ^1Сообщение ^3повторяется! ^4Проявите фантазию^1.
+
+[ro]
+CA_ANTIFLOOD_CHAT_PREFIX            = ^1[^4AntiFlood^1]
+
+CA_ANTIFLOOD_CHAT_STOP_FLOODING     = ^1Opreste-te din ^3flood.
+CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE     = ^1Mesajul tau ^3se repeta! ^4Exerseaza-ti imaginatia^1.

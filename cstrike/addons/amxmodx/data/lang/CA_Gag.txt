@@ -291,3 +291,52 @@ Gag_NotValidTimeEntered = ^3Час вказаний невірно:^1
 Gag_NotifyPlayer_BlockedChat = ^1Вам ^1заблокували чат^1.
 
 Gag_prefix = [^3GAG^1]
+
+[ro]
+Gag_MenuTitle_PlayersList = Gag unui jucator
+Gag_MenuTitle_SelectReason = Alege motivul:
+Gag_MenuTitle_SelectTime = Alege timpul gag-ului:
+Gag_MenuItem_RemoveGag = \rInlatura\w
+Gag_MenuItem_EditGag = Editeaza
+Gag_MenuItem_ShowGag = Jucatorul cu gag [\r%s\y]:
+Gag_MenuItem_PropSay = Chat:
+Gag_MenuItem_PropSayTeam = Chat Echipa:
+Gag_MenuItem_PropVoice = Chat vocal:
+Gag_MenuItem_Time = Timp:
+Gag_MenuItem_Confirm = Confirma!
+Gag_MenuItem_Reason = Motiv:
+Gag_MenuItem_Resolution =  Timp: \y%s\w (motiv: \y%s\w)
+Gag_MenuItem_Admin = Admin:
+Gag_MenuItem_Type = Tip:
+Gag_MenuItem_Length = Durata:
+Gag_MenuItem_Expire = Expira la:
+Gag_MenuItem_Left = Ramas:
+
+Gag_SelectFlags = Parametrii gag: [ \r%n\y ]
+Gag_EnterReason = Insereaza motivul gag-ului ->\n
+Gag_EnterTime = Insereaza timpul gag-ului ->
+
+Gag_Immunity = Imunitate_Gag
+Gag_Gagged = *GAG*
+
+Gag_ChatMsg_Reason = ^4Motiv:^1
+Gag_NotSet = Neselectat
+Gag_Permanent = *PERMANENT*
+
+Gag_AdminGagPlayer = ^3gag ^1jucatorul ^4%s^1
+Gag_AdminUngagPlayer = ^3inlaturare ^1gag jucatorului ^4%s^1
+Gag_PlayerNotConnected = ^3Jucatorul nu este conectat!
+Gag_PlayerAlreadyRemoved = ^3Jucatorul ^4%n^1 deja inlaturat!^1
+Gag_PlayerExpiredGag = ^3Jucaotrului ^4%n^1 i-a expirat gag-ul.
+
+Gag_NotEnoughPlayers = ^3Nu sunt suficienti jucatori pentru a deschide meniul!
+Gag_NoTemplatesAvailable_Reasons = Nu exista sabloane pentru motive.
+Gag_NoTemplatesAvailable_Times = Nu exista sabloane pentru timp.
+
+Gag_YouSetManual_Time = ^3Ai setat timpul personalizat:^1
+Gag_YouSetManual_Reason = ^3Ai setat motivul personalizat:^1
+Gag_NotValidTimeEntered = ^3Timpul inserat nu este valid:^1
+
+Gag_NotifyPlayer_BlockedChat = ^3Chat-ul ^1tau a fost ^4blocat^1.
+
+Gag_prefix = [^3GAG^1]
