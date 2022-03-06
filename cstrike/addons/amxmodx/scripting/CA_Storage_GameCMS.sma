@@ -28,6 +28,7 @@ new Queue: g_queueLoad = Invalid_Queue,
   Queue: g_queueSave = Invalid_Queue
 
 new g_serverID = -1
+new g_gamecmsAdminId[MAX_PLAYERS + 1]
 
 new ca_storage_host[64],
   ca_storage_user[128],
@@ -78,6 +79,14 @@ public plugin_natives() {
 
 public plugin_cfg() {
   RegisterForwards()
+}
+
+public client_putinserver(id) {
+  GameCMS_GetAdminID(id)
+}
+
+public client_disconnected(id) {
+  g_gamecmsAdminId[id] = 0
 }
 
 Register_CVars() {
@@ -167,7 +176,7 @@ Storage_Save(const name[], const authID[], const IP[],
     return
   }
 
-  #pragma unused adminIP, adminAuthID, IP
+  #pragma unused adminIP, IP
   new name_safe[MAX_NAME_LENGTH * 2];
   SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name);
 
@@ -176,6 +185,13 @@ Storage_Save(const name[], const authID[], const IP[],
 
   new adminName_safe[MAX_NAME_LENGTH * 2];
   SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName);
+
+
+  new admin_id = 0
+  new admin = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), adminAuthID)
+  if(admin) {
+    admin_id = g_gamecmsAdminId[admin]
+  }
 
   // TODO: Optimize this EPIC QUERY
   formatex(g_query, charsmax(g_query), "INSERT INTO %s ", SQL_TBL_GAGS); {
@@ -191,7 +207,7 @@ Storage_Save(const name[], const authID[], const IP[],
     strcat(g_query, fmt("%i,", expireAt), charsmax(g_query))
     strcat(g_query, fmt("(%i - UNIX_TIMESTAMP(NOW())) / 60,", expireAt), charsmax(g_query))
     strcat(g_query, fmt("'%s',", reason_safe), charsmax(g_query))
-    strcat(g_query, fmt("'%i',", 1 /* JUST A 1 AND NOTHING ELSE!!! */), charsmax(g_query))
+    strcat(g_query, fmt("'%i',", admin_id), charsmax(g_query))
     strcat(g_query, fmt("'%s',", adminName_safe), charsmax(g_query))
     strcat(g_query, fmt("'%i',", g_serverID), charsmax(g_query))
     strcat(g_query, fmt("'%s',", adminName_safe), charsmax(g_query))
@@ -463,4 +479,33 @@ static stock CAGAGFlags_to_GCMS_Flags(const gag_flags_s: flags) {
   }
 
   return GCMS_FLAG_NONE;
+}
+
+GameCMS_GetAdminID(const id) {
+  new authID[MAX_AUTHID_LENGTH], name[MAX_NAME_LENGTH]
+  get_user_authid(id, authID, charsmax(authID))
+  get_user_name(id, name, charsmax(name))
+
+  formatex(g_query, charsmax(g_query), "SELECT id FROM admins WHERE name = '%s' or name = '%s' LIMIT 1;",
+    authID, name
+  )
+
+  new data[1]; data[0] = id
+  SQL_ThreadQuery(g_tuple, "handle_GetAdminID", g_query, data, sizeof(data))
+}
+
+public handle_GetAdminID(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
+  enum { col_id }
+
+  if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    return
+  }
+
+  new bool: found = bool: (SQL_NumResults(query) != 0)
+  if(!found) {
+    return
+  }
+
+  g_gamecmsAdminId[data[0]] = SQL_ReadResult(query, col_id)
+  CA_Log(logLevel_Debug, "Found admin `%N` in gameCMS DB. admins.id=%i", data[0], g_gamecmsAdminId[data[0]])
 }
