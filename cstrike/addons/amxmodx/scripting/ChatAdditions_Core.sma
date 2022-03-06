@@ -376,6 +376,17 @@ stock log_to_file_ex(const filepath[], message[])
 
   new iFile, bool:bFirstTime = true, szDate[32]
   format_time(szDate, charsmax(szDate), "%m/%d/%Y - %H:%M:%S")
+  static szModName[15], szAmxVersion[15]
+  
+  if(!szModName[0])
+  {
+    get_modname(szModName, charsmax(szModName))
+  }
+
+  if(!szAmxVersion[0])
+  {
+    get_amxx_verstring(szAmxVersion, charsmax(szAmxVersion))
+  }
 
   if((iFile = fopen(logfile, "r")))
   {
@@ -391,9 +402,6 @@ stock log_to_file_ex(const filepath[], message[])
 
   if(bFirstTime)
   {
-    new szModName[15], szAmxVersion[15]
-    get_modname(szModName, charsmax(szModName))
-    get_amxx_verstring(szAmxVersion, charsmax(szAmxVersion))
     fprintf(iFile, "L %s: Log file started (file \"%s\") (game \"%s\") (amx \"%s\")\n", szDate, filepath, szModName, szAmxVersion)
   }
 
