@@ -33,7 +33,8 @@ new ca_gag_times[64],
   ca_gag_sound_error[128],
   bool: ca_gag_block_nickname_change,
   bool: ca_gag_block_admin_chat,
-  bool: ca_gag_common_chat_block
+  bool: ca_gag_common_chat_block,
+  ca_gag_own_reason_enabled
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 
@@ -215,6 +216,15 @@ Register_CVars() {
         0 = disabled"
     ),
     ca_gag_common_chat_block
+  )
+
+  bind_pcvar_num(create_cvar("ca_gag_own_reason_enabled", "1",
+      .description = "Enable own gag reason\n \
+        0 = disabled (excluding when there are no reasons)\n \
+        1 = enabled, at first position in reasons list\n \
+        2 = enabled, at last position in reasons list"
+    ),
+    ca_gag_own_reason_enabled
   )
 }
 
@@ -409,7 +419,7 @@ static MenuShow_SelectReason(const id) {
 
   new bool: hasReasonsTemplates = bool: (g_gagReasonsTemplates_size != 0)
 
-  if(playerFlags & (accessFlagsHigh | accessFlagsOwnReason) || !hasReasonsTemplates) {
+  if(ca_gag_own_reason_enabled == 1 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason) || !hasReasonsTemplates) {
     menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
   }
 
@@ -444,6 +454,10 @@ static MenuShow_SelectReason(const id) {
       }
 
       menu_additem(menu, buffer,  fmt("%i", i))
+    }
+
+    if(ca_gag_own_reason_enabled == 2 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason)) {
+      menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
     }
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
