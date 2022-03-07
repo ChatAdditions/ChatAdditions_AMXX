@@ -12,7 +12,8 @@
 
 enum logType_s {
   _Default,
-  _LogToDir
+  _LogToDir,
+  _LogToDirSilent
 }
 
 new logType_s: ca_log_type,
@@ -92,9 +93,12 @@ public _OnConfigsExecuted() {
 
 Register_CVars() {
   bind_pcvar_num(create_cvar("ca_log_type", "1",
-      .description = fmt("Log file type\n 0 = log to common amxx log file (logs/L*.log)\n 1 = log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER),
+      .description = fmt("Log file type\n \
+        0 = log to common amxx log file (logs/L*.log)\n \
+        1 = log to plugins folder (logs/%s/[plugin name]/L*.log)\n \
+        2 = silent log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER),
       .has_min = true, .min_val = 0.0,
-      .has_max = true, .max_val = float(_LogToDir)
+      .has_max = true, .max_val = float(_LogToDirSilent)
     ),
     ca_log_type
   )
@@ -209,30 +213,35 @@ public bool: native_CA_Log(const plugin_id, const argc) {
     return false
   }
 
-  new msg[2048];
+  new msg[2048]
   vdformat(msg, charsmax(msg), arg_msg, arg_format)
 
-  new pluginName[32]
-  get_plugin(plugin_id, pluginName, charsmax(pluginName))
+  new logsFile[PLATFORM_MAX_PATH]
 
-  replace(pluginName, charsmax(pluginName), ".amxx", "")
+  if(ca_log_type > _Default)
+  {
+    new pluginName[32]
+    get_plugin(plugin_id, pluginName, charsmax(pluginName))
 
-  new logsPath[PLATFORM_MAX_PATH]
-  formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
+    replace(pluginName, charsmax(pluginName), ".amxx", "")
 
-  if(!dir_exists(logsPath)) {
-    mkdir(logsPath)
+    new logsPath[PLATFORM_MAX_PATH]
+    formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
+
+    if(!dir_exists(logsPath)) {
+      mkdir(logsPath)
+    }
+
+    new year, month, day
+    date(year, month, day)
+
+    formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
   }
 
-  new year, month, day
-  date(year, month, day)
-
-  new logsFile[PLATFORM_MAX_PATH];
-  formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
-
   switch(ca_log_type) {
-    case _LogToDir:   log_to_file(logsFile, msg)
-    case _Default:    log_amx(msg)
+    case _LogToDir:         log_to_file(logsFile, msg)
+    case _Default:          log_amx(msg)
+    case _LogToDirSilent:   log_to_file_ex(logsFile, msg)
   }
 
   return true
@@ -250,7 +259,6 @@ public bool: native_CA_PlayerHasBlockedPlayer(const plugin_id, const argc) {
 
   return false
 }
-
 
 static GetLogsFilePath(buffer[], len = PLATFORM_MAX_PATH, const dir[] = "ChatAdditions") {
   get_localinfo("amxx_logs", buffer, len)
@@ -365,4 +373,41 @@ static stock CmpVersions(const a[], const b[]) {
   }
 
   return countA - countB
+}
+
+stock log_to_file_ex(const filePath[], message[]) {
+  new file
+  new bool:firstTime = true
+  new date[32]
+
+  format_time(date, charsmax(date), "%m/%d/%Y - %H:%M:%S")
+  static modName[15], amxVersion[15]
+
+  if(!modName[0]) {
+    get_modname(modName, charsmax(modName))
+  }
+
+  if(!amxVersion[0]) {
+    get_amxx_verstring(amxVersion, charsmax(amxVersion))
+  }
+
+  if((file = fopen(filePath, "r"))) {
+    firstTime = false
+    fclose(file)
+  }
+
+  if(!(file = fopen(filePath, "at"))) {
+    log_error(AMX_ERR_GENERAL, "Can't open \"%s\" file for writing.", filePath)
+    return PLUGIN_CONTINUE
+  }
+
+  if(firstTime) {
+    fprintf(file, "L %s: Log file started (file \"%s\") (game \"%s\") (amx \"%s\")\n", date, filePath, modName, amxVersion)
+  }
+
+  fprintf(file, "L %s: %s\n", date, message)
+
+  fclose(file)
+
+  return PLUGIN_HANDLED
 }
