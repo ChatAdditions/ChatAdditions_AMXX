@@ -210,7 +210,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
     return false
   }
 
-  new msg[2048];
+  new msg[2048], logsFile[PLATFORM_MAX_PATH];
   vdformat(msg, charsmax(msg), arg_msg, arg_format)
 
   if(ca_log_type > _Default)
@@ -230,7 +230,6 @@ public bool: native_CA_Log(const plugin_id, const argc) {
     new year, month, day
     date(year, month, day)
 
-    new logsFile[PLATFORM_MAX_PATH];
     formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
   }
 
