@@ -138,7 +138,7 @@ public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], 
   new queueCounter
 
   for(new i, len = QueueSize(g_queueLoad); i < len; i++) {
-    new authID[MAX_AUTHID_LENGTH] QueuePopString(g_queueLoad, authID, charsmax(authID))
+    new authID[MAX_AUTHID_LENGTH]; QueuePopString(g_queueLoad, authID, charsmax(authID))
     Storage_Load(authID)
 
     ++queueCounter
