@@ -33,7 +33,7 @@ public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
   register_dictionary("CA_Addon_RankRestrictions.txt")
 
-  CreateCVars()
+  Create_CVars()
 
   AutoExecConfig(true, "CA_Addon_RankRestrictions", "ChatAdditions")
 }
@@ -67,7 +67,7 @@ public native_filter(const name[], index, trap) {
   return PLUGIN_CONTINUE
 }
 
-static CreateCVars() {
+static Create_CVars() {
   bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "1",
     .description = "Restrictions Types\n\
       0 - Disable restrictions\n\

@@ -30,7 +30,7 @@ public plugin_init() {
   AutoExecConfig(true, "CA_Addon_RequestUnGag", "ChatAdditions")
 }
 
-public CreateCVars() {
+public Create_CVars() {
   bind_pcvar_string(create_cvar("ca_requestungag_cmd", "/sorry",
       .description = "Request ungag command"),
     ca_requestungag_cmd, charsmax(ca_requestungag_cmd)
