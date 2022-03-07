@@ -14,82 +14,82 @@
 	#pragma loadlib mysql
 #endif
 
-static const SQL_TBL_GAGS[] = "pgb_comms";
+static const SQL_TBL_GAGS[] = "pgb_comms"
 
 const QUERY_LENGTH 		= 4096
-const MAX_REASON_LENGTH = 256;
+const MAX_REASON_LENGTH = 256
 
-new g_query[QUERY_LENGTH];
+new g_query[QUERY_LENGTH]
 
 new Handle:g_tuple 	  = Empty_Handle,
 	Queue:g_queueLoad = Invalid_Queue,
-	Queue:g_queueSave = Invalid_Queue;
+	Queue:g_queueSave = Invalid_Queue
 
 new pgb_storage_host[33],
 	pgb_storage_user[33],
 	pgb_storage_pass[64],
-	pgb_storage_dbname[33];
+	pgb_storage_dbname[33]
 
 public stock const PluginURL[]  = "https://github.com/ChatAdditions/"
 public stock const PluginDesc[] = "PGBans (MySQL) storage provider for ChatAdditions"
 
 public plugin_init()
 {
-	register_plugin("CA: Storage PGBans", "1.0", "Sergey Shorokhov");
+	register_plugin("CA: Storage PGBans", "1.0", "Sergey Shorokhov")
 
 	if(!SQL_SetAffinity("mysql"))
 	{
-		  set_fail_state("Can't user 'MySQL'. Check modules.ini");
+		  set_fail_state("Can't user 'MySQL'. Check modules.ini")
 	}
 
-	register_cvars();
-	AutoExecConfig(true, "CA_Storage_PGBans", "ChatAdditions");
+	register_cvars()
+	AutoExecConfig(true, "CA_Storage_PGBans", "ChatAdditions")
 
-	g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH);
-	g_queueSave = QueueCreate(gagData_s);
+	g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
+	g_queueSave = QueueCreate(gagData_s)
 
   set_task_ex(6.274, "_OnConfigsExecuted")
 }
 
 public _OnConfigsExecuted()
 {
-	g_tuple = SQL_MakeDbTuple(pgb_storage_host, pgb_storage_user, pgb_storage_pass, pgb_storage_dbname);
+	g_tuple = SQL_MakeDbTuple(pgb_storage_host, pgb_storage_user, pgb_storage_pass, pgb_storage_dbname)
 
-	storage_create();
+	storage_create()
 }
 
 public plugin_end()
 {
 	if(g_tuple != Empty_Handle)
 	{
-		SQL_FreeHandle(g_tuple);
+		SQL_FreeHandle(g_tuple)
 	}
 
-	QueueDestroy(g_queueLoad);
-	QueueDestroy(g_queueSave);
+	QueueDestroy(g_queueLoad)
+	QueueDestroy(g_queueSave)
 }
 
 public plugin_natives()
 {
-	RegisterNatives();
+	RegisterNatives()
 }
 
 public plugin_cfg()
 {
-	RegisterForwards();
+	RegisterForwards()
 }
 
 register_cvars()
 {
-	bind_pcvar_string(create_cvar("pgb_storage_host", 	"127.0.0.1", 	FCVAR_PROTECTED, .description = "PGBans MySQL database host address"), 	pgb_storage_host, 	charsmax(pgb_storage_host));
-	bind_pcvar_string(create_cvar("pgb_storage_user", 	"root", 		FCVAR_PROTECTED, .description = "PGBans MySQL database user"), 			pgb_storage_user, 	charsmax(pgb_storage_user));
-	bind_pcvar_string(create_cvar("pgb_storage_pass", 	"pass", 		FCVAR_PROTECTED, .description = "PGBans MySQL database host password"), pgb_storage_pass, 	charsmax(pgb_storage_pass));
-	bind_pcvar_string(create_cvar("pgb_storage_dbname", "db", 			FCVAR_PROTECTED, .description = "PGBans MySQL database name"), 			pgb_storage_dbname, charsmax(pgb_storage_dbname));
+	bind_pcvar_string(create_cvar("pgb_storage_host", 	"127.0.0.1", 	FCVAR_PROTECTED, .description = "PGBans MySQL database host address"), 	pgb_storage_host, 	charsmax(pgb_storage_host))
+	bind_pcvar_string(create_cvar("pgb_storage_user", 	"root", 		FCVAR_PROTECTED, .description = "PGBans MySQL database user"), 			pgb_storage_user, 	charsmax(pgb_storage_user))
+	bind_pcvar_string(create_cvar("pgb_storage_pass", 	"pass", 		FCVAR_PROTECTED, .description = "PGBans MySQL database host password"), pgb_storage_pass, 	charsmax(pgb_storage_pass))
+	bind_pcvar_string(create_cvar("pgb_storage_dbname", "db", 			FCVAR_PROTECTED, .description = "PGBans MySQL database name"), 			pgb_storage_dbname, charsmax(pgb_storage_dbname))
 }
 
 storage_create()
 {
-	formatex(g_query, charsmax(g_query), "CREATE TABLE IF NOT EXISTS %s ", SQL_TBL_GAGS);
+	formatex(g_query, charsmax(g_query), "CREATE TABLE IF NOT EXISTS %s ", SQL_TBL_GAGS)
 	{
 		strcat(g_query, "( id INTEGER PRIMARY KEY AUTO_INCREMENT,", charsmax(g_query))
 		strcat(g_query, "name VARCHAR(32) NOT NULL,", charsmax(g_query))
@@ -105,43 +105,43 @@ storage_create()
 		strcat(g_query, "UNIQUE INDEX authid_unique_idx (authid)", charsmax(g_query))
 		strcat(g_query, ") CHARACTER SET utf8 COLLATE utf8_general_ci;", charsmax(g_query))
 	}
-	SQL_ThreadQuery(g_tuple, "handle_StorageCreated", g_query);
+	SQL_ThreadQuery(g_tuple, "handle_StorageCreated", g_query)
 }
 
 public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], size, Float:queuetime)
 {
 	if(IsSQLQueryFailed(failstate, query, error, errnum))
 	{
-		return;
+		return
 	}
 
-	CA_Log(logLevel_Debug, "Table '%s' created! (queryTime: '%.3f' sec)", SQL_TBL_GAGS, queuetime);
+	CA_Log(logLevel_Debug, "Table '%s' created! (queryTime: '%.3f' sec)", SQL_TBL_GAGS, queuetime)
 
 	g_storageInitialized = true
 	ExecuteForward(g_fwd_StorageInitialized, g_ret)
 
-	new queueCounter;
-	for(new i, len = QueueSize(g_queueLoad); i < len; i++)
+	new queueCounter
+	for(new i, len = QueueSize(g_queueLoad) i < len i++)
 	{
-		new authID[MAX_AUTHID_LENGTH]; QueuePopString(g_queueLoad, authID, charsmax(authID))
-		Storage_Load(authID);
+		new authID[MAX_AUTHID_LENGTH] QueuePopString(g_queueLoad, authID, charsmax(authID))
+		Storage_Load(authID)
 		++queueCounter
 	}
 	if(queueCounter)
 	{
-		CA_Log(logLevel_Info, "Loaded %i queue gags from DB (slow DB connection issue)", queueCounter);
+		CA_Log(logLevel_Info, "Loaded %i queue gags from DB (slow DB connection issue)", queueCounter)
 		queueCounter = 0
 	}
 
-	for(new i, len = QueueSize(g_queueSave); i < len; i++)
+	for(new i, len = QueueSize(g_queueSave) i < len i++)
 	{
-		new gagData[gagData_s];
+		new gagData[gagData_s]
 		QueuePopArray(g_queueSave, gagData, sizeof(gagData))
 
 		Storage_Save(gagData[gd_name], gagData[gd_authID], gagData[gd_IP],
 		gagData[gd_reason][r_name], gagData[gd_adminName], gagData[gd_adminAuthID],
 		gagData[gd_adminIP], gagData[gd_expireAt], gagData[gd_reason][r_flags]
-		);
+		)
 		++queueCounter
 	}
 
@@ -156,7 +156,7 @@ Storage_Save(const name[], const authID[], const IP[], const reason[], const adm
 {
 	if(!g_storageInitialized)
 	{
-		new gagData[gagData_s];
+		new gagData[gagData_s]
 		{
 			copy(gagData[gd_name], charsmax(gagData[gd_name]), name)
 			copy(gagData[gd_authID], charsmax(gagData[gd_authID]), authID)
@@ -171,63 +171,63 @@ Storage_Save(const name[], const authID[], const IP[], const reason[], const adm
 
 			gagData[gd_expireAt] = expireAt
 		}
-		QueuePushArray(g_queueSave, gagData);
-		return;
+		QueuePushArray(g_queueSave, gagData)
+		return
 	}
-	new name_safe[MAX_NAME_LENGTH * 2];
-	SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name);
+	new name_safe[MAX_NAME_LENGTH * 2]
+	SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name)
 
-	new reason_safe[MAX_REASON_LENGTH * 2];
-	SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason);
+	new reason_safe[MAX_REASON_LENGTH * 2]
+	SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason)
 
-	new adminName_safe[MAX_NAME_LENGTH * 2];
-	SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName);
+	new adminName_safe[MAX_NAME_LENGTH * 2]
+	SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName)
 
 	// TODO: Optimize this EPIC QUERY
-	formatex(g_query, charsmax(g_query), "INSERT INTO %s ", SQL_TBL_GAGS);
+	formatex(g_query, charsmax(g_query), "INSERT INTO %s ", SQL_TBL_GAGS)
 	{
-		strcat(g_query, "( name,authid,ip,", charsmax(g_query));
-		strcat(g_query, "reason,admin_name,admin_authid,", charsmax(g_query));
-		strcat(g_query, "admin_ip,created_at,expire_at,flags )", charsmax(g_query));
+		strcat(g_query, "( name,authid,ip,", charsmax(g_query))
+		strcat(g_query, "reason,admin_name,admin_authid,", charsmax(g_query))
+		strcat(g_query, "admin_ip,created_at,expire_at,flags )", charsmax(g_query))
 
-		strcat(g_query, fmt(" VALUES ( '%s',", name_safe), charsmax(g_query));
-		strcat(g_query, fmt("'%s',", authID), charsmax(g_query));
-		strcat(g_query, fmt("'%s',", IP), charsmax(g_query));
-		strcat(g_query, fmt("'%s',", reason_safe), charsmax(g_query));
-		strcat(g_query, fmt("'%s',", adminName_safe), charsmax(g_query));
-		strcat(g_query, fmt("'%s',", adminAuthID), charsmax(g_query));
-		strcat(g_query, fmt("'%s',", adminIP), charsmax(g_query));
+		strcat(g_query, fmt(" VALUES ( '%s',", name_safe), charsmax(g_query))
+		strcat(g_query, fmt("'%s',", authID), charsmax(g_query))
+		strcat(g_query, fmt("'%s',", IP), charsmax(g_query))
+		strcat(g_query, fmt("'%s',", reason_safe), charsmax(g_query))
+		strcat(g_query, fmt("'%s',", adminName_safe), charsmax(g_query))
+		strcat(g_query, fmt("'%s',", adminAuthID), charsmax(g_query))
+		strcat(g_query, fmt("'%s',", adminIP), charsmax(g_query))
 		strcat(g_query, fmt("NOW(),"), charsmax(g_query))
-		strcat(g_query, fmt("FROM_UNIXTIME(%i),", expireAt), charsmax(g_query));
-		strcat(g_query, fmt("%i ) ", flags), charsmax(g_query));
-		strcat(g_query, "ON DUPLICATE KEY UPDATE ", charsmax(g_query));
-		strcat(g_query, fmt("name='%s',", name_safe), charsmax(g_query));
-		strcat(g_query, fmt("ip='%s',", IP), charsmax(g_query));
-		strcat(g_query, fmt("reason='%s',", reason_safe), charsmax(g_query));
-		strcat(g_query, fmt("admin_name='%s',", adminName_safe), charsmax(g_query));
-		strcat(g_query, fmt("admin_authid='%s',", adminAuthID), charsmax(g_query));
-		strcat(g_query, fmt("admin_ip='%s',", adminIP), charsmax(g_query));
-		strcat(g_query, "created_at=NOW(),", charsmax(g_query));
-		strcat(g_query, fmt("expire_at=FROM_UNIXTIME(%i),", expireAt), charsmax(g_query));
-		strcat(g_query, fmt("flags=%i; ", flags), charsmax(g_query));
+		strcat(g_query, fmt("FROM_UNIXTIME(%i),", expireAt), charsmax(g_query))
+		strcat(g_query, fmt("%i ) ", flags), charsmax(g_query))
+		strcat(g_query, "ON DUPLICATE KEY UPDATE ", charsmax(g_query))
+		strcat(g_query, fmt("name='%s',", name_safe), charsmax(g_query))
+		strcat(g_query, fmt("ip='%s',", IP), charsmax(g_query))
+		strcat(g_query, fmt("reason='%s',", reason_safe), charsmax(g_query))
+		strcat(g_query, fmt("admin_name='%s',", adminName_safe), charsmax(g_query))
+		strcat(g_query, fmt("admin_authid='%s',", adminAuthID), charsmax(g_query))
+		strcat(g_query, fmt("admin_ip='%s',", adminIP), charsmax(g_query))
+		strcat(g_query, "created_at=NOW(),", charsmax(g_query))
+		strcat(g_query, fmt("expire_at=FROM_UNIXTIME(%i),", expireAt), charsmax(g_query))
+		strcat(g_query, fmt("flags=%i;", flags), charsmax(g_query))
 	}
-	SQL_ThreadQuery(g_tuple, "handle_Saved", g_query);
+	SQL_ThreadQuery(g_tuple, "handle_Saved", g_query)
 }
 
 public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Float:queuetime)
 {
 	if(IsSQLQueryFailed(failstate, query, error, errnum))
 	{
-		return;
+		return
 	}
 	formatex(g_query, charsmax(g_query), "SELECT \
 		name,authid,ip,reason,\
 		admin_name,admin_authid,admin_ip,\
-		UNIX_TIMESTAMP(created_at),UNIX_TIMESTAMP(expire_at),flags");
-	strcat(g_query, fmt(" FROM %s", SQL_TBL_GAGS), charsmax(g_query));
-	strcat(g_query, fmt(" WHERE id=%i;", SQL_GetInsertId(query)), charsmax(g_query));
+		UNIX_TIMESTAMP(created_at),UNIX_TIMESTAMP(expire_at),flags")
+	strcat(g_query, fmt(" FROM %s", SQL_TBL_GAGS), charsmax(g_query))
+	strcat(g_query, fmt(" WHERE id=%i;", SQL_GetInsertId(query)), charsmax(g_query))
 
-	SQL_ThreadQuery(g_tuple, "handle_SavedResult", g_query);
+	SQL_ThreadQuery(g_tuple, "handle_SavedResult", g_query)
 }
 
 public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime)
@@ -242,14 +242,14 @@ public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], siz
 		res_admin_name, res_admin_authid, res_admin_ip,
 		res_created_at, res_expire_at, res_flags
 	}
-	new name[MAX_NAME_LENGTH]; SQL_ReadResult(query, res_name, name, charsmax(name))
-	new authID[MAX_AUTHID_LENGTH]; SQL_ReadResult(query, res_authid, authID, charsmax(authID))
-	new IP[MAX_IP_LENGTH]; SQL_ReadResult(query, res_ip, IP, charsmax(IP))
-	new reason[MAX_REASON_LENGTH]; SQL_ReadResult(query, res_reason, reason, charsmax(reason))
+	new name[MAX_NAME_LENGTH] SQL_ReadResult(query, res_name, name, charsmax(name))
+	new authID[MAX_AUTHID_LENGTH] SQL_ReadResult(query, res_authid, authID, charsmax(authID))
+	new IP[MAX_IP_LENGTH] SQL_ReadResult(query, res_ip, IP, charsmax(IP))
+	new reason[MAX_REASON_LENGTH] SQL_ReadResult(query, res_reason, reason, charsmax(reason))
 
-	new adminName[MAX_NAME_LENGTH]; SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
-	new adminAuthID[MAX_AUTHID_LENGTH]; SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID))
-	new adminIP[MAX_IP_LENGTH]; SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP))
+	new adminName[MAX_NAME_LENGTH] SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
+	new adminAuthID[MAX_AUTHID_LENGTH] SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID))
+	new adminIP[MAX_IP_LENGTH] SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP))
 
 	new createdAt = SQL_ReadResult(query, res_created_at)
 	new expireAt = SQL_ReadResult(query, res_expire_at)
@@ -259,25 +259,25 @@ public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], siz
 		name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags,\
 		queuetime \
 	)
-	ExecuteForward(g_fwd_StorageSaved, g_ret, name, authID, IP, reason,	adminName, adminAuthID,adminIP, createdAt, expireAt, flags);
+	ExecuteForward(g_fwd_StorageSaved, g_ret, name, authID, IP, reason,	adminName, adminAuthID,adminIP, createdAt, expireAt, flags)
 }
 
 Storage_Load(const authID[])
 {
 	if(!g_storageInitialized)
 	{
-		QueuePushString(g_queueLoad, authID);
-		return;
+		QueuePushString(g_queueLoad, authID)
+		return
 	}
 
 	formatex(g_query, charsmax(g_query), "SELECT name, authid, ip, reason,\
 		admin_name, admin_authid, admin_ip, \
-		UNIX_TIMESTAMP(created_at), UNIX_TIMESTAMP(expire_at), flags FROM %s", SQL_TBL_GAGS);
+		UNIX_TIMESTAMP(created_at), UNIX_TIMESTAMP(expire_at), flags FROM %s", SQL_TBL_GAGS)
 	{
 		strcat(g_query, fmt(" WHERE (authid = '%s')", authID), charsmax(g_query))
 		strcat(g_query, " AND ( expire_at = FROM_UNIXTIME(9999999999) OR (expire_at > NOW())) LIMIT 1", charsmax(g_query))
 	}
-	SQL_ThreadQuery(g_tuple, "handle_Loaded", g_query);
+	SQL_ThreadQuery(g_tuple, "handle_Loaded", g_query)
 }
 
 public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Float:queuetime)
@@ -293,47 +293,47 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
 
 	new bool: found = (SQL_NumResults(query) != 0)
 	if(!found) {
-		return;
+		return
 	}
 
-	new name[MAX_NAME_LENGTH]; SQL_ReadResult(query, res_name, name, charsmax(name))
-	new authID[MAX_AUTHID_LENGTH]; SQL_ReadResult(query, res_authid, authID, charsmax(authID))
-	new IP[MAX_IP_LENGTH]; SQL_ReadResult(query, res_ip, IP, charsmax(IP))
-	new reason[MAX_REASON_LENGTH]; SQL_ReadResult(query, res_reason, reason, charsmax(reason))
+	new name[MAX_NAME_LENGTH] SQL_ReadResult(query, res_name, name, charsmax(name))
+	new authID[MAX_AUTHID_LENGTH] SQL_ReadResult(query, res_authid, authID, charsmax(authID))
+	new IP[MAX_IP_LENGTH] SQL_ReadResult(query, res_ip, IP, charsmax(IP))
+	new reason[MAX_REASON_LENGTH] SQL_ReadResult(query, res_reason, reason, charsmax(reason))
 
-	new adminName[MAX_NAME_LENGTH]; SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
-	new adminAuthID[MAX_AUTHID_LENGTH]; SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID))
-	new adminIP[MAX_IP_LENGTH]; SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP))
+	new adminName[MAX_NAME_LENGTH] SQL_ReadResult(query, res_admin_name, adminName, charsmax(adminName))
+	new adminAuthID[MAX_AUTHID_LENGTH] SQL_ReadResult(query, res_admin_authid, adminAuthID, charsmax(adminAuthID))
+	new adminIP[MAX_IP_LENGTH] SQL_ReadResult(query, res_admin_ip, adminIP, charsmax(adminIP))
 
 	new createdAt = SQL_ReadResult(query, res_created_at)
 	new expireAt = SQL_ReadResult(query, res_expire_at)
 	new flags = SQL_ReadResult(query, res_flags)
 
-	CA_Log(logLevel_Debug, "Player gag loaded {'%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i} (queryTime: '%.3f' sec)", name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags, queuetime);
-	ExecuteForward(g_fwd_StorageLoaded, g_ret, name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags);
+	CA_Log(logLevel_Debug, "Player gag loaded {'%s', '%s', '%s', '%s', '%s', '%s', '%s', %i, %i, %i} (queryTime: '%.3f' sec)", name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags, queuetime)
+	ExecuteForward(g_fwd_StorageLoaded, g_ret, name, authID, IP, reason, adminName, adminAuthID, adminIP, createdAt, expireAt, flags)
 }
 
 Storage_Remove(const authID[])
 {
 	if(!g_storageInitialized || g_tuple == Empty_Handle)
 	{
-		CA_Log(logLevel_Warning, "Storage_Remove(): Storage connection not initialized. Query not executed. (g_storageInitialized=%i, g_tuple=%i)", g_storageInitialized, g_tuple);
-		return;
+		CA_Log(logLevel_Warning, "Storage_Remove(): Storage connection not initialized. Query not executed. (g_storageInitialized=%i, g_tuple=%i)", g_storageInitialized, g_tuple)
+		return
 	}
-	formatex(g_query, charsmax(g_query), "DELETE FROM %s ", SQL_TBL_GAGS);
+	formatex(g_query, charsmax(g_query), "DELETE FROM %s ", SQL_TBL_GAGS)
 	{
-		strcat(g_query, fmt("WHERE (authid = '%s')", authID), charsmax(g_query));
+		strcat(g_query, fmt("WHERE (authid = '%s')", authID), charsmax(g_query))
 	}
-	SQL_ThreadQuery(g_tuple, "handle_Removed", g_query);
+	SQL_ThreadQuery(g_tuple, "handle_Removed", g_query)
 }
 
 public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime)
 {
 	if(IsSQLQueryFailed(failstate, query, error, errnum))
 	{
-		return;
+		return
 	}
-	CA_Log(logLevel_Debug, "Player gag removed { } (queryTime: '%.3f' sec)", queuetime);
+	CA_Log(logLevel_Debug, "Player gag removed { } (queryTime: '%.3f' sec)", queuetime)
 
-	ExecuteForward(g_fwd_StorageRemoved, g_ret);
+	ExecuteForward(g_fwd_StorageRemoved, g_ret)
 }
