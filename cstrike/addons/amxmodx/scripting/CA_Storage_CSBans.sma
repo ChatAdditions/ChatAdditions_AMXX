@@ -20,7 +20,7 @@
 new const SQL_TBL_GAGS[] = "chatadditions_gags"
 
 const QUERY_LENGTH = 4096
-const MAX_REASON_LENGTH = 256;
+const MAX_REASON_LENGTH = 256
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
@@ -192,14 +192,14 @@ Storage_Save(const name[], const authID[], const IP[],
     return
   }
 
-  new name_safe[MAX_NAME_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name);
+  new name_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name)
 
-  new reason_safe[MAX_REASON_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason);
+  new reason_safe[MAX_REASON_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason)
 
-  new adminName_safe[MAX_NAME_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName);
+  new adminName_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName)
 
   // TODO: Optimize this EPIC QUERY
   formatex(g_query, charsmax(g_query), "INSERT INTO %s ", SQL_TBL_GAGS); {
