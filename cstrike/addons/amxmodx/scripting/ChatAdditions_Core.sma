@@ -4,6 +4,7 @@
 
 #include <grip>
 #include <ChatAdditions>
+#include <unixtime>
 
 #pragma ctrlchar '\'
 #pragma tabsize 2
@@ -19,7 +20,9 @@ enum logType_s {
 new logType_s: ca_log_type,
   logLevel_s: ca_log_level = logLevel_Debug,
   g_logsPath[PLATFORM_MAX_PATH],
-  bool: ca_update_notify
+  bool: ca_update_notify,
+  bool: ca_log_autodelete,
+  ca_log_autodelete_time
 
 new const LOG_FOLDER[] = "ChatAdditions"
 
@@ -76,6 +79,8 @@ public plugin_init() {
   g_fwdClientVoice        = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
   g_fwdClientChangeName   = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
 
+  CheckAutoDelete()
+
   CA_Log(logLevel_Debug, "Chat Additions: Core initialized!")
 
   set_task_ex(6.274, "_OnConfigsExecuted")
@@ -91,12 +96,69 @@ public _OnConfigsExecuted() {
   CheckUpdate()
 }
 
+CheckAutoDelete() {
+  if(ca_log_autodelete) {
+    if(dir_exists(g_logsPath)) {
+      new logFile[PLATFORM_MAX_PATH]
+      new dirHandle
+      new subDirectory[PLATFORM_MAX_PATH]
+      new deleteTime
+
+      deleteTime = get_systime() - (ca_log_autodelete_time * 60 * 60 * 24)
+
+      dirHandle = open_dir(g_logsPath, logFile, charsmax(logFile))
+
+      if(dirHandle) {
+        while(next_file(dirHandle, logFile, charsmax(logFile))) {
+          if(logFile[0] == '.')
+            continue
+
+          if(containi(logFile, ".log") == -1) {
+            formatex(subDirectory, charsmax(subDirectory), "%s/%s", g_logsPath, logFile)
+
+            ReadFolder(deleteTime, subDirectory)
+
+            continue
+          }
+        }
+        close_dir(dirHandle)
+      }
+    }
+  }
+}
+
+ReadFolder(deleteTime, logPath[]) {
+  new logFile[PLATFORM_MAX_PATH]
+  new dirHandle = open_dir(logPath, logFile, charsmax(logFile))
+  new fileTime
+
+  if(dirHandle) {
+    do 
+    {
+      if(logFile[0] == '.') {
+        continue
+      }
+
+      if(containi(logFile, ".log") != -1) {
+        fileTime = 0
+        format(logFile, charsmax(logFile), "%s/%s", logPath, logFile)
+
+        fileTime = GetFileTime(logFile, FileTime_Created)
+        if(fileTime < deleteTime) {
+          unlink(logFile)
+        }
+      }
+    } while(next_file(dirHandle, logFile, charsmax(logFile)))
+  }
+  close_dir(dirHandle)
+}
+
 Register_CVars() {
   bind_pcvar_num(create_cvar("ca_log_type", "1",
       .description = fmt("Log file type\n \
         0 = log to common amxx log file (logs/L*.log)\n \
         1 = log to plugins folder (logs/%s/[plugin name]/L*.log)\n \
-        2 = silent log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER),
+        2 = silent log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER, LOG_FOLDER),
       .has_min = true, .min_val = 0.0,
       .has_max = true, .max_val = float(_LogToDirSilent)
     ),
@@ -117,6 +179,21 @@ Register_CVars() {
       .has_max = true, .max_val = 1.0
     ),
     ca_update_notify
+  )
+
+  bind_pcvar_num(create_cvar("ca_log_autodelete", "1",
+      .description = "Auto delete log files older than X days?",
+      .has_min = true, .min_val = 0.0,
+      .has_max = true, .max_val = 1.0
+      ), 
+    ca_log_autodelete
+  )
+
+  bind_pcvar_num(create_cvar("ca_log_autodelete_time", "7",
+      .description = "The time in days after which the log files should be deleted.",
+      .has_min = true, .min_val = 0.0
+      ), 
+    ca_log_autodelete_time
   )
 }
 
