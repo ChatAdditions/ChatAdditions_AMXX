@@ -4,7 +4,6 @@
 
 #include <grip>
 #include <ChatAdditions>
-#include <unixtime>
 
 #pragma ctrlchar '\'
 #pragma tabsize 2
