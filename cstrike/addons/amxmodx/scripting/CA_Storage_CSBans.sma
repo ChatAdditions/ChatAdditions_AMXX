@@ -313,7 +313,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
   new bool: found = (SQL_NumResults(query) != 0)
 
   if(!found) {
-    return;
+    return
   }
 
   new name[MAX_NAME_LENGTH];            SQL_ReadResult(query, res_name, name, charsmax(name))
