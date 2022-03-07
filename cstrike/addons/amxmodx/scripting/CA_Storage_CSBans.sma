@@ -45,7 +45,8 @@ public plugin_init() {
     set_fail_state("Can't user 'MySQL'. Check modules.ini")
   }
 
-  Register_CVars()
+  Create_CVars()
+
   AutoExecConfig(true, "CA_Storage_CSBans", "ChatAdditions")
 
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
@@ -77,7 +78,7 @@ public plugin_cfg() {
   RegisterForwards()
 }
 
-Register_CVars() {
+Create_CVars() {
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
       .description = "CSBans MySQL database host address"
     ),

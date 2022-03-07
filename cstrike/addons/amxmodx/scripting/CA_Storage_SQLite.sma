@@ -17,7 +17,7 @@ new const SQL_DBNAME[] = "ChatAdditions"
 new const SQL_TBL_GAGS[] = "players_gags"
 
 const QUERY_LENGTH = 4096
-const MAX_REASON_LENGTH = 256;
+const MAX_REASON_LENGTH = 256
 
 new Handle: g_tuple = Empty_Handle
 

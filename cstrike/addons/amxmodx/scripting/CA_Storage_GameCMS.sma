@@ -20,7 +20,7 @@
 new const SQL_TBL_GAGS[] = "comms"
 
 const QUERY_LENGTH = 4096
-const MAX_REASON_LENGTH = 256;
+const MAX_REASON_LENGTH = 256
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
@@ -48,7 +48,8 @@ public plugin_init() {
     set_fail_state("Can't user 'MySQL'. Check modules.ini")
   }
 
-  Register_CVars()
+  Create_CVars()
+
   AutoExecConfig(true, "CA_Storage_GameCMS", "ChatAdditions")
 
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
@@ -89,7 +90,7 @@ public client_disconnected(id) {
   g_gamecmsAdminId[id] = 0
 }
 
-Register_CVars() {
+Create_CVars() {
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
       .description = "GameCMS MySQL database host address"
     ),

@@ -20,7 +20,8 @@ public plugin_init() {
 
   register_dictionary("CA_AntiFlood.txt")
 
-  CreateCVars()
+  Create_CVars()
+
   AutoExecConfig(true, "CA_AntiFlood", "ChatAdditions")
 }
 
@@ -77,7 +78,7 @@ public client_disconnected(id) {
   g_OldMessage[id][0] = EOS
 }
 
-CreateCVars() {
+Create_CVars() {
   bind_pcvar_float(
     create_cvar(
       .name = "ca_anti_flood_time",

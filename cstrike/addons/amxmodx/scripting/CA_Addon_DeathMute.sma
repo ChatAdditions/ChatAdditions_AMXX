@@ -39,7 +39,7 @@ public plugin_init() {
 
   register_dictionary("CA_Addon_DeathMute.txt")
 
-  Register_CVars()
+  CreateCVars()
 
   AutoExecConfig(true, "CA_Addon_DeathMute", "ChatAdditions")
 
@@ -49,7 +49,7 @@ public plugin_init() {
   g_syncHudOj = CreateHudSyncObj()
 }
 
-Register_CVars() {
+CreateCVars() {
   bind_pcvar_float(create_cvar("ca_deathmute_time", "5.0",
       .description = "Time (in seconds) for killed players, during which they can report information to living players.\n\
         0 - disabled functionality",
