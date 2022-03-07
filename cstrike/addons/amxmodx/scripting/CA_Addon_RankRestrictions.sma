@@ -5,18 +5,18 @@
 #pragma tabsize 2
 
 // Natives
-native aes_get_player_level(const player)
-native ar_get_user_level(const player, rankName[] = "", len = 0)
-native crxranks_get_user_level(const player)
-native cmsranks_get_user_level(id, szLevel[] = "", len = 0)
-native csstats_get_user_stats(const player, const stats[22])
-native Float:cmsstats_get_user_skill(index, skillname[] = "", namelen = 0, &skill_level = 0);
-native get_user_skill(player,&Float:skill)
-native get_user_stats(index,stats[STATSX_MAX_STATS],bodyhits[MAX_BODYHITS]);
+native aes_get_player_level(const player);
+native ar_get_user_level(const player, rankName[] = "", len = 0);
+native crxranks_get_user_level(const player);
+native cmsranks_get_user_level(player, szLevel[] = "", len = 0);
+native csstats_get_user_stats(const player, const stats[22]);
+native Float:cmsstats_get_user_skill(player, skillname[] = "", namelen = 0, &skill_level = 0);
+native get_user_skill(player, &Float: skill);
+native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
 //
 
 
-static ca_rankrestrictions_type,
+new ca_rankrestrictions_type,
   ca_rankrestrictions_min_kills,
   ca_rankrestrictions_type_level,
   ca_rankrestrictions_min_level,
@@ -67,7 +67,7 @@ public native_filter(const name[], index, trap) {
   return PLUGIN_CONTINUE
 }
 
-static Create_CVars() {
+Create_CVars() {
   bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "1",
     .description = "Restrictions Types\n\
       0 - Disable restrictions\n\
@@ -141,7 +141,7 @@ public CA_Client_Voice(const listener, const sender) {
   return CanCommunicate(sender, false) ? CA_CONTINUE : CA_SUPERCEDE
 }
 
-static bool: CanCommunicate(const player, const bool: print = true) {
+bool: CanCommunicate(const player, const bool: print = true) {
   if(ca_rankrestrictions_type <= 0)
     return true
 
@@ -172,7 +172,7 @@ static bool: CanCommunicate(const player, const bool: print = true) {
   return true
 }
 
-static GetUserLevel(const player) {
+GetUserLevel(const player) {
   switch(ca_rankrestrictions_type_level) {
     case 0: return aes_get_player_level(player)
     case 1: return ar_get_user_level(player)
@@ -201,7 +201,7 @@ static GetUserLevel(const player) {
   return 0
 }
 
-static GetUserFragsFromStats(const player) {
+GetUserFragsFromStats(const player) {
 	enum { stats_Frags/* , stats_Deaths, stats_Rounds = 16 */ }
 
 	switch(ca_rankrestrictions_type_kills)
