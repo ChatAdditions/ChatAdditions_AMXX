@@ -7,12 +7,11 @@
 #pragma ctrlchar '\'
 #pragma tabsize 2
 
-static Float: g_userNextRequestTime[MAX_PLAYERS + 1]
+new Float: g_userNextRequestTime[MAX_PLAYERS + 1]
 
-static ca_requestungag_cmd[32],
-  Float: ca_requestungag_delay
-
-static ca_gag_access_flags_high[32],
+new ca_requestungag_cmd[32],
+  Float: ca_requestungag_delay,
+  ca_gag_access_flags_high[32],
   ca_gag_access_flags[32]
 
 public stock const PluginName[] = "CA Addon: Request UnGAG"
