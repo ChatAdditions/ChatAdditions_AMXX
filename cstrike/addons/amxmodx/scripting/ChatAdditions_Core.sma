@@ -213,23 +213,26 @@ public bool: native_CA_Log(const plugin_id, const argc) {
   new msg[2048];
   vdformat(msg, charsmax(msg), arg_msg, arg_format)
 
-  new pluginName[32]
-  get_plugin(plugin_id, pluginName, charsmax(pluginName))
+  if(ca_log_type > _Default)
+  {
+    new pluginName[32]
+    get_plugin(plugin_id, pluginName, charsmax(pluginName))
 
-  replace(pluginName, charsmax(pluginName), ".amxx", "")
+    replace(pluginName, charsmax(pluginName), ".amxx", "")
 
-  new logsPath[PLATFORM_MAX_PATH]
-  formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
+    new logsPath[PLATFORM_MAX_PATH]
+    formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
 
-  if(!dir_exists(logsPath)) {
-    mkdir(logsPath)
+    if(!dir_exists(logsPath)) {
+      mkdir(logsPath)
+    }
+
+    new year, month, day
+    date(year, month, day)
+
+    new logsFile[PLATFORM_MAX_PATH];
+    formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
   }
-
-  new year, month, day
-  date(year, month, day)
-
-  new logsFile[PLATFORM_MAX_PATH];
-  formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
 
   switch(ca_log_type) {
     case _LogToDir:         log_to_file(logsFile, msg)
