@@ -20,7 +20,6 @@ new logType_s: ca_log_type,
   logLevel_s: ca_log_level = logLevel_Debug,
   g_logsPath[PLATFORM_MAX_PATH],
   bool: ca_update_notify,
-  bool: ca_log_autodelete,
   ca_log_autodelete_time
 
 new const LOG_FOLDER[] = "ChatAdditions"
@@ -96,7 +95,7 @@ public _OnConfigsExecuted() {
 }
 
 CheckAutoDelete() {
-  if(ca_log_autodelete) {
+  if(ca_log_autodelete_time > 0) {
     if(dir_exists(g_logsPath)) {
       new logFile[PLATFORM_MAX_PATH]
       new dirHandle
@@ -180,16 +179,10 @@ Register_CVars() {
     ca_update_notify
   )
 
-  bind_pcvar_num(create_cvar("ca_log_autodelete", "1",
-      .description = "Auto delete log files older than X days?",
-      .has_min = true, .min_val = 0.0,
-      .has_max = true, .max_val = 1.0
-      ), 
-    ca_log_autodelete
-  )
-
   bind_pcvar_num(create_cvar("ca_log_autodelete_time", "7",
-      .description = "The time in days after which the log files should be deleted.",
+      .description = "The time in days after which the log files should be deleted.\n \
+      0 - The logs won't be deleted.\n \
+      > 0 - The logs will be deleted at the time inserted.",
       .has_min = true, .min_val = 0.0
       ), 
     ca_log_autodelete_time
