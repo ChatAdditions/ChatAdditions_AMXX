@@ -41,7 +41,7 @@ public CA_Client_SayTeam(id, const message[]) {
 
 CheckMessage(id, const message[]) {
   if(message[0] == '/') {
-    return CA_CONTINUE;
+    return CA_CONTINUE
   }
 
   static Float:nextMessage[MAX_PLAYERS + 1]
