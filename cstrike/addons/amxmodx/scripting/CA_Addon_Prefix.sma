@@ -16,10 +16,7 @@ native statsx_get_skill(stats[22], string[] = "", len = 0);
 new g_sGameCmsPrefix[MAX_PLAYERS + 1][128];
 new g_sGameCmsAdminPrefix[MAX_PLAYERS + 1][128];
 new g_sChatRbsPrefix[MAX_PLAYERS + 1][128];
-new g_sUnrealPrefix[MAX_PLAYERS + 1][64];
-new g_sUnrealSkillPrefix[MAX_PLAYERS + 1][16];
 
-new bool:UNREAL_RANK_PREFIX_ENABLED = false;
 new bool:AES_PREFIX_ENABLED = true;
 new bool:AR_PREFIX_ENABLED = true;
 new bool:CMS_PREFIX_ENABLED = true;
@@ -27,8 +24,6 @@ new bool:GAMECMS_PREFIX_ENABLED = true;
 new bool:CHATRBS_PREFIX_ENABLED = true;
 
 new bool:STATSRBS_PREFIX_ENABLED[2] = {true,true};
-
-/*new bool:g_bPlayerConnected[MAX_PLAYERS + 1] = {false, ...};*/
 
 public stock const PluginName[] = "CA: Prefix";
 public stock const PluginVersion[] = "1.0.1";
@@ -53,22 +48,16 @@ public plugin_natives()
 
 public client_disconnected(id)
 {
-	g_sUnrealPrefix[id][0] = EOS;
-	g_sUnrealSkillPrefix[id][0] = EOS;
 	g_sGameCmsPrefix[id][0] = EOS;
 	g_sGameCmsAdminPrefix[id][0] = EOS;
 	g_sChatRbsPrefix[id][0] = EOS;
-	/*g_bPlayerConnected[id] = false;*/
 }
 
 public client_connect(id)
 {
-	g_sUnrealPrefix[id][0] = EOS;
-	g_sUnrealSkillPrefix[id][0] = EOS;
 	g_sGameCmsPrefix[id][0] = EOS;
 	g_sGameCmsAdminPrefix[id][0] = EOS;
 	g_sChatRbsPrefix[id][0] = EOS;
-	/*g_bPlayerConnected[id] = false;*/
 }
 
 public native_filter(const name[], index, trap) 
@@ -267,14 +256,6 @@ CheckMessage(id, const message[], const bool:team) {
 	new bool:rankAdded = false;
 	new rankName[64];
 	
-	if (UNREAL_RANK_PREFIX_ENABLED && !rankAdded)
-	{
-		if (g_sUnrealPrefix[id][0] != EOS)
-		{
-			copy(rankName,charsmax(rankName),g_sUnrealPrefix[id]);
-			rankAdded = true;
-		}
-	}
 	
 	if (AES_PREFIX_ENABLED && !rankAdded)
 	{
@@ -317,16 +298,7 @@ CheckMessage(id, const message[], const bool:team) {
 	new bool:skillAdded = false;
 	new skillName[64];
 	
-	if (UNREAL_RANK_PREFIX_ENABLED && !skillAdded)
-	{
-		if (g_sUnrealSkillPrefix[id][0] != EOS)
-		{
-			copy(skillName,charsmax(skillName),g_sUnrealSkillPrefix[id]);
-			skillAdded = true;
-		}
-	}
-	
-	if (STATSRBS_PREFIX_ENABLED[0] && STATSRBS_PREFIX_ENABLED[1] && skillAdded)
+	if (STATSRBS_PREFIX_ENABLED[0] && STATSRBS_PREFIX_ENABLED[1] && !skillAdded)
 	{
 		new statsRbs[22];
 		new iPlayerLvl = csstats_get_user_stats(id,statsRbs);
@@ -422,54 +394,14 @@ public OnAPISendChatPrefix(id, prefix[], type)
 				add(g_sGameCmsPrefix[id],charsmax(g_sGameCmsPrefix[]), prefix);
 				add(g_sGameCmsPrefix[id],charsmax(g_sGameCmsPrefix[]),"^1] ");
 			}
-			/*if (!g_bPlayerConnected[id])
-			{
-				g_bPlayerConnected[id] = true;
-				set_task(1.5,"print_joined_admin_prefix",id);
-			}*/
 		}
 		if (type == 2 && (get_user_flags(id) & (ADMIN_BAN | ADMIN_RESERVATION | ADMIN_IMMUNITY)) > 0)
 		{
 			copy(g_sGameCmsAdminPrefix[id], charsmax(g_sGameCmsAdminPrefix[]), prefix);
-			/*if (!g_bPlayerConnected[id] || task_exists(id))
-			{
-				if (task_exists(id))
-				{
-					remove_task(id);
-				}
-				g_bPlayerConnected[id] = true;
-				set_task(1.5,"print_joined_admin",id);
-			}*/
 		}
 	}
 }
 
-/*
-Working but temporary disabled, because need add to lang file.
-public print_joined_admin_prefix(id)
-{
-	g_bPlayerConnected[id] = true;
-	if (is_user_connected(id))
-	{
-		new username[33];
-		get_user_name(id,username,charsmax(username));
-		print_color(0,print_team_red,"^1Игрок %s ^3%s^1 присоединился к игре!",g_sGameCmsPrefix[id], username );
-	}
-}
-
-
-public print_joined_admin(id)
-{
-	g_bPlayerConnected[id] = true;
-	if (is_user_connected(id))
-	{
-		new username[33];
-		get_user_name(id,username,charsmax(username));
-		print_color(0,print_team_red,"^1Игрок [^4%s^1] ^3%s^1 присоединился к игре!",g_sGameCmsAdminPrefix[id], username );
-	}
-}*/
-
-// CHAT RBS PREFIX SUPPORT
 public chat_addons_prefix(id, prefix[])
 {
 	if ( prefix[0] != EOS )
@@ -484,21 +416,6 @@ public chat_addons_prefix(id, prefix[])
 				add(g_sChatRbsPrefix[id],charsmax(g_sChatRbsPrefix[]),"^1] ");
 			}
 		}
-	}
-}
-
-public unrealranks_user_level_updated(const id,const level,const levelstr[],const rankstr[])
-{
-	UNREAL_RANK_PREFIX_ENABLED = true;
-	
-	if ( levelstr[0] != EOS )
-	{
-		copy(g_sUnrealPrefix[id],charsmax(g_sUnrealPrefix[]),levelstr);
-	}
-	
-	if ( rankstr[0] != EOS )
-	{
-		copy(g_sUnrealSkillPrefix[id],charsmax(g_sUnrealSkillPrefix[]),rankstr);
 	}
 }
 
