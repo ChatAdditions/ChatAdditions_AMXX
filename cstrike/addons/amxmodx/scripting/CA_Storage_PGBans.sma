@@ -30,7 +30,7 @@ new pgb_storage_host[33],
 	pgb_storage_pass[64],
 	pgb_storage_dbname[33];
 
-public stock const PluginURL[]  = "github.com/ChatAdditions/ChatsAdditions_AMXX"
+public stock const PluginURL[]  = "https://github.com/ChatAdditions/"
 public stock const PluginDesc[] = "PGBans (MySQL) storage provider for ChatAdditions"
 
 public plugin_init()

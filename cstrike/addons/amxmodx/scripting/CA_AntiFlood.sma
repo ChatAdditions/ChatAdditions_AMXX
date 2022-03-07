@@ -12,7 +12,7 @@ new Float: ca_anti_flood_time,
 public stock const PluginName[] = "CA: Anti Flood"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Nordic Warrior"
-public stock const PluginURL[] = "https://github.com/ChatAdditions"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "Antiflood for chat"
 
 public plugin_init() {

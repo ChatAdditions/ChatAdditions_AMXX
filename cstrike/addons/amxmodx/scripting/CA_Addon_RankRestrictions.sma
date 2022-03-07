@@ -25,7 +25,7 @@ static ca_rankrestrictions_type,
 public stock const PluginName[] = "CA Addon: Rank restrictions"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "steelzzz"
-public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "Restrict chat until you reach the rank of a statistic"
 
 public plugin_init() {
