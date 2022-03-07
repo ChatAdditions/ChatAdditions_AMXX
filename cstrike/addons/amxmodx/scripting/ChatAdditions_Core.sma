@@ -213,8 +213,10 @@ public bool: native_CA_Log(const plugin_id, const argc) {
     return false
   }
 
-  new msg[2048], logsFile[PLATFORM_MAX_PATH];
+  new msg[2048]
   vdformat(msg, charsmax(msg), arg_msg, arg_format)
+
+  new logsFile[PLATFORM_MAX_PATH]
 
   if(ca_log_type > _Default)
   {
@@ -373,36 +375,39 @@ static stock CmpVersions(const a[], const b[]) {
   return countA - countB
 }
 
-stock log_to_file_ex(const filepath[], message[]) {
-  new iFile, bool:bFirstTime = true, szDate[32]
-  format_time(szDate, charsmax(szDate), "%m/%d/%Y - %H:%M:%S")
-  static szModName[15], szAmxVersion[15]
+stock log_to_file_ex(const filePath[], message[]) {
+  new file
+  new bool:firstTime = true
+  new date[32]
 
-  if(!szModName[0]) {
-    get_modname(szModName, charsmax(szModName))
+  format_time(date, charsmax(date), "%m/%d/%Y - %H:%M:%S")
+  static modName[15], amxVersion[15]
+
+  if(!modName[0]) {
+    get_modname(modName, charsmax(modName))
   }
 
-  if(!szAmxVersion[0]) {
-    get_amxx_verstring(szAmxVersion, charsmax(szAmxVersion))
+  if(!amxVersion[0]) {
+    get_amxx_verstring(amxVersion, charsmax(amxVersion))
   }
 
-  if((iFile = fopen(filepath, "r"))) {
-    bFirstTime = false
-    fclose(iFile)
+  if((file = fopen(filePath, "r"))) {
+    firstTime = false
+    fclose(file)
   }
 
-  if(!(iFile = fopen(filepath, "at"))) {
-    log_error(AMX_ERR_GENERAL, "Can't open \"%s\" file for writing.", filepath)
+  if(!(file = fopen(filePath, "at"))) {
+    log_error(AMX_ERR_GENERAL, "Can't open \"%s\" file for writing.", filePath)
     return PLUGIN_CONTINUE
   }
 
-  if(bFirstTime) {
-    fprintf(iFile, "L %s: Log file started (file \"%s\") (game \"%s\") (amx \"%s\")\n", szDate, filepath, szModName, szAmxVersion)
+  if(firstTime) {
+    fprintf(file, "L %s: Log file started (file \"%s\") (game \"%s\") (amx \"%s\")\n", date, filePath, modName, amxVersion)
   }
 
-  fprintf(iFile, "L %s: %s\n", szDate, message);
+  fprintf(file, "L %s: %s\n", date, message)
 
-  fclose(iFile)
+  fclose(file)
 
   return PLUGIN_HANDLED
 }
