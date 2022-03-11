@@ -31,7 +31,7 @@ new g_syncHudOj
 public stock const PluginName[] = "CA Addon: Death mute"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "Alive players don't hear dead players after 5 secs"
 
 public plugin_init() {
@@ -39,7 +39,7 @@ public plugin_init() {
 
   register_dictionary("CA_Addon_DeathMute.txt")
 
-  Register_CVars()
+  Create_CVars()
 
   AutoExecConfig(true, "CA_Addon_DeathMute", "ChatAdditions")
 
@@ -49,7 +49,7 @@ public plugin_init() {
   g_syncHudOj = CreateHudSyncObj()
 }
 
-Register_CVars() {
+Create_CVars() {
   bind_pcvar_float(create_cvar("ca_deathmute_time", "5.0",
       .description = "Time (in seconds) for killed players, during which they can report information to living players.\n\
         0 - disabled functionality",

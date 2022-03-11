@@ -7,28 +7,29 @@
 #pragma ctrlchar '\'
 #pragma tabsize 2
 
-static Float: g_userNextRequestTime[MAX_PLAYERS + 1]
+new Float: g_userNextRequestTime[MAX_PLAYERS + 1]
 
-static ca_requestungag_cmd[32],
-  Float: ca_requestungag_delay
-
-static ca_gag_access_flags_high[32], ca_gag_access_flags[32]
+new ca_requestungag_cmd[32],
+  Float: ca_requestungag_delay,
+  ca_gag_access_flags_high[32],
+  ca_gag_access_flags[32]
 
 public stock const PluginName[] = "CA Addon: Request UnGAG"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "steelzzz"
-public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "A player can apologize to the administration"
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
   register_dictionary("CA_Addon_RequestUngag.txt")
 
-  Register_CVars()
+  Create_CVars()
+
   AutoExecConfig(true, "CA_Addon_RequestUnGag", "ChatAdditions")
 }
 
-public Register_CVars() {
+public Create_CVars() {
   bind_pcvar_string(create_cvar("ca_requestungag_cmd", "/sorry",
       .description = "Request ungag command"),
     ca_requestungag_cmd, charsmax(ca_requestungag_cmd)

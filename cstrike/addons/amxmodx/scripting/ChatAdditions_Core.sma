@@ -57,7 +57,7 @@ public plugin_precache() {
 
   GetLogsFilePath(g_logsPath, .dir = LOG_FOLDER)
 
-  Register_CVars()
+  Create_CVars()
 
   AutoExecConfig(true, "ChatAdditions_core", "ChatAdditions")
 }
@@ -151,7 +151,8 @@ ReadFolder(deleteTime, logPath[]) {
   close_dir(dirHandle)
 }
 
-Register_CVars() {
+Create_CVars() {
+
   bind_pcvar_num(create_cvar("ca_log_type", "1",
       .description = fmt("Log file type\n \
         0 = log to common amxx log file (logs/L*.log)\n \

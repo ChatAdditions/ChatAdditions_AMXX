@@ -33,7 +33,8 @@ new ca_gag_times[64],
   ca_gag_sound_error[128],
   bool: ca_gag_block_nickname_change,
   bool: ca_gag_block_admin_chat,
-  bool: ca_gag_common_chat_block
+  bool: ca_gag_common_chat_block,
+  ca_gag_own_reason_enabled
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 
@@ -75,7 +76,7 @@ public plugin_precache() {
   register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates");
   register_srvcmd("ca_gag_reload_config", "SrvCmd_ReloadConfig")
 
-  Register_CVars()
+  Create_CVars()
 
   g_gagReasonsTemplates = ArrayCreate(reason_s)
   g_gagTimeTemplates = ArrayCreate()
@@ -125,7 +126,7 @@ public plugin_end() {
   DestroyForward(g_fwd_gag_removed)
 }
 
-Register_CVars() {
+Create_CVars() {
   bind_pcvar_string(create_cvar("ca_gag_times", "1i, 5i, 10i, 30i, 1h, 1d, 1w, 1m",
       .description = "Gag time values for choose\n \
         format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week, 1m = 1 month, 1y = 1 year\n \
@@ -215,6 +216,15 @@ Register_CVars() {
         0 = disabled"
     ),
     ca_gag_common_chat_block
+  )
+
+  bind_pcvar_num(create_cvar("ca_gag_own_reason_enabled", "1",
+      .description = "Enable own gag reason\n \
+        0 = disabled (excluding when there are no reasons)\n \
+        1 = enabled, at first position in reasons list\n \
+        2 = enabled, at last position in reasons list"
+    ),
+    ca_gag_own_reason_enabled
   )
 }
 
@@ -409,7 +419,7 @@ static MenuShow_SelectReason(const id) {
 
   new bool: hasReasonsTemplates = bool: (g_gagReasonsTemplates_size != 0)
 
-  if(playerFlags & (accessFlagsHigh | accessFlagsOwnReason) || !hasReasonsTemplates) {
+  if(ca_gag_own_reason_enabled == 1 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason) || !hasReasonsTemplates) {
     menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
   }
 
@@ -444,6 +454,10 @@ static MenuShow_SelectReason(const id) {
       }
 
       menu_additem(menu, buffer,  fmt("%i", i))
+    }
+
+    if(ca_gag_own_reason_enabled == 2 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason)) {
+      menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
     }
   } else {
     menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)

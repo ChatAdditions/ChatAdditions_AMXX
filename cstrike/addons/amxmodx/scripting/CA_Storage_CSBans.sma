@@ -20,7 +20,7 @@
 new const SQL_TBL_GAGS[] = "chatadditions_gags"
 
 const QUERY_LENGTH = 4096
-const MAX_REASON_LENGTH = 256;
+const MAX_REASON_LENGTH = 256
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
@@ -35,7 +35,7 @@ new ca_storage_host[64],
 public stock const PluginName[] = "ChatAdditions: CSBans storage"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "CSBans (MySQL) storage provider for ChatAdditions"
 
 public plugin_init() {
@@ -45,7 +45,8 @@ public plugin_init() {
     set_fail_state("Can't user 'MySQL'. Check modules.ini")
   }
 
-  Register_CVars()
+  Create_CVars()
+
   AutoExecConfig(true, "CA_Storage_CSBans", "ChatAdditions")
 
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
@@ -77,7 +78,7 @@ public plugin_cfg() {
   RegisterForwards()
 }
 
-Register_CVars() {
+Create_CVars() {
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
       .description = "CSBans MySQL database host address"
     ),
@@ -192,14 +193,14 @@ Storage_Save(const name[], const authID[], const IP[],
     return
   }
 
-  new name_safe[MAX_NAME_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name);
+  new name_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name)
 
-  new reason_safe[MAX_REASON_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason);
+  new reason_safe[MAX_REASON_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason)
 
-  new adminName_safe[MAX_NAME_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName);
+  new adminName_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName)
 
   // TODO: Optimize this EPIC QUERY
   formatex(g_query, charsmax(g_query), "INSERT INTO %s ", SQL_TBL_GAGS); {
@@ -312,7 +313,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
   new bool: found = (SQL_NumResults(query) != 0)
 
   if(!found) {
-    return;
+    return
   }
 
   new name[MAX_NAME_LENGTH];            SQL_ReadResult(query, res_name, name, charsmax(name))
