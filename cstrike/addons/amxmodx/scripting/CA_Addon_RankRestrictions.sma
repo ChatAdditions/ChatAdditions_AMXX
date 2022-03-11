@@ -2,20 +2,21 @@
 #include <ChatAdditions>
 
 #pragma ctrlchar '\'
+#pragma tabsize 2
 
 // Natives
-native aes_get_player_level(const player)
-native ar_get_user_level(const player, rankName[] = "", len = 0)
-native crxranks_get_user_level(const player)
-native cmsranks_get_user_level(id, szLevel[] = "", len = 0)
-native csstats_get_user_stats(const player, const stats[22])
-native Float:cmsstats_get_user_skill(index, skillname[] = "", namelen = 0, &skill_level = 0);
-native get_user_skill(player,&Float:skill)
-native get_user_stats(index,stats[STATSX_MAX_STATS],bodyhits[MAX_BODYHITS]);
+native aes_get_player_level(const player);
+native ar_get_user_level(const player, rankName[] = "", len = 0);
+native crxranks_get_user_level(const player);
+native cmsranks_get_user_level(player, szLevel[] = "", len = 0);
+native csstats_get_user_stats(const player, const stats[22]);
+native Float:cmsstats_get_user_skill(player, skillname[] = "", namelen = 0, &skill_level = 0);
+native get_user_skill(player, &Float: skill);
+native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
 //
 
 
-static ca_rankrestrictions_type,
+new ca_rankrestrictions_type,
   ca_rankrestrictions_min_kills,
   ca_rankrestrictions_type_level,
   ca_rankrestrictions_min_level,
@@ -25,14 +26,14 @@ static ca_rankrestrictions_type,
 public stock const PluginName[] = "CA Addon: Rank restrictions"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "steelzzz"
-public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "Restrict chat until you reach the rank of a statistic"
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
   register_dictionary("CA_Addon_RankRestrictions.txt")
 
-  Register_CVars()
+  Create_CVars()
 
   AutoExecConfig(true, "CA_Addon_RankRestrictions", "ChatAdditions")
 }
@@ -43,31 +44,31 @@ public plugin_natives() {
 
 public native_filter(const name[], index, trap) {
   if(strcmp(name, "aes_get_player_level"))
-    return  PLUGIN_HANDLED
+    return PLUGIN_HANDLED
 
   if(strcmp(name, "ar_get_user_level"))
-    return  PLUGIN_HANDLED
+    return PLUGIN_HANDLED
 
   if(strcmp(name, "crxranks_get_user_level"))
-    return  PLUGIN_HANDLED
+    return PLUGIN_HANDLED
 
   if(strcmp(name, "csstats_get_user_stats"))
-    return  PLUGIN_HANDLED
+    return PLUGIN_HANDLED
 
   if(strcmp(name, "cmsranks_get_user_level"))
-    return  PLUGIN_HANDLED;
+    return PLUGIN_HANDLED
 
   if(strcmp(name, "cmsstats_get_user_skill"))
-  	return  PLUGIN_HANDLED;
+  	return PLUGIN_HANDLED
 
   if(strcmp(name, "get_user_stats"))
-  	return  PLUGIN_HANDLED;
+  	return PLUGIN_HANDLED
 
   return PLUGIN_CONTINUE
 }
 
-static Register_CVars() {
-  bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "1",
+Create_CVars() {
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "1", 
     .description = "Restrictions Types\n\
       0 - Disable restrictions\n\
       1 - Level restrictions\n\
@@ -140,7 +141,7 @@ public CA_Client_Voice(const listener, const sender) {
   return CanCommunicate(sender, false) ? CA_CONTINUE : CA_SUPERCEDE
 }
 
-static bool: CanCommunicate(const player, const bool: print = true) {
+bool: CanCommunicate(const player, const bool: print = true) {
   if(ca_rankrestrictions_type <= 0)
     return true
 
@@ -171,7 +172,7 @@ static bool: CanCommunicate(const player, const bool: print = true) {
   return true
 }
 
-static GetUserLevel(const player) {
+GetUserLevel(const player) {
   switch(ca_rankrestrictions_type_level) {
     case 0: return aes_get_player_level(player)
     case 1: return ar_get_user_level(player)
@@ -200,7 +201,7 @@ static GetUserLevel(const player) {
   return 0
 }
 
-static GetUserFragsFromStats(const player) {
+GetUserFragsFromStats(const player) {
 	enum { stats_Frags/* , stats_Deaths, stats_Rounds = 16 */ }
 
 	switch(ca_rankrestrictions_type_kills)

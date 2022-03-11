@@ -17,7 +17,7 @@ new const SQL_DBNAME[] = "ChatAdditions"
 new const SQL_TBL_GAGS[] = "players_gags"
 
 const QUERY_LENGTH = 4096
-const MAX_REASON_LENGTH = 256;
+const MAX_REASON_LENGTH = 256
 
 new Handle: g_tuple = Empty_Handle
 
@@ -89,14 +89,14 @@ Storage_Save(const name[], const authID[], const IP[],
   const reason[], const adminName[], const adminAuthID[],
   const adminIP[], const expireAt, const flags) {
 
-  new name_safe[MAX_NAME_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name);
+  new name_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name)
 
-  new reason_safe[MAX_REASON_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason);
+  new reason_safe[MAX_REASON_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason)
 
-  new adminName_safe[MAX_NAME_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName);
+  new adminName_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName)
 
   new query[QUERY_LENGTH]
   formatex(query, charsmax(query), "INSERT OR REPLACE INTO %s ", SQL_TBL_GAGS); {
@@ -186,7 +186,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
   new bool: found = (SQL_NumResults(query) != 0)
 
   if(!found) {
-    return;
+    return
   }
 
   new name[MAX_NAME_LENGTH];            SQL_ReadResult(query, res_name, name, charsmax(name))

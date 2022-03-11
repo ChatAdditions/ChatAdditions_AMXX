@@ -20,7 +20,7 @@
 new const SQL_TBL_GAGS[] = "comms"
 
 const QUERY_LENGTH = 4096
-const MAX_REASON_LENGTH = 256;
+const MAX_REASON_LENGTH = 256
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
@@ -38,7 +38,7 @@ new ca_storage_host[64],
 public stock const PluginName[] = "ChatAdditions: GameCMS storage"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "github.com/ChatAdditions/ChatsAdditions_AMXX"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "GameCMS (MySQL) storage provider for ChatAdditions"
 
 public plugin_init() {
@@ -48,7 +48,8 @@ public plugin_init() {
     set_fail_state("Can't user 'MySQL'. Check modules.ini")
   }
 
-  Register_CVars()
+  Create_CVars()
+
   AutoExecConfig(true, "CA_Storage_GameCMS", "ChatAdditions")
 
   g_queueLoad = QueueCreate(MAX_AUTHID_LENGTH)
@@ -89,7 +90,7 @@ public client_disconnected(id) {
   g_gamecmsAdminId[id] = 0
 }
 
-Register_CVars() {
+Create_CVars() {
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
       .description = "GameCMS MySQL database host address"
     ),
@@ -177,14 +178,14 @@ Storage_Save(const name[], const authID[], const IP[],
   }
 
   #pragma unused adminIP, IP
-  new name_safe[MAX_NAME_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name);
+  new name_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name)
 
-  new reason_safe[MAX_REASON_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason);
+  new reason_safe[MAX_REASON_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, reason_safe, charsmax(reason_safe), reason)
 
-  new adminName_safe[MAX_NAME_LENGTH * 2];
-  SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName);
+  new adminName_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, adminName_safe, charsmax(adminName_safe), adminName)
 
 
   new admin_id = 0
@@ -316,7 +317,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
   new bool: found = (SQL_NumResults(query) != 0)
 
   if(!found) {
-    return;
+    return
   }
 
   new name[MAX_NAME_LENGTH];            SQL_ReadResult(query, res_name, name, charsmax(name))
@@ -406,7 +407,7 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
   if(!found) {
     set_fail_state("Server `%s` not found on db.", net_address)
 
-    return;
+    return
   }
 
   g_serverID = SQL_ReadResult(query, 0)
@@ -457,28 +458,28 @@ enum {
 
 static stock gag_flags_s: GCMS_FlagsTo_CAGAGFlags(const flag) {
   switch(flag) {
-    case GCMS_FLAG_NONE:    return (gagFlag_Removed);
-    case GCMS_FLAG_ALL:     return (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice);
-    case GCMS_FLAG_CHAT:    return (gagFlag_Say | gagFlag_SayTeam);
-    case GCMS_FLAG_VOICE:   return (gagFlag_Voice);
+    case GCMS_FLAG_NONE:    return (gagFlag_Removed)
+    case GCMS_FLAG_ALL:     return (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice)
+    case GCMS_FLAG_CHAT:    return (gagFlag_Say | gagFlag_SayTeam)
+    case GCMS_FLAG_VOICE:   return (gagFlag_Voice)
   }
 
   CA_Log(logLevel_Warning, "[WARN]: GCMS_FlagsTo_CAGAGFlags() => Undefinded flag:%i", flag)
-  return gagFlag_Removed;
+  return gagFlag_Removed
 }
 
 static stock CAGAGFlags_to_GCMS_Flags(const gag_flags_s: flags) {
   if(flags == gagFlag_Voice) {
-    return GCMS_FLAG_VOICE;
+    return GCMS_FLAG_VOICE
   }
   if(flags == (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice)) {
-    return GCMS_FLAG_ALL;
+    return GCMS_FLAG_ALL
   }
   if(flags & (gagFlag_Say | gagFlag_SayTeam)) {
-    return GCMS_FLAG_CHAT;
+    return GCMS_FLAG_CHAT
   }
 
-  return GCMS_FLAG_NONE;
+  return GCMS_FLAG_NONE
 }
 
 GameCMS_GetAdminID(const id) {

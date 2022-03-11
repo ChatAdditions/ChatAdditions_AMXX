@@ -12,7 +12,7 @@ new Float: ca_anti_flood_time,
 public stock const PluginName[] = "CA: Anti Flood"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Nordic Warrior"
-public stock const PluginURL[] = "https://github.com/ChatAdditions"
+public stock const PluginURL[] = "https://github.com/ChatAdditions/"
 public stock const PluginDescription[] = "Antiflood for chat"
 
 public plugin_init() {
@@ -20,7 +20,8 @@ public plugin_init() {
 
   register_dictionary("CA_AntiFlood.txt")
 
-  CreateCVars()
+  Create_CVars()
+
   AutoExecConfig(true, "CA_AntiFlood", "ChatAdditions")
 }
 
@@ -41,7 +42,7 @@ public CA_Client_SayTeam(id, const message[]) {
 
 CheckMessage(id, const message[]) {
   if(message[0] == '/') {
-    return CA_CONTINUE;
+    return CA_CONTINUE
   }
 
   static Float:nextMessage[MAX_PLAYERS + 1]
@@ -77,7 +78,7 @@ public client_disconnected(id) {
   g_OldMessage[id][0] = EOS
 }
 
-CreateCVars() {
+Create_CVars() {
   bind_pcvar_float(
     create_cvar(
       .name = "ca_anti_flood_time",

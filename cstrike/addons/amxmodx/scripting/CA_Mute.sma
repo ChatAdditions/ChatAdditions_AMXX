@@ -20,7 +20,6 @@ enum {
   ITEM_MUTE_ALL = -1
 }
 
-
 public stock const PluginName[] = "CA: Mute"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Sergey Shorokhov"

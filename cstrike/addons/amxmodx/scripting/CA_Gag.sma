@@ -76,7 +76,7 @@ public plugin_precache() {
   register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates");
   register_srvcmd("ca_gag_reload_config", "SrvCmd_ReloadConfig")
 
-  Register_CVars()
+  Create_CVars()
 
   g_gagReasonsTemplates = ArrayCreate(reason_s)
   g_gagTimeTemplates = ArrayCreate()
@@ -126,7 +126,7 @@ public plugin_end() {
   DestroyForward(g_fwd_gag_removed)
 }
 
-Register_CVars() {
+Create_CVars() {
   bind_pcvar_string(create_cvar("ca_gag_times", "1i, 5i, 10i, 30i, 1h, 1d, 1w, 1m",
       .description = "Gag time values for choose\n \
         format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week, 1m = 1 month, 1y = 1 year\n \
