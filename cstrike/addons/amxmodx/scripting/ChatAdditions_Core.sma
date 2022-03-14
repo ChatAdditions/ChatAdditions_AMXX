@@ -1,4 +1,4 @@
-#include <amxmodx>
+
 #include <amxmisc>
 #include <reapi>
 
@@ -25,7 +25,6 @@ new logType_s: ca_log_type,
 new const LOG_FOLDER[] = "ChatAdditions"
 
 new g_fwdClientSay,
-  g_fwdClientSayTeam,
   g_fwdClientVoice,
   g_fwdClientChangeName,
   g_retVal
@@ -64,7 +63,7 @@ public plugin_precache() {
 
 public plugin_init() {
   register_clcmd("say",       "ClCmd_Say",      ADMIN_ALL)
-  register_clcmd("say_team",  "ClCmd_SayTeam",  ADMIN_ALL)
+  register_clcmd("say_team",  "ClCmd_Say",      ADMIN_ALL)
 
   RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer,     "CSGameRules_CanPlayerHearPlayer",    .post = false)
   RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName,   "CBasePlayer_SetClientUserInfoName",  .post = false)
@@ -72,8 +71,7 @@ public plugin_init() {
   register_clcmd("VModEnable",  "ClCmd_VModEnable",   ADMIN_ALL, .FlagManager = false)
   register_clcmd("vban",        "ClCmd_vban",         ADMIN_ALL, .FlagManager = false)
 
-  g_fwdClientSay          = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL, FP_STRING)
-  g_fwdClientSayTeam      = CreateMultiForward("CA_Client_SayTeam", ET_STOP, FP_CELL, FP_STRING)
+  g_fwdClientSay          = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL, FP_CELL, FP_STRING)
   g_fwdClientVoice        = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
   g_fwdClientChangeName   = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
 
@@ -86,7 +84,6 @@ public plugin_init() {
 
 public plugin_end() {
   DestroyForward(g_fwdClientSay)
-  DestroyForward(g_fwdClientSayTeam)
   DestroyForward(g_fwdClientVoice)
 }
 
@@ -210,20 +207,12 @@ public NativeFilter(const nativeName[], index, trap) {
 
 public ClCmd_Say(const id) {
   static message[CA_MAX_MESSAGE_SIZE]
+  read_argv(0, message, charsmax(message))
+  new isTeamMessage = (message[3] == '_')
   read_args(message, charsmax(message))
   remove_quotes(message)
 
-  ExecuteForward(g_fwdClientSay, g_retVal, id, message)
-
-  return (g_retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE
-}
-
-public ClCmd_SayTeam(const id) {
-  static message[CA_MAX_MESSAGE_SIZE]
-  read_args(message, charsmax(message))
-  remove_quotes(message)
-
-  ExecuteForward(g_fwdClientSayTeam, g_retVal, id, message)
+  ExecuteForward(g_fwdClientSay, g_retVal, id, isTeamMessage, message)
 
   return (g_retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE
 }
