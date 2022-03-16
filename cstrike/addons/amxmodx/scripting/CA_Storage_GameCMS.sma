@@ -83,6 +83,10 @@ public plugin_cfg() {
 }
 
 public client_putinserver(id) {
+  if(!g_storageInitialized) {
+    return
+  }
+
   GameCMS_GetAdminID(id)
 }
 
@@ -446,6 +450,13 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
   if(queueCounter) {
     CA_Log(logLevel_Warning, "Saved %i queue gags to DB (slow DB connection issue)", queueCounter)
     queueCounter = 0
+  }
+
+  new players[MAX_PLAYERS], count
+  get_players_ex(players, count, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV))
+
+  for(new i; i < count; i++) {
+    GameCMS_GetAdminID(players[i])
   }
 }
 
