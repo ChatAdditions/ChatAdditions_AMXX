@@ -498,8 +498,11 @@ GameCMS_GetAdminID(const id) {
   get_user_authid(id, authID, charsmax(authID))
   get_user_name(id, name, charsmax(name))
 
-  formatex(g_query, charsmax(g_query), "SELECT id FROM admins WHERE name = '%s' or name = '%s' LIMIT 1;",
-    authID, name
+  new name_safe[MAX_NAME_LENGTH * 2]
+  SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name)
+
+  formatex(g_query, charsmax(g_query), "SELECT id FROM admins WHERE (name = '%s' or name = '%s') LIMIT 1;",
+    authID, name_safe
   )
 
   new data[1]; data[0] = id
