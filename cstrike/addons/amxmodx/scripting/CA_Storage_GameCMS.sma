@@ -21,6 +21,7 @@ new const SQL_TBL_GAGS[] = "comms"
 
 const QUERY_LENGTH = 4096
 const MAX_REASON_LENGTH = 256
+const MAX_PORT_LENGTH = 5
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
@@ -30,7 +31,9 @@ new Queue: g_queueLoad = Invalid_Queue,
 new g_serverID = -1
 new g_gamecmsAdminId[MAX_PLAYERS + 1]
 
-new ca_storage_host[64],
+new ca_server_ip[MAX_IP_LENGTH],
+  ca_server_port[MAX_PORT_LENGTH],
+  ca_storage_host[64],
   ca_storage_user[128],
   ca_storage_pass[128],
   ca_storage_dbname[128]
@@ -95,6 +98,18 @@ public client_disconnected(id) {
 }
 
 Create_CVars() {
+  bind_pcvar_string(create_cvar("ca_server_ip", "127.0.0.1",
+      .description = "Server IP in the GameCMS database"
+    ),
+    ca_server_ip, charsmax(ca_server_ip)
+  )
+
+  bind_pcvar_string(create_cvar("ca_server_port", "27015",
+      .description = "Server PORT in the GameCMS database"
+    ),
+    ca_server_port, charsmax(ca_server_port)
+  )
+
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
       .description = "GameCMS MySQL database host address"
     ),
@@ -390,11 +405,8 @@ public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, F
 
 
 GameCMS_GetServerID() {
-  new net_address[64]; get_cvar_string("net_address", net_address, charsmax(net_address))
-  new serverAddress[2][32]; explode_string(net_address, ":", serverAddress, sizeof(serverAddress), charsmax(serverAddress[]))
-
   formatex(g_query, charsmax(g_query), "SELECT id FROM servers WHERE servers.ip = '%s' AND servers.port = '%s' LIMIT 1;",
-    serverAddress[0], serverAddress[1]
+    ca_server_ip, ca_server_port
   )
 
   SQL_ThreadQuery(g_tuple, "handle_GetServerID", g_query)
