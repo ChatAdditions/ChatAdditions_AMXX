@@ -21,7 +21,7 @@ new const SQL_TBL_GAGS[] = "comms"
 
 const QUERY_LENGTH = 4096
 const MAX_REASON_LENGTH = 256
-const MAX_PORT_LENGTH = 5
+const MAX_PORT_LENGTH = 6
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
@@ -418,16 +418,15 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
   }
 
   new bool: found = bool: (SQL_NumResults(query) != 0)
-  new net_address[64]; get_cvar_string("net_address", net_address, charsmax(net_address))
 
   if(!found) {
-    set_fail_state("Server `%s` not found on db.", net_address)
+    set_fail_state("Server `%s:%s` not found on db.", ca_server_ip, ca_server_port)
 
     return
   }
 
   g_serverID = SQL_ReadResult(query, 0)
-  CA_Log(logLevel_Debug, "Found server `%s` in db. ServerID=%i", net_address, g_serverID)
+  CA_Log(logLevel_Debug, "Found server `%s:%s` in db. ServerID=%i", ca_server_ip, ca_server_port, g_serverID)
 
   g_storageInitialized = true
   ExecuteForward(g_fwd_StorageInitialized, g_ret)
