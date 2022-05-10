@@ -65,6 +65,7 @@ public _OnConfigsExecuted() {
   g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname)
   SQL_SetCharset(g_tuple, "utf8")
 
+  ServerAddress_Check()
   Storage_Create()
 }
 
@@ -133,6 +134,16 @@ Create_CVars() {
     ),
     ca_storage_dbname, charsmax(ca_storage_dbname)
   )
+}
+
+ServerAddress_Check() {
+  if (!strcmp(ca_server_ip, "127.0.0.1") || ca_server_ip[0] == EOS) {
+    new net_address[64]; get_cvar_string("net_address", net_address, charsmax(net_address))
+    new serverAddress[2][32]; explode_string(net_address, ":", serverAddress, sizeof(serverAddress), charsmax(serverAddress[]))
+
+    copy(ca_server_ip, charsmax(ca_server_ip), serverAddress[0])
+    copy(ca_server_port, charsmax(ca_server_port), serverAddress[1])
+  }
 }
 
 Storage_Create() {
