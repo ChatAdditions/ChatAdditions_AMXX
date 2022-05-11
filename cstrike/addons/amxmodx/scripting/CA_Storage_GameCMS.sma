@@ -31,8 +31,7 @@ new Queue: g_queueLoad = Invalid_Queue,
 new g_serverID = -1
 new g_gamecmsAdminId[MAX_PLAYERS + 1]
 
-new ca_server_ip[MAX_IP_LENGTH],
-  ca_server_port[MAX_PORT_LENGTH],
+new ca_server_address[MAX_IP_LENGTH + MAX_PORT_LENGTH],
   ca_storage_host[64],
   ca_storage_user[128],
   ca_storage_pass[128],
@@ -99,16 +98,10 @@ public client_disconnected(id) {
 }
 
 Create_CVars() {
-  bind_pcvar_string(create_cvar("ca_server_ip", "127.0.0.1",
-      .description = "Server IP in the GameCMS database"
+  bind_pcvar_string(create_cvar("ca_server_address", "",
+      .description = "Server address in the GameCMS database"
     ),
-    ca_server_ip, charsmax(ca_server_ip)
-  )
-
-  bind_pcvar_string(create_cvar("ca_server_port", "27015",
-      .description = "Server PORT in the GameCMS database"
-    ),
-    ca_server_port, charsmax(ca_server_port)
+    ca_server_address, charsmax(ca_server_address)
   )
 
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
@@ -137,13 +130,10 @@ Create_CVars() {
 }
 
 ServerAddress_Check() {
-  if (!strcmp(ca_server_ip, "127.0.0.1") || ca_server_ip[0] == EOS) {
-    new net_address[64]; get_cvar_string("net_address", net_address, charsmax(net_address))
-    new serverAddress[2][32]; explode_string(net_address, ":", serverAddress, sizeof(serverAddress), charsmax(serverAddress[]))
+  if (ca_server_address[0] != EOS)
+    return
 
-    copy(ca_server_ip, charsmax(ca_server_ip), serverAddress[0])
-    copy(ca_server_port, charsmax(ca_server_port), serverAddress[1])
-  }
+  get_cvar_string("net_address", ca_server_address, charsmax(ca_server_address))
 }
 
 Storage_Create() {
@@ -414,10 +404,12 @@ public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, F
   ExecuteForward(g_fwd_StorageRemoved, g_ret)
 }
 
-
 GameCMS_GetServerID() {
+  new serverAddress[2][MAX_IP_LENGTH + MAX_PORT_LENGTH]
+  explode_string(ca_server_address, ":", serverAddress, sizeof(serverAddress), charsmax(serverAddress[]))
+
   formatex(g_query, charsmax(g_query), "SELECT id FROM servers WHERE servers.ip = '%s' AND servers.port = '%s' LIMIT 1;",
-    ca_server_ip, ca_server_port
+    serverAddress[0], serverAddress[1]
   )
 
   SQL_ThreadQuery(g_tuple, "handle_GetServerID", g_query)
@@ -431,13 +423,13 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
   new bool: found = bool: (SQL_NumResults(query) != 0)
 
   if(!found) {
-    set_fail_state("Server `%s:%s` not found on db.", ca_server_ip, ca_server_port)
+    set_fail_state("Server `%s` not found on db.", ca_server_address)
 
     return
   }
 
   g_serverID = SQL_ReadResult(query, 0)
-  CA_Log(logLevel_Debug, "Found server `%s:%s` in db. ServerID=%i", ca_server_ip, ca_server_port, g_serverID)
+  CA_Log(logLevel_Debug, "Found server `%s` in db. ServerID=%i", ca_server_address, g_serverID)
 
   g_storageInitialized = true
   ExecuteForward(g_fwd_StorageInitialized, g_ret)
