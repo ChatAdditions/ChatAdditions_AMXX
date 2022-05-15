@@ -21,7 +21,6 @@ new const SQL_TBL_GAGS[] = "comms"
 
 const QUERY_LENGTH = 4096
 const MAX_REASON_LENGTH = 256
-const MAX_PORT_LENGTH = 6
 new g_query[QUERY_LENGTH]
 
 new Handle: g_tuple = Empty_Handle
@@ -31,7 +30,7 @@ new Queue: g_queueLoad = Invalid_Queue,
 new g_serverID = -1
 new g_gamecmsAdminId[MAX_PLAYERS + 1]
 
-new ca_server_address[MAX_IP_LENGTH + MAX_PORT_LENGTH],
+new ca_server_address[128],
   ca_storage_host[64],
   ca_storage_user[128],
   ca_storage_pass[128],
@@ -405,7 +404,7 @@ public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, F
 }
 
 GameCMS_GetServerID() {
-  new serverAddress[2][MAX_IP_LENGTH + MAX_PORT_LENGTH]
+  new serverAddress[2][128]
   explode_string(ca_server_address, ":", serverAddress, sizeof(serverAddress), charsmax(serverAddress[]))
 
   formatex(g_query, charsmax(g_query), "SELECT id FROM servers WHERE servers.ip = '%s' AND servers.port = '%s' LIMIT 1;",
