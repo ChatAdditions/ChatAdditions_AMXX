@@ -30,7 +30,8 @@ new Queue: g_queueLoad = Invalid_Queue,
 new g_serverID = -1
 new g_gamecmsAdminId[MAX_PLAYERS + 1]
 
-new ca_storage_host[64],
+new ca_server_address[128],
+  ca_storage_host[64],
   ca_storage_user[128],
   ca_storage_pass[128],
   ca_storage_dbname[128]
@@ -62,6 +63,7 @@ public _OnConfigsExecuted() {
   g_tuple = SQL_MakeDbTuple(ca_storage_host, ca_storage_user, ca_storage_pass, ca_storage_dbname)
   SQL_SetCharset(g_tuple, "utf8")
 
+  ServerAddress_Check()
   Storage_Create()
 }
 
@@ -95,6 +97,12 @@ public client_disconnected(id) {
 }
 
 Create_CVars() {
+  bind_pcvar_string(create_cvar("ca_server_address", "",
+      .description = "Server address in the GameCMS database"
+    ),
+    ca_server_address, charsmax(ca_server_address)
+  )
+
   bind_pcvar_string(create_cvar("ca_storage_host", "127.0.0.1", FCVAR_PROTECTED,
       .description = "GameCMS MySQL database host address"
     ),
@@ -118,6 +126,13 @@ Create_CVars() {
     ),
     ca_storage_dbname, charsmax(ca_storage_dbname)
   )
+}
+
+ServerAddress_Check() {
+  if (ca_server_address[0] != EOS)
+    return
+
+  get_cvar_string("net_address", ca_server_address, charsmax(ca_server_address))
 }
 
 Storage_Create() {
@@ -388,10 +403,9 @@ public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, F
   ExecuteForward(g_fwd_StorageRemoved, g_ret)
 }
 
-
 GameCMS_GetServerID() {
-  new net_address[64]; get_cvar_string("net_address", net_address, charsmax(net_address))
-  new serverAddress[2][32]; explode_string(net_address, ":", serverAddress, sizeof(serverAddress), charsmax(serverAddress[]))
+  new serverAddress[2][128]
+  explode_string(ca_server_address, ":", serverAddress, sizeof(serverAddress), charsmax(serverAddress[]))
 
   formatex(g_query, charsmax(g_query), "SELECT id FROM servers WHERE servers.ip = '%s' AND servers.port = '%s' LIMIT 1;",
     serverAddress[0], serverAddress[1]
@@ -406,16 +420,15 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
   }
 
   new bool: found = bool: (SQL_NumResults(query) != 0)
-  new net_address[64]; get_cvar_string("net_address", net_address, charsmax(net_address))
 
   if(!found) {
-    set_fail_state("Server `%s` not found on db.", net_address)
+    set_fail_state("Server `%s` not found on db.", ca_server_address)
 
     return
   }
 
   g_serverID = SQL_ReadResult(query, 0)
-  CA_Log(logLevel_Debug, "Found server `%s` in db. ServerID=%i", net_address, g_serverID)
+  CA_Log(logLevel_Debug, "Found server `%s` in db. ServerID=%i", ca_server_address, g_serverID)
 
   g_storageInitialized = true
   ExecuteForward(g_fwd_StorageInitialized, g_ret)
