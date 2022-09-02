@@ -120,15 +120,7 @@ Create_CVars() {
   )
 }
 
-public CA_Client_Say(player) {
-  if(!CanCommunicate(player)) {
-    return CA_SUPERCEDE
-  }
-
-  return CA_CONTINUE
-}
-
-public CA_Client_SayTeam(player) {
+public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
   if(!CanCommunicate(player)) {
     return CA_SUPERCEDE
   }

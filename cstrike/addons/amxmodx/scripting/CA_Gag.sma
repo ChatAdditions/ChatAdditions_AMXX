@@ -1326,27 +1326,16 @@ public CA_Client_Voice(const listener, const sender) {
   return CA_SUPERCEDE
 }
 
-public CA_Client_SayTeam(id, const message[]) {
+public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
   if(CmdRouter(id, message))
     return PLUGIN_CONTINUE
 
-  new bool: hasBlock = bool: (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_SayTeam : gagFlag_Say))
-
-  if(!hasBlock) {
-    return CA_CONTINUE
+  new bool: hasBlock
+  if(isTeamMessage) {
+    hasBlock = (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_SayTeam : gagFlag_Say))
+  } else {
+    hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
   }
-
-  UTIL_SendAudio(id, ca_gag_sound_error)
-  Message_ChatBlocked(id)
-
-  return CA_SUPERCEDE
-}
-
-public CA_Client_Say(id, const message[]) {
-  if(CmdRouter(id, message))
-    return PLUGIN_CONTINUE
-
-  new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
 
   if(!hasBlock) {
     return CA_CONTINUE
