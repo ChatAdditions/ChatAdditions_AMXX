@@ -1330,7 +1330,7 @@ public CA_Client_SayTeam(id, const message[]) {
   if(CmdRouter(id, message))
     return PLUGIN_CONTINUE
 
-  new bool: hasBlock = bool: (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_SayTeam : gagFlag_Say))
+  new bool: hasBlock = bool: (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_Say : gagFlag_SayTeam))
 
   if(!hasBlock) {
     return CA_CONTINUE
