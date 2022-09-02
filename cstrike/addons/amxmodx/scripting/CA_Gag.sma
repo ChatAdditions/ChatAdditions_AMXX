@@ -1332,7 +1332,7 @@ public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
 
   new bool: hasBlock
   if(isTeamMessage) {
-    hasBlock = (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_SayTeam : gagFlag_Say))
+    hasBlock = (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_Say : gagFlag_SayTeam))
   } else {
     hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
   }
