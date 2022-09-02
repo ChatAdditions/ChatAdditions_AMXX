@@ -467,7 +467,7 @@ static MenuShow_SelectReason(const id) {
 
   menu_setprop(menu, MPROP_BACKNAME, fmt("%L", id, "BACK"))
   menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
-  menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
+  menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "Gag_BackToPlayersMenu"))
 
   menu_display(id, menu)
   return PLUGIN_HANDLED

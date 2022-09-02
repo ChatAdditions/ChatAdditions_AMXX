@@ -47,6 +47,8 @@ Gag_NotifyPlayer_BlockedChat = ^1Вам ^3заблокировали чат^1.
 
 Gag_prefix = [^3GAG^1]
 
+Gag_BackToPlayersMenu = К списку игроков
+
 [en]
 Gag_MenuTitle_PlayersList = Gag player
 Gag_MenuTitle_SelectReason = Choose reason:
@@ -95,6 +97,8 @@ Gag_NotValidTimeEntered = ^3Entered time not valid:^1
 Gag_NotifyPlayer_BlockedChat = ^1Your ^3chat has been blocked^1.
 
 Gag_prefix = [^3GAG^1]
+
+Gag_BackToPlayersMenu = To players list
 
 [es]
 Gag_MenuTitle_PlayersList = Silenciar Jugador
