@@ -85,6 +85,7 @@ public plugin_init() {
 public plugin_end() {
   DestroyForward(g_fwdClientSay)
   DestroyForward(g_fwdClientVoice)
+  DestroyForward(g_fwdClientChangeName)
 }
 
 public _OnConfigsExecuted() {
