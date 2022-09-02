@@ -32,13 +32,10 @@ public plugin_cfg() {
   }
 }
 
-public CA_Client_Say(id, const message[]) {
+public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
   return CheckMessage(id, message)
 }
 
-public CA_Client_SayTeam(id, const message[]) {
-  return CheckMessage(id, message)
-}
 
 CheckMessage(id, const message[]) {
   if(message[0] == '/') {
