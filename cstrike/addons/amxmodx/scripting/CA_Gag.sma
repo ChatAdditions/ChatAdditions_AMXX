@@ -1337,8 +1337,6 @@ public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
     hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
   }
 
-  new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
-
   if(!hasBlock) {
     return CA_CONTINUE
   }
