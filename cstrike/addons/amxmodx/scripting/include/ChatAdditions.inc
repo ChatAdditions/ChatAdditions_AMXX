@@ -239,7 +239,7 @@ native bool: CA_PlayerHasBlockedPlayer(const receiver, const sender);
  * Called when player say to chat.
  *
  * @param index          Client index.
- * @param isTeamMessage  Client index.
+ * @param isTeamMessage  Is team message (say_team).
  * @param message        Client message.
  *
  * @return      CA_CONTINUE to allow send message
