@@ -128,17 +128,13 @@ Create_CVars() {
 public client_disconnected(id) {
   g_canSpeakWithAlive[id] = false
 
-  if(task_exists(id)) {
-    remove_task(id)
-  }
+  remove_task(id)
 }
 
 public CBasePlayer_Spawn(const id) {
   g_canSpeakWithAlive[id] = true
 
-  if(task_exists(id)) {
-    remove_task(id)
-  }
+  remove_task(id)
 }
 
 public CBasePlayer_Killed(const id, const attacker) {
