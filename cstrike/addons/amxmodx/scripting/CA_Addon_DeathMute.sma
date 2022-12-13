@@ -142,10 +142,6 @@ public CBasePlayer_Killed(const id, const attacker) {
     return
   }
 
-  if(read_flags(ca_deathmute_immunity_flags) & get_user_flags(id)) {
-    return
-  }
-
   set_task_ex(ca_deathmute_time, "DisableSpeakWithAlive", .id = id)
 
   switch(ca_deathmute_notify_type) {
