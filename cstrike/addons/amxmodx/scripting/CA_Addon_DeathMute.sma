@@ -205,6 +205,13 @@ public CA_Client_Voice(const listener, const sender) {
   if(ca_deathmute_time <= 0.0) {
     return CA_CONTINUE
   }
+  
+  new listenerFlags = get_user_flags(listener)
+  new immunityFlags = read_flags(ca_deathmute_immunity_flags)
+
+  if(listenerFlags & immunityFlags) {
+    return CA_CONTINUE
+  }
 
   new bool: listenerAlive = bool: is_user_alive(listener)
   new bool: senderAlive = bool: is_user_alive(sender)
