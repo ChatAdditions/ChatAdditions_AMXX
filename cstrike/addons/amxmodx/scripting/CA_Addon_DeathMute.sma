@@ -128,25 +128,17 @@ Create_CVars() {
 public client_disconnected(id) {
   g_canSpeakWithAlive[id] = false
 
-  if(task_exists(id)) {
-    remove_task(id)
-  }
+  remove_task(id)
 }
 
 public CBasePlayer_Spawn(const id) {
   g_canSpeakWithAlive[id] = true
 
-  if(task_exists(id)) {
-    remove_task(id)
-  }
+  remove_task(id)
 }
 
 public CBasePlayer_Killed(const id, const attacker) {
   if(ca_deathmute_time <= 0.0) {
-    return
-  }
-
-  if(read_flags(ca_deathmute_immunity_flags) & get_user_flags(id)) {
     return
   }
 
@@ -213,9 +205,15 @@ public CA_Client_Voice(const listener, const sender) {
   if(ca_deathmute_time <= 0.0) {
     return CA_CONTINUE
   }
+  
+  new bool: listenerHasImmunity = get_user_flags(listener) & read_flags(ca_deathmute_immunity_flags)
 
-  new bool: listenerAlive = bool:is_user_alive(listener)
-  new bool: senderAlive = bool:is_user_alive(sender)
+  if(listenerHasImmunity) {
+    return CA_CONTINUE
+  }
+
+  new bool: listenerAlive = bool: is_user_alive(listener)
+  new bool: senderAlive = bool: is_user_alive(sender)
 
   if(!g_canSpeakWithAlive[sender] && !senderAlive && listenerAlive) {
     return CA_SUPERCEDE
