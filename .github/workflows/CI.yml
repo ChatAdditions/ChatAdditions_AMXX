@@ -80,7 +80,7 @@ jobs:
         run: sed -i "s|%CA_VERSION%|$PLUGIN_VERSION|g" ChatAdditions.inc
 
       - name: Setup AMXXPawn Compiler
-        uses: wopox1337/setup-amxxpawn@v1
+        uses: wopox1337/setup-amxxpawn@v1.0.2
         with:
           version: "1.10.5428"
 
