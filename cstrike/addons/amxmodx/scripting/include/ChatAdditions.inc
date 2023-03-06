@@ -19,10 +19,6 @@
   #define CA_VERSION "%CA_VERSION%"
 #endif
 
-#if !defined _time_included
-  #include <time>
-#endif
-
 const CA_MAX_MESSAGE_SIZE = 188
 
 /**
@@ -66,6 +62,13 @@ new stock const BASE_CHAT_TRIGGERS[][] = { /* "",  */"/", "\", "!", "." };
 
 
 stock parseTime(const value[]) {
+  const _SECONDS_IN_MINUTE = 60;
+  const _SECONDS_IN_HOUR = 3600;
+  const _SECONDS_IN_DAY = 86400;
+  const _SECONDS_IN_WEEK = 604800;
+  const _SECONDS_IN_MONTH = _SECONDS_IN_DAY * 31;
+  const _SECONDS_IN_YEAR = _SECONDS_IN_MONTH * 12;
+
   new t, k;
   for (new i; value[i] != EOS; i++) {
     switch (value[i]) {
@@ -74,32 +77,32 @@ stock parseTime(const value[]) {
       }
 
       case 'i': {
-        k += t * SECONDS_IN_MINUTE;
+        k += t * _SECONDS_IN_MINUTE;
         t = 0;
       }
 
       case 'h': {
-        k += t * SECONDS_IN_HOUR;
+        k += t * _SECONDS_IN_HOUR;
         t = 0;
       }
 
       case 'd': {
-        k += t * SECONDS_IN_DAY;
+        k += t * _SECONDS_IN_DAY;
         t = 0;
       }
 
       case 'w': {
-        k += t * SECONDS_IN_WEEK;
+        k += t * _SECONDS_IN_WEEK;
         t = 0;
       }
 
       case 'm': {
-        k += t * SECONDS_IN_MONTH;
+        k += t * _SECONDS_IN_MONTH;
         t = 0;
       }
 
       case 'y': {
-        k += t * SECONDS_IN_YEAR;
+        k += t * _SECONDS_IN_YEAR;
         t = 0;
       }
 
