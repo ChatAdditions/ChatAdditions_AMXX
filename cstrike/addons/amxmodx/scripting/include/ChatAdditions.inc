@@ -66,8 +66,8 @@ stock parseTime(const value[]) {
   const _SECONDS_IN_HOUR = 3600;
   const _SECONDS_IN_DAY = 86400;
   const _SECONDS_IN_WEEK = 604800;
-  const _SECONDS_IN_MONTH = _SECONDS_IN_DAY * 31;
-  const _SECONDS_IN_YEAR = _SECONDS_IN_MONTH * 12;
+  const _SECONDS_IN_MONTH = 2592000;
+  const _SECONDS_IN_YEAR = 31536000;
 
   new t, k;
   for (new i; value[i] != EOS; i++) {
