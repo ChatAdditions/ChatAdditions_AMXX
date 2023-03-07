@@ -1455,11 +1455,10 @@ static LoadConfig() {
     g_gagReasonsTemplates_size = 0
   }
 
-  AutoExecConfig(true, "CA_Gag", "ChatAdditions")
-
   new configsDir[PLATFORM_MAX_PATH]
   get_configsdir(configsDir, charsmax(configsDir))
 
+  server_cmd("exec %s/plugins/ChatAdditions/CA_Gag.cfg", configsDir)
   server_cmd("exec %s/plugins/ChatAdditions/ca_gag_reasons.cfg", configsDir)
   server_exec()
 
