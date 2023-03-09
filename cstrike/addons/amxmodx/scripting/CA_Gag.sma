@@ -73,7 +73,7 @@ public plugin_precache() {
   register_dictionary("time.txt")
 
   register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason")
-  register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates");
+  register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates")
   register_srvcmd("ca_gag_reload_config", "SrvCmd_ReloadConfig")
 
   Create_CVars()
@@ -114,7 +114,7 @@ public plugin_init() {
   register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh), .FlagManager = false)
 
   for(new i; i < sizeof g_adminChatCmds; i++)
-    register_clcmd(g_adminChatCmds[i], "ClCmd_adminSay", ADMIN_CHAT);
+    register_clcmd(g_adminChatCmds[i], "ClCmd_adminSay", ADMIN_CHAT)
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 
@@ -1552,9 +1552,9 @@ static Get_GagFlags_Names(gag_flags_s: flags) {
   if(ca_gag_common_chat_block && (flags & gagFlag_SayTeam))
     flags ^= gagFlag_SayTeam
 
-  for(new i = 0; i < sizeof(GAG_FLAGS_STR); i++) {
+  for(new i; i < sizeof(GAG_FLAGS_STR); i++) {
     if(flags & gag_flags_s: (1 << i)) {
-      strcat(buffer, fmt("%s + ", GAG_FLAGS_STR[i]), charsmax(buffer));
+      strcat(buffer, fmt("%s + ", GAG_FLAGS_STR[i]), charsmax(buffer))
     }
   }
 
