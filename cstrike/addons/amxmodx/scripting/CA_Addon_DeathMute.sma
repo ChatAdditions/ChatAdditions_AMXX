@@ -206,7 +206,7 @@ public CA_Client_Voice(const listener, const sender) {
     return CA_CONTINUE
   }
   
-  new bool: listenerHasImmunity = get_user_flags(listener) & read_flags(ca_deathmute_immunity_flags)
+  new bool: listenerHasImmunity = bool: (get_user_flags(listener) & read_flags(ca_deathmute_immunity_flags))
 
   if(listenerHasImmunity) {
     return CA_CONTINUE
