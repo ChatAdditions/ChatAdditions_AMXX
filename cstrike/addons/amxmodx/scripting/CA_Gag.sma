@@ -363,6 +363,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   }
 
   menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  menu_destroy(menu)
 
   new userID = strtol(g_itemInfo)
 
@@ -373,7 +374,6 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
@@ -384,7 +384,6 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     g_adminTempData[id][gd_target] = target
 
     MenuShow_ShowGag(id)
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
@@ -392,7 +391,6 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   GagData_GetPersonalData(id, target, g_adminTempData[id])
 
   MenuShow_SelectReason(id)
-  menu_destroy(menu)
   return PLUGIN_HANDLED
 }
 
@@ -494,13 +492,12 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
   }
 
   menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  menu_destroy(menu)
 
   new reasonID = strtol(g_itemInfo)
 
   if(reasonID == ITEM_ENTER_GAG_REASON) {
     client_cmd(id, "messagemode enter_GagReason")
-
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
@@ -513,29 +510,22 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
   // Time not set
   if(reason[r_time] == 0) {
     MenuShow_SelectTime(id)
-
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
   if(g_inEditMenu[id]) {
     MenuShow_EditGag(id)
-
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
   if(reason[r_flags] == gagFlag_Removed) {
     MenuShow_SelectFlags(id)
-
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
   Gag_Save(id, target, reason[r_time], reason[r_flags])
   GagData_Reset(g_adminTempData[id])
 
-  menu_destroy(menu)
   return PLUGIN_HANDLED
 }
 
@@ -606,13 +596,12 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
   }
 
   menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  menu_destroy(menu)
 
   new timeID = strtol(g_itemInfo)
 
   if(timeID == ITEM_ENTER_GAG_TIME) {
     client_cmd(id, "messagemode enter_GagTime")
-
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
@@ -621,13 +610,10 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
 
   if(g_inEditMenu[id]) {
     MenuShow_EditGag(id)
-    menu_destroy(menu)
-
     return PLUGIN_HANDLED
   }
 
   MenuShow_SelectFlags(id)
-  menu_destroy(menu)
   return PLUGIN_HANDLED
 }
 
@@ -740,6 +726,8 @@ public MenuHandler_SelectFlags(const id, const menu, const item) {
   }
 
   menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  menu_destroy(menu)
+
   new itemIndex = strtol(g_itemInfo)
 
   switch(itemIndex) {
@@ -757,13 +745,11 @@ public MenuHandler_SelectFlags(const id, const menu, const item) {
       Gag_Save(id, target, time, flags, expireAt)
       GagData_Reset(g_adminTempData[id])
 
-      menu_destroy(menu)
       return PLUGIN_HANDLED
     }
   }
 
   MenuShow_SelectFlags(id)
-  menu_destroy(menu)
   return PLUGIN_HANDLED
 }
 
@@ -855,10 +841,10 @@ public MenuCallback_ShowGag(const id, const menu, const item) {
 public MenuHandler_ShowGag(const id, const menu, const item) {
   enum { menu_ComfirmRemove, menu_EditGagProperties }
 
+  menu_destroy(menu)
+
   if(item == MENU_EXIT || item < 0) {
     MenuShow_PlayersList(id)
-
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
@@ -869,7 +855,6 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
     client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
     MenuShow_PlayersList(id)
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
@@ -878,7 +863,6 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
     Gag_Remove(id, target)
 
     MenuShow_PlayersList(id)
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
@@ -897,12 +881,10 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
     g_inEditMenu[id] = true
 
     MenuShow_EditGag(id)
-    menu_destroy(menu)
     return PLUGIN_HANDLED
   }
 
   MenuShow_PlayersList(id)
-  menu_destroy(menu)
   return PLUGIN_HANDLED
 }
 
@@ -1028,8 +1010,9 @@ public MenuHandler_EditGag(const id, const menu, const item) {
     return PLUGIN_HANDLED
   }
 
-
   menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
+  menu_destroy(menu)
+
   new itemIndex = strtol(g_itemInfo)
 
   switch(itemIndex) {
@@ -1038,8 +1021,6 @@ public MenuHandler_EditGag(const id, const menu, const item) {
     case gagFlag_Voice:    g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Voice
     case ITEM_REASON: {
       MenuShow_SelectReason(id)
-
-      menu_destroy(menu)
       return PLUGIN_HANDLED
     }
     case ITEM_CONFIRM: {
@@ -1063,13 +1044,11 @@ public MenuHandler_EditGag(const id, const menu, const item) {
       GagData_Reset(g_adminTempData[id])
       g_inEditMenu[id] = false
 
-      menu_destroy(menu)
       return PLUGIN_HANDLED
     }
   }
 
   MenuShow_EditGag(id)
-  menu_destroy(menu)
   return PLUGIN_HANDLED
 }
 /*
@@ -1328,7 +1307,7 @@ public CA_Client_Voice(const listener, const sender) {
 
 public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
   if(CmdRouter(id, message))
-    return PLUGIN_CONTINUE
+    return CA_CONTINUE
 
   new bool: hasBlock
   if(isTeamMessage) {
