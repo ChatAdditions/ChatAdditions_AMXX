@@ -13,7 +13,7 @@ public stock const PluginName[] = "CA: Anti Flood"
 public stock const PluginVersion[] = CA_VERSION
 public stock const PluginAuthor[] = "Nordic Warrior"
 public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "Antiflood for chat"
+public stock const PluginDescription[] = "Antiflood for text chat"
 
 public plugin_init() {
   register_plugin(PluginName, PluginVersion, PluginAuthor)
@@ -27,7 +27,7 @@ public plugin_init() {
 
 public plugin_cfg() {
   if(find_plugin_byfile("antiflood.amxx") != INVALID_PLUGIN_ID) {
-    log_amx("Default plugin <antiflood.amxx> was found. Stopped.")
+    log_amx("Default plugin <antiflood.amxx> was found. It has been stopped.")
     pause("acd", "antiflood.amxx")
   }
 }

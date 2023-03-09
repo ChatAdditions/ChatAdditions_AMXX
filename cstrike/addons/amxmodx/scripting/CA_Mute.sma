@@ -148,13 +148,13 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   menu_item_getinfo(menu, item, g_dummy, g_itemInfo, charsmax(g_itemInfo), g_itemName, charsmax(g_itemName), g_dummy)
 
+  menu_destroy(menu)
+  MenuShow_PlayersList(id)
+
   new Float: gametime = get_gametime()
 
   if(g_nextUse[id] > gametime) {
     client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_UseTooOften")
-
-    menu_destroy(menu)
-    MenuShow_PlayersList(id)
     return PLUGIN_HANDLED
   }
 
@@ -170,9 +170,6 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     )
 
     CA_Log(logLevel_Info, "Mute: \"%N\" %sMuted everyone", id, g_globalMute[id] ? "" : "Un")
-
-    menu_destroy(menu)
-    MenuShow_PlayersList(id)
     return PLUGIN_HANDLED
   }
 
@@ -180,9 +177,6 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   if(player == 0) {
     client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_PlayerNotConnected")
-
-    menu_destroy(menu)
-    MenuShow_PlayersList(id)
     return PLUGIN_HANDLED
   }
 
@@ -197,9 +191,6 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   )
 
   CA_Log(logLevel_Info, "Mute: '%N' %smuted '%N'", id, g_playersMute[id][player] ? "" : "Un", player)
-
-  menu_destroy(menu)
-  MenuShow_PlayersList(id)
   return PLUGIN_HANDLED
 }
 
