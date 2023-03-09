@@ -114,7 +114,7 @@ static MenuShow_PlayersList(const id) {
   menu_setprop(menu, MPROP_NEXTNAME, fmt("%L", id, "MORE"))
   menu_setprop(menu, MPROP_EXITNAME, fmt("%L", id, "EXIT"))
 
-  menu_display(id, menu, .time = 10)
+  menu_display(id, menu)
 }
 
 public MenuCallback_PlayersList(const id, const menu, const item) {
