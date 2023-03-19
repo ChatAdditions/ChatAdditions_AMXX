@@ -173,7 +173,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     return PLUGIN_HANDLED
   }
 
-  new player = find_player_ex((FindPlayer_MatchUserId), userID)
+  new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
 
   if(player == 0) {
     client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_PlayerNotConnected")
