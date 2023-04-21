@@ -1,4 +1,6 @@
 #include <amxmodx>
+#include <reapi_reunion>
+
 #include <ChatAdditions>
 
 #pragma ctrlchar '\'
@@ -17,11 +19,12 @@ native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
 
 
 new ca_rankrestrictions_type,
+  ca_rankrestrictions_type_kills,
   ca_rankrestrictions_min_kills,
   ca_rankrestrictions_type_level,
   ca_rankrestrictions_min_level,
   ca_rankrestrictions_immunity_flag[16],
-  ca_rankrestrictions_type_kills
+  ca_rankrestrictions_steam_immunity
 
 public stock const PluginName[] = "CA Addon: Rank restrictions"
 public stock const PluginVersion[] = CA_VERSION
@@ -78,6 +81,15 @@ Create_CVars() {
     ), ca_rankrestrictions_type
   )
 
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_type_kills", "1",
+  	.description = "Kill System Types\n\
+  	0 - CSStats MySQL\n\
+  	1 - CSX Module",
+  	.has_min = true, .min_val = 0.0,
+    .has_max = true, .max_val = 1.0
+    ), ca_rankrestrictions_type_kills
+  )
+
   bind_pcvar_num(create_cvar("ca_rankrestrictions_min_kills", "10",
     .description = "Min kills count to access voice & text chat",
     .has_min = true, .min_val = 0.0
@@ -110,13 +122,11 @@ Create_CVars() {
     ca_rankrestrictions_immunity_flag, charsmax(ca_rankrestrictions_immunity_flag)
   )
 
-  bind_pcvar_num(create_cvar("ca_rankrestrictions_type_kills", "1",
-  	.description = "Kill System Types\n\
-  	0 - CSStats MySQL\n\
-  	1 - CSX Module",
-  	.has_min = true, .min_val = 0.0,
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_steam_immunity", "0",
+    .description = "Enable immunity for steam players",
+    .has_min = true, .min_val = 0.0,
     .has_max = true, .max_val = 1.0
-    ), ca_rankrestrictions_type_kills
+    ), ca_rankrestrictions_steam_immunity
   )
 }
 
@@ -140,6 +150,10 @@ bool: CanCommunicate(const player, const bool: print = true) {
   // check is gagged?
   if(get_user_flags(player) & read_flags(ca_rankrestrictions_immunity_flag))
     return true
+
+  if(ca_rankrestrictions_steam_immunity && is_user_steam(player)) {
+    return true
+  }
 
   if(ca_rankrestrictions_type == 1 && GetUserLevel(player) < ca_rankrestrictions_min_level) {
     if(print) {
