@@ -21,6 +21,7 @@ static bool: g_inEditMenu[MAX_PLAYERS + 1] // HACK: need for transmit data per m
 
 static Array: g_gagReasonsTemplates, g_gagReasonsTemplates_size
 static Array: g_gagTimeTemplates, g_gagTimeTemplates_size
+static Array: g_chatWhitelistCmds, g_chatWhitelistCmds_size
 
 new ca_gag_times[64],
   ca_gag_immunity_flags[16],
@@ -74,12 +75,14 @@ public plugin_precache() {
 
   register_srvcmd("ca_gag_add_reason", "SrvCmd_AddReason")
   register_srvcmd("ca_gag_show_templates", "SrvCmd_ShowTemplates")
+  register_srvcmd("ca_gag_add_chat_whitelist_cmd", "SrvCmd_AddWhitelistCmd")
   register_srvcmd("ca_gag_reload_config", "SrvCmd_ReloadConfig")
 
   Create_CVars()
 
   g_gagReasonsTemplates = ArrayCreate(reason_s)
   g_gagTimeTemplates = ArrayCreate()
+  g_chatWhitelistCmds = ArrayCreate(MAX_WHITELIST_CMD_LEN)
 
   LoadConfig()
 
@@ -1247,6 +1250,24 @@ public SrvCmd_AddReason() {
   )
 }
 
+public SrvCmd_AddWhitelistCmd() {
+  enum { arg_chat_cmd = 1 }
+
+  new argCount = read_argc()
+  if(argCount < 2 || argCount > 2) {
+    server_print("\tUsage: ca_gag_add_chat_whitelist_cmd <cmd>")
+    return
+  }
+
+  new whitelistCmd[MAX_WHITELIST_CMD_LEN]
+  read_argv(arg_chat_cmd, whitelistCmd, charsmax(whitelistCmd))
+
+  ArrayPushArray(g_chatWhitelistCmds, whitelistCmd)
+  g_chatWhitelistCmds_size = ArraySize(g_chatWhitelistCmds)
+
+  CA_Log(logLevel_Debug, "ADD: Whitelist chat cmd[#%i]: %s", g_chatWhitelistCmds_size, whitelistCmd)
+}
+
 public SrvCmd_ShowTemplates() {
   if(!g_gagReasonsTemplates_size) {
     CA_Log(logLevel_Warning, "\t NO REASONS FOUNDED!")
@@ -1285,6 +1306,20 @@ static Message_ChatBlocked(const target) {
     client_print_color(target, print_team_red, "%L %L %L %s", target, "Gag_prefix", target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Left", expireLeftStr)
   }
 }
+
+static bool:IsWhitelistCmd(const message[]) {
+  new whitelistCmd[MAX_WHITELIST_CMD_LEN]
+
+  for(new i; i < g_chatWhitelistCmds_size; i++) {
+    ArrayGetArray(g_chatWhitelistCmds, i, whitelistCmd)
+
+    if(strcmp(message, whitelistCmd) == 0) {
+      return true
+    }
+  }
+
+  return false
+}
 /*
  * @endsection user cmds handling
  */
@@ -1317,6 +1352,10 @@ public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
   }
 
   if(!hasBlock) {
+    return CA_CONTINUE
+  }
+
+  if(IsWhitelistCmd(message)) {
     return CA_CONTINUE
   }
 
@@ -1434,6 +1473,13 @@ static LoadConfig() {
     g_gagReasonsTemplates_size = 0
   }
 
+  if(!g_chatWhitelistCmds) {
+    g_chatWhitelistCmds = ArrayCreate(MAX_WHITELIST_CMD_LEN)
+  } else if(ArraySize(g_chatWhitelistCmds) > 0) {
+    ArrayClear(g_chatWhitelistCmds)
+    g_chatWhitelistCmds_size = 0
+  }
+
   AutoExecConfig(true, "CA_Gag", "ChatAdditions")
 
   new configsDir[PLATFORM_MAX_PATH]
@@ -1441,6 +1487,7 @@ static LoadConfig() {
 
   server_cmd("exec %s/plugins/ChatAdditions/CA_Gag.cfg", configsDir)
   server_cmd("exec %s/plugins/ChatAdditions/ca_gag_reasons.cfg", configsDir)
+  server_cmd("exec %s/plugins/ChatAdditions/ca_gag_chat_whitelist_cmds.cfg", configsDir)
   server_exec()
 
   ParseTimes()

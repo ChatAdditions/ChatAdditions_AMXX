@@ -18,6 +18,7 @@ enum any: gag_flags_s ( <<=1 ) {
 }
 
 const MAX_REASON_LEN = 128;
+const MAX_WHITELIST_CMD_LEN = 32;
 
 enum reason_s {
   r_name[MAX_REASON_LEN],
