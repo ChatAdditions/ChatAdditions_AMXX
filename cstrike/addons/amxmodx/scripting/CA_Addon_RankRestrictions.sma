@@ -17,6 +17,11 @@ native get_user_skill(player, &Float: skill);
 native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
 //
 
+enum any: rankRestrictionsType {
+  rr_type_none,
+  rr_type_level,
+  rr_type_frags
+}
 
 new ca_rankrestrictions_type,
   ca_rankrestrictions_type_kills,
@@ -151,7 +156,7 @@ public CA_Client_Voice(const listener, const sender) {
 }
 
 bool: CanCommunicate(const player, const bool: print = true) {
-  if(ca_rankrestrictions_type <= 0) {
+  if(ca_rankrestrictions_type <= rr_type_none) {
     return true
   }
 
@@ -164,7 +169,7 @@ bool: CanCommunicate(const player, const bool: print = true) {
     return true
   }
 
-  if(ca_rankrestrictions_type == 1 && GetUserLevel(player) < ca_rankrestrictions_min_level) {
+  if(ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level) {
     if(print) {
       client_print_color(player, print_team_red, "%L",
         player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level
@@ -174,7 +179,7 @@ bool: CanCommunicate(const player, const bool: print = true) {
     return false
   }
 
-  if(ca_rankrestrictions_type == 2 && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills) {
+  if(ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills) {
     if(print) {
       client_print_color(player, print_team_red, "%L",
         player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills
