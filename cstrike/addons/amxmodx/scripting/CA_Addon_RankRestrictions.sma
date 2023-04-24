@@ -71,7 +71,7 @@ public native_filter(const name[], index, trap) {
   }
 
   if(strcmp(name, "get_user_stats")) {
-
+    return PLUGIN_HANDLED
   }
 
   return PLUGIN_CONTINUE
