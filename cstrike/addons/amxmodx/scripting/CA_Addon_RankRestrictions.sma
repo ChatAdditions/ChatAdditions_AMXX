@@ -17,16 +17,18 @@ native get_user_skill(player, &Float: skill);
 native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
 //
 
-enum {
+enum any: eChatType{
   voice_chat,
   text_chat
 }
 
 new ca_rankrestrictions_type,
   ca_rankrestrictions_type_kills,
-  ca_rankrestrictions_min_kills,
+  ca_rankrestrictions_min_kills_voice_chat,
+  ca_rankrestrictions_min_kills_text_chat,
   ca_rankrestrictions_type_level,
-  ca_rankrestrictions_min_level,
+  ca_rankrestrictions_min_level_voice_chat,
+  ca_rankrestrictions_min_level_text_chat,
   ca_rankrestrictions_immunity_flag[16],
   ca_rankrestrictions_steam_immunity
 
@@ -76,7 +78,7 @@ public native_filter(const name[], index, trap) {
 
 Create_CVars() {
   bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "1", 
-    .description = "Restrictions Types\n\
+    .description = "Restrictions Type\n\
       0 - Disable restrictions\n\
       1 - Level restrictions\n\
       2 - Kills count restrictions",
@@ -147,7 +149,7 @@ Create_CVars() {
 }
 
 public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
-  if(!CanCommunicate(player, .print = true, text_chat)) {
+  if(!CanCommunicate(player, true, text_chat)) {
     return CA_SUPERCEDE
   }
 
@@ -155,7 +157,7 @@ public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
 }
 
 public CA_Client_Voice(const listener, const sender) {
-  if(!CanCommunicate(sender, .print = false, voice_chat)) {
+  if(!CanCommunicate(sender, false, voice_chat)) {
     // need chat notification?
     return CA_SUPERCEDE
   }
@@ -197,6 +199,7 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
         return false
       }
     }
+
     case text_chat: {
       if(ca_rankrestrictions_type == 1 && GetUserLevel(player) < ca_rankrestrictions_min_level_text_chat) {
         if(print) {
