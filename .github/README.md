@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/github/downloads/ChatAdditions/ChatAdditions_AMXX/total?label=Download%40latest&style=flat-square&logo=github&logoColor=white"
          alt="Build status">
     <a href="https://github.com/wopox1337/ChatsAdditions_AMXX/actions">
-    <img src="https://img.shields.io/github/workflow/status/wopox1337/ChatsAdditions_AMXX/Build/master?style=flat-square&logo=github&logoColor=white"
+    <img src="https://img.shields.io/github/actions/workflow/status/wopox1337/ChatsAdditions_AMXX/CI.yml?branch=master&style=flat-square&logo=github&logoColor=white"
          alt="Build status">
     <a href="https://github.com/wopox1337/ChatsAdditions_AMXX/releases">
     <img src="https://img.shields.io/github/v/release/wopox1337/ChatsAdditions_AMXX?include_prereleases&style=flat-square&logo=github&logoColor=white"
