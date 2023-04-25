@@ -11,9 +11,9 @@
 #pragma tabsize 2
 
 
-  /* ----- START SETTINGS----- */
+  /* ----- START SETTINGS ----- */
 const Float: GAG_THINKER_FREQ = 3.0
-  /* ----- END OF SETTINGS----- */
+  /* ----- END OF SETTINGS ----- */
 
 static g_currentGags[MAX_PLAYERS + 1][gagData_s]
 static g_adminTempData[MAX_PLAYERS + 1][gagData_s]
@@ -956,8 +956,9 @@ static MenuShow_EditGag(const id) {
   menu_addblank2(menu)
   menu_addblank2(menu)
 
-  if(ca_gag_common_chat_block)
+  if(ca_gag_common_chat_block) {
     menu_addblank2(menu)
+  }
 
   menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), fmt("%i", ITEM_CONFIRM), .callback = callback)
 
@@ -1221,7 +1222,7 @@ public SrvCmd_AddReason() {
   enum any: args_s { arg_cmd, arg_reason, arg_flags, arg_time }
 
   new argCount = read_argc()
-  if(argCount < 2 || argCount > 4){
+  if(argCount < 2 || argCount > 4) {
     server_print("\tUsage: ca_gag_add_reason <reason> [flags] [time]")
     return
   }
@@ -1254,7 +1255,7 @@ public SrvCmd_AddWhitelistCmd() {
   enum { arg_chat_cmd = 1 }
 
   new argCount = read_argc()
-  if(argCount < 2 || argCount > 2) {
+  if(argCount != 2) {
     server_print("\tUsage: ca_gag_add_chat_whitelist_cmd <cmd>")
     return
   }
@@ -1307,7 +1308,7 @@ static Message_ChatBlocked(const target) {
   }
 }
 
-static bool:IsWhitelistCmd(const message[]) {
+static bool: IsWhitelistCmd(const message[]) {
   new whitelistCmd[MAX_WHITELIST_CMD_LEN]
 
   for(new i; i < g_chatWhitelistCmds_size; i++) {
@@ -1466,16 +1467,12 @@ public CA_Storage_Removed( ) {
 
 
 static LoadConfig() {
-  if(!g_gagReasonsTemplates) {
-    g_gagReasonsTemplates = ArrayCreate(reason_s)
-  } else if(ArraySize(g_gagReasonsTemplates) > 0) {
+  if(ArraySize(g_gagReasonsTemplates) > 0) {
     ArrayClear(g_gagReasonsTemplates)
     g_gagReasonsTemplates_size = 0
   }
 
-  if(!g_chatWhitelistCmds) {
-    g_chatWhitelistCmds = ArrayCreate(MAX_WHITELIST_CMD_LEN)
-  } else if(ArraySize(g_chatWhitelistCmds) > 0) {
+  if(ArraySize(g_chatWhitelistCmds) > 0) {
     ArrayClear(g_chatWhitelistCmds)
     g_chatWhitelistCmds_size = 0
   }

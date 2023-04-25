@@ -10,13 +10,18 @@
 native aes_get_player_level(const player);
 native ar_get_user_level(const player, rankName[] = "", len = 0);
 native crxranks_get_user_level(const player);
-native cmsranks_get_user_level(player, szLevel[] = "", len = 0);
+native cmsranks_get_user_level(player, level[] = "", len = 0);
 native csstats_get_user_stats(const player, const stats[22]);
 native Float:cmsstats_get_user_skill(player, skillname[] = "", namelen = 0, &skill_level = 0);
 native get_user_skill(player, &Float: skill);
 native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
 //
 
+enum any: rankRestrictionsType {
+  rr_type_none,
+  rr_type_level,
+  rr_type_frags
+}
 
 new ca_rankrestrictions_type,
   ca_rankrestrictions_type_kills,
@@ -46,26 +51,33 @@ public plugin_natives() {
 }
 
 public native_filter(const name[], index, trap) {
-  if(strcmp(name, "aes_get_player_level"))
+  if(strcmp(name, "aes_get_player_level")) {
     return PLUGIN_HANDLED
+  }
 
-  if(strcmp(name, "ar_get_user_level"))
+  if(strcmp(name, "ar_get_user_level")) {
     return PLUGIN_HANDLED
+  }
 
-  if(strcmp(name, "crxranks_get_user_level"))
+  if(strcmp(name, "crxranks_get_user_level")) {
     return PLUGIN_HANDLED
+  }
 
-  if(strcmp(name, "csstats_get_user_stats"))
+  if(strcmp(name, "csstats_get_user_stats")) {
     return PLUGIN_HANDLED
+  }
 
-  if(strcmp(name, "cmsranks_get_user_level"))
+  if(strcmp(name, "cmsranks_get_user_level")) {
     return PLUGIN_HANDLED
+  }
 
-  if(strcmp(name, "cmsstats_get_user_skill"))
-  	return PLUGIN_HANDLED
+  if(strcmp(name, "cmsstats_get_user_skill")) {
+    return PLUGIN_HANDLED
+  }
 
-  if(strcmp(name, "get_user_stats"))
-  	return PLUGIN_HANDLED
+  if(strcmp(name, "get_user_stats")) {
+    return PLUGIN_HANDLED
+  }
 
   return PLUGIN_CONTINUE
 }
@@ -144,18 +156,20 @@ public CA_Client_Voice(const listener, const sender) {
 }
 
 bool: CanCommunicate(const player, const bool: print = true) {
-  if(ca_rankrestrictions_type <= 0)
+  if(ca_rankrestrictions_type <= rr_type_none) {
     return true
+  }
 
   // check is gagged?
-  if(get_user_flags(player) & read_flags(ca_rankrestrictions_immunity_flag))
+  if(get_user_flags(player) & read_flags(ca_rankrestrictions_immunity_flag)) {
     return true
+  }
 
   if(ca_rankrestrictions_steam_immunity && is_user_steam(player)) {
     return true
   }
 
-  if(ca_rankrestrictions_type == 1 && GetUserLevel(player) < ca_rankrestrictions_min_level) {
+  if(ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level) {
     if(print) {
       client_print_color(player, print_team_red, "%L",
         player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level
@@ -165,7 +179,7 @@ bool: CanCommunicate(const player, const bool: print = true) {
     return false
   }
 
-  if(ca_rankrestrictions_type == 2 && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills) {
+  if(ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills) {
     if(print) {
       client_print_color(player, print_team_red, "%L",
         player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills
@@ -184,23 +198,20 @@ GetUserLevel(const player) {
     case 1: return ar_get_user_level(player)
     case 2: return crxranks_get_user_level(player)
     case 3: return cmsranks_get_user_level(player)
-    case 4:
-    {
+    case 4: {
 			new iSkill
 			cmsstats_get_user_skill(player, .skill_level = iSkill)
 			return iSkill
     }
-    case 5:
-    {
+    case 5: {
     	new Float:iSkill
     	get_user_skill(player, iSkill)
     	return floatround(iSkill)
     }
-    case 6:
-    {
-			new iStats[STATSX_MAX_STATS], iHits[MAX_BODYHITS]
-			get_user_stats(player, iStats, iHits)
-			return iStats[STATSX_RANK]
+    case 6: {
+			new stats[STATSX_MAX_STATS], hits[MAX_BODYHITS]
+			get_user_stats(player, stats, hits)
+			return stats[STATSX_RANK]
     }
   }
 
@@ -210,19 +221,16 @@ GetUserLevel(const player) {
 GetUserFragsFromStats(const player) {
 	enum { stats_Frags/* , stats_Deaths, stats_Rounds = 16 */ }
 
-	switch(ca_rankrestrictions_type_kills)
-	{
-		case 0:
-		{
+	switch(ca_rankrestrictions_type_kills) {
+		case 0: {
 			new stats[22]
 			csstats_get_user_stats(player, stats)
 			return stats[stats_Frags]
 		}
-		case 1:
-		{
-			new iStats[STATSX_MAX_STATS], iHits[MAX_BODYHITS]
-			get_user_stats(player, iStats, iHits)
-			return iStats[STATSX_KILLS]
+		case 1: {
+			new stats[STATSX_MAX_STATS], hits[MAX_BODYHITS]
+			get_user_stats(player, stats, hits)
+			return stats[STATSX_KILLS]
 		}
 	}
 
