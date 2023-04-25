@@ -18,12 +18,12 @@ native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
 //
 
 
-enum any: eChatType 
+enum any: eChatType {
   voice_chat,
   text_chat
 }
 
-enum any: rankRestrictionsType {
+enum any: eRankRestrictionsType {
   rr_type_none,
   rr_type_level,
   rr_type_frags
@@ -180,7 +180,7 @@ public CA_Client_Voice(const listener, const sender) {
 }
 
 bool: CanCommunicate(const player, const bool: print, chatType) {
-  if(ca_rankrestrictions_type <= rr_type_none)
+  if(ca_rankrestrictions_type <= rr_type_none) {
     return true
   }
 
