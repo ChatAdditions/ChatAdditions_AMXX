@@ -17,7 +17,13 @@ native get_user_skill(player, &Float: skill);
 native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
 //
 
-enum any: rankRestrictionsType {
+
+enum any: eChatType {
+  voice_chat,
+  text_chat
+}
+
+enum any: eRankRestrictionsType {
   rr_type_none,
   rr_type_level,
   rr_type_frags
@@ -25,9 +31,11 @@ enum any: rankRestrictionsType {
 
 new ca_rankrestrictions_type,
   ca_rankrestrictions_type_kills,
-  ca_rankrestrictions_min_kills,
+  ca_rankrestrictions_min_kills_voice_chat,
+  ca_rankrestrictions_min_kills_text_chat,
   ca_rankrestrictions_type_level,
-  ca_rankrestrictions_min_level,
+  ca_rankrestrictions_min_level_voice_chat,
+  ca_rankrestrictions_min_level_text_chat,
   ca_rankrestrictions_immunity_flag[16],
   ca_rankrestrictions_steam_immunity
 
@@ -84,7 +92,7 @@ public native_filter(const name[], index, trap) {
 
 Create_CVars() {
   bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "1", 
-    .description = "Restrictions Types\n\
+    .description = "Restrictions Type\n\
       0 - Disable restrictions\n\
       1 - Level restrictions\n\
       2 - Kills count restrictions",
@@ -102,10 +110,16 @@ Create_CVars() {
     ), ca_rankrestrictions_type_kills
   )
 
-  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_kills", "10",
-    .description = "Min kills count to access voice & text chat",
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_kills_voice_chat", "10",
+    .description = "Min kills count to access VOICE chat",
     .has_min = true, .min_val = 0.0
-    ), ca_rankrestrictions_min_kills
+    ), ca_rankrestrictions_min_kills_voice_chat
+  )
+
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_kills_text_chat", "10",
+    .description = "Min kills count to access TEXT chat",
+    .has_min = true, .min_val = 0.0
+    ), ca_rankrestrictions_min_kills_text_chat
   )
 
   bind_pcvar_num(create_cvar("ca_rankrestrictions_type_level", "1",
@@ -122,10 +136,16 @@ Create_CVars() {
     ), ca_rankrestrictions_type_level
   )
 
-  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_level", "2",
-    .description = "Min Level to access voice & text chat",
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_level_voice_chat", "2",
+    .description = "Min Level to access VOICE chat",
     .has_min = true, .min_val = 0.0
-    ), ca_rankrestrictions_min_level
+    ), ca_rankrestrictions_min_level_voice_chat
+  )
+
+  bind_pcvar_num(create_cvar("ca_rankrestrictions_min_level_text_chat", "2",
+    .description = "Min Level to access TEXT chat",
+    .has_min = true, .min_val = 0.0
+    ), ca_rankrestrictions_min_level_text_chat
   )
 
   bind_pcvar_string(create_cvar("ca_rankrestrictions_immunity_flag", "a",
@@ -143,7 +163,7 @@ Create_CVars() {
 }
 
 public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
-  if(!CanCommunicate(player)) {
+  if(!CanCommunicate(player, true, text_chat)) {
     return CA_SUPERCEDE
   }
 
@@ -151,11 +171,15 @@ public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
 }
 
 public CA_Client_Voice(const listener, const sender) {
-  // need chat notification?
-  return CanCommunicate(sender, false) ? CA_CONTINUE : CA_SUPERCEDE
+  if(!CanCommunicate(sender, false, voice_chat)) {
+    // need chat notification?
+    return CA_SUPERCEDE
+  }
+  
+  return CA_CONTINUE
 }
 
-bool: CanCommunicate(const player, const bool: print = true) {
+bool: CanCommunicate(const player, const bool: print, chatType) {
   if(ca_rankrestrictions_type <= rr_type_none) {
     return true
   }
@@ -169,24 +193,50 @@ bool: CanCommunicate(const player, const bool: print = true) {
     return true
   }
 
-  if(ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level) {
-    if(print) {
-      client_print_color(player, print_team_red, "%L",
-        player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level
-      )
+  switch(chatType) {
+    case voice_chat: {
+      if(ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level_voice_chat) {
+        if(print) {
+          client_print_color(player, print_team_red, "%L",
+            player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level_voice_chat
+          )
+        }
+
+        return false
+      }
+
+      if(ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills_voice_chat) {
+        if(print) {
+          client_print_color(player, print_team_red, "%L",
+            player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills_voice_chat
+          )
+        }
+
+        return false
+      }
     }
 
-    return false
-  }
+    case text_chat: {
+      if(ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level_text_chat) {
+        if(print) {
+          client_print_color(player, print_team_red, "%L",
+            player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level_text_chat
+          )
+        }
 
-  if(ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills) {
-    if(print) {
-      client_print_color(player, print_team_red, "%L",
-        player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills
-      )
+        return false
+      }
+
+      if(ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills_text_chat) {
+        if(print) {
+          client_print_color(player, print_team_red, "%L",
+            player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills_text_chat
+          )
+        }
+
+        return false
+      }
     }
-
-    return false
   }
 
   return true
