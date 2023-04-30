@@ -216,6 +216,7 @@ public client_disconnected(id) {
 
     // Storage_Update(i, id)
     g_playersMute[i][id] = false
+  }
 }
 
 public CA_Client_Voice(const listener, const sender) {
@@ -273,9 +274,9 @@ Storage_Update(const player, const target) {
   if(!is_user_connected(target))
     return
 
-  new authId[32], authId_target[32]
-  get_user_authid(player, authId, charmax(authId))
-  get_user_authid(target, authId_target, charmax(authId_target))
+  new authId[MAX_AUTHID_LENGTH], authId_target[MAX_AUTHID_LENGTH]
+  get_user_authid(player, authId, charsmax(authId))
+  get_user_authid(target, authId_target, charsmax(authId_target))
 
   new query[QUERY_LENGTH / 2]
 
@@ -297,7 +298,7 @@ public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Flo
 }
 
 Storage_Load(const player) {
-  new authId[32]
+  new authId[MAX_AUTHID_LENGTH]
   get_user_authid(player, authId, charsmax(authId))
 
   new query[QUERY_LENGTH / 2]
@@ -316,7 +317,7 @@ public handle_LoadedMute(failstate, Handle: query, error[], errnum, data[], size
     return
   
   while(SQL_MoreResults(query)) {
-    new authId[32], authId_target[32]
+    new authId[MAX_AUTHID_LENGTH], authId_target[MAX_AUTHID_LENGTH]
     SQL_ReadResult(query, 0, authId, charsmax(authId))
     SQL_ReadResult(query, 1, authId_target, charsmax(authId_target))
 
