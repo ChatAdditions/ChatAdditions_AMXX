@@ -1,5 +1,6 @@
 #include <amxmodx>
 #include <amxmisc>
+#include <sqlx>
 
 #include <ChatAdditions>
 
@@ -19,6 +20,10 @@ enum {
   ITEM_NOT_ENOUTH_PLAYERS = -2,
   ITEM_MUTE_ALL = -1
 }
+
+const QUERY_LENGTH = 4096
+new const g_mute_table[] = "ca_players_mute"
+new Handle: g_tuple = Empty_Handle
 
 public stock const PluginName[] = "CA: Mute"
 public stock const PluginVersion[] = CA_VERSION
@@ -47,6 +52,8 @@ public plugin_init() {
   }
 
   AutoExecConfig(true, "CA_Mute", "ChatAdditions")
+
+  Storage_Init()
 
   CA_Log(logLevel_Debug, "[CA]: Mute initialized!")
 }
@@ -182,6 +189,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
   }
 
   g_playersMute[id][player] ^= true
+  Storage_Update(id, player)
 
   client_print_color(id, print_team_default, "%L %L \3%n\1", id, "Mute_prefix",
     id, g_playersMute[id][player] ? "Mute_YouMutePlayer" : "Mute_YouUnmutePlayer", player
@@ -202,8 +210,13 @@ public client_disconnected(id) {
   g_globalMute[id] = false
   g_nextUse[id] = 0.0
 
-  for(new i; i < sizeof(g_playersMute[]); i++)
+  for(new i; i < sizeof(g_playersMute[]); i++) {
+    if (!g_playersMute[i][id])
+      continue
+
+    // Storage_Update(i, id)
     g_playersMute[i][id] = false
+  }
 }
 
 public CA_Client_Voice(const listener, const sender) {
@@ -220,4 +233,129 @@ public CA_Client_Voice(const listener, const sender) {
   }
 
   return CA_CONTINUE
+}
+
+Storage_Init() {
+  if(!SQL_SetAffinity("sqlite")) {
+    set_fail_state("Can't user 'SQLite'. Check modules.ini")
+  }
+
+  g_tuple = SQL_MakeDbTuple("", "", "", g_mute_table)
+
+  Storage_Create()
+}
+
+Storage_Create() {
+  new query[QUERY_LENGTH / 2]
+
+  formatex(query, charsmax(query), "CREATE TABLE IF NOT EXISTS %s ", g_mute_table); {
+    strcat(query, "( id INTEGER PRIMARY KEY AUTOINCREMENT,", charsmax(query))
+    strcat(query, "authid VARCHAR NOT NULL,", charsmax(query))
+    strcat(query, "authid_target VARCHAR NOT NULL); ", charsmax(query))
+    strcat(query, fmt("CREATE UNIQUE INDEX IF NOT EXISTS authid_target_idx1 ON %s (authid, authid_target)", g_mute_table), charsmax(query))
+  }
+
+  SQL_ThreadQuery(g_tuple, "handle_StorageCreated", query)
+}
+
+public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
+  if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    return
+  }
+
+  CA_Log(logLevel_Debug, "Table '%s' created! (queryTime: '%.3f' sec)", g_mute_table, queuetime)
+}
+
+public client_putinserver(player) {
+  Storage_Load(player)
+}
+
+Storage_Update(const player, const target) {
+  if(!is_user_connected(target))
+    return
+
+  new authId[MAX_AUTHID_LENGTH], authId_target[MAX_AUTHID_LENGTH]
+  get_user_authid(player, authId, charsmax(authId))
+  get_user_authid(target, authId_target, charsmax(authId_target))
+
+  new query[QUERY_LENGTH / 2]
+
+  if(g_playersMute[player][target]) {
+    formatex(query, charsmax(query), "INSERT INTO %s (authid, authid_target)", g_mute_table)
+    strcat(query, fmt("VALUES ('%s', '%s') ON CONFLICT IGNORE", authId, authId_target), charsmax(query))
+  } else {
+    formatex(query, charsmax(query), "DELETE FROM %s ", g_mute_table)
+    strcat(query, fmt("WHERE authid='%s' AND authid_target = '%s'", authId, authId_target), charsmax(query))
+  }
+
+  SQL_ThreadQuery(g_tuple, "handle_Saved", query)
+}
+
+public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
+  if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    return
+  }
+}
+
+Storage_Load(const player) {
+  new authId[MAX_AUTHID_LENGTH]
+  get_user_authid(player, authId, charsmax(authId))
+
+  new query[QUERY_LENGTH / 2]
+  formatex(query, charsmax(query), "SELECT authid, authid_target FROM %s ", g_mute_table)
+  strcat(query, fmt("WHERE authid='%s' OR authid_target = '%s'", authId, authId), charsmax(query))
+
+  SQL_ThreadQuery(g_tuple, "handle_LoadedMute", query)
+}
+
+public handle_LoadedMute(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
+  if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    return
+  }
+
+  if(!SQL_NumResults(query))
+    return
+  
+  while(SQL_MoreResults(query)) {
+    new authId[MAX_AUTHID_LENGTH], authId_target[MAX_AUTHID_LENGTH]
+    SQL_ReadResult(query, 0, authId, charsmax(authId))
+    SQL_ReadResult(query, 1, authId_target, charsmax(authId_target))
+
+    new player = find_player_ex(FindPlayer_MatchAuthId, authId)
+    if (player == 0) {
+      goto next
+    }
+
+    new target = find_player_ex(FindPlayer_MatchAuthId, authId_target)
+    if (target == 0) {
+      goto next
+    }
+
+    g_playersMute[player][target] = true 
+
+    next:
+    SQL_NextRow(query)
+  }
+}
+
+static stock bool: IsSQLQueryFailed(const failstate, const Handle: query, const error[], const errNum) {
+  switch(failstate) {
+    case TQUERY_CONNECT_FAILED:	{
+      log_amx("SQL: connection failed [%i] `%s`", errNum, error)
+      return true
+    }
+    case TQUERY_QUERY_FAILED: {
+      log_amx("SQL: query failed [%i] %s", errNum, error);
+
+      server_print("^n^n ===> Query:")
+      new buffer[1024]; SQL_GetQueryString(query, buffer, charsmax(buffer));
+      for(new i, len = strlen(buffer); i < len; i+=255) {
+        server_print(fmt("%-255s", buffer[i]));
+      }
+
+      return true
+    }
+  }
+
+  return false
 }
