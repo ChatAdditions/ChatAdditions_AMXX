@@ -514,7 +514,7 @@ GameCMS_GetAdminID(const id) {
   new name_safe[MAX_NAME_LENGTH * 2]
   SQL_QuoteString(Empty_Handle, name_safe, charsmax(name_safe), name)
 
-  formatex(g_query, charsmax(g_query), "SELECT id FROM admins WHERE (name = '%s' or name = '%s') LIMIT 1;",
+  formatex(g_query, charsmax(g_query), "SELECT id FROM admins WHERE (name = '%s' or name = \"%s\") LIMIT 1;",
     authID, name_safe
   )
 
