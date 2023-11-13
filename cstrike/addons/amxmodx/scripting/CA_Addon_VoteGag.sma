@@ -44,7 +44,7 @@ new bool:g_bPlayerVoted[MAX_PLAYERS + 1], g_iPlayersVotedCount;
 
 public plugin_init()
 {
-	register_plugin("CA: VoteGAG", "1.0.0-alpha", "Sergey Shorokhov");
+	register_plugin("CA: VoteGAG", "1.0.1-alpha", "Sergey Shorokhov");
 
 	register_clcmd("say /votegag", "clcmd_VoteGag");
 	register_clcmd("say_team /votegag", "clcmd_VoteGag");
