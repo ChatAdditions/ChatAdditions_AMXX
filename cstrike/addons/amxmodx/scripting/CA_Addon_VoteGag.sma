@@ -22,6 +22,7 @@ const IMMUNITY_FLAGS = ADMIN_IMMUNITY; 	// Иммунитет к функция�
 #define MSG_MENU_BACK	"\rНазад"
 #define MSG_MENU_EXIT	"\rВыход"
 
+#define MSG_VOTE_START		"^1[^4%s^1] ^3%n^4 Запустил голосование за ^1gag ^4игрока ^3%n^1!"
 #define MSG_VOTE_EXISTS		"^1[^4%s^1] ^4Голосование за ^1gag ^4игрока ^3уже запужено!"
 #define MSG_VOTE_BLOCK		"^1[^4%s^1] ^4Голосование будет доступно через ^3%d сек."
 #define MSG_VOTING_FAIL 	"^1[^4%s^1] ^4Голосование завершилось ^3неудачно^4. Недостаточно голосов ^1[^3%d^1/^3%d^1]"
@@ -139,6 +140,8 @@ public players_handler(id, menu, item)
 
 	formatex(szTitle, charsmax(szTitle), MSG_VMENU_TITLE, szName);
 	menu_setprop(g_VotingMenu, MPROP_TITLE, szTitle);
+
+	ChatColor(0, g_iVotingIndex, MSG_VOTE_START, PREFIX, id, g_iVotingIndex);
 
 	for(new i; i < g_iPnum; i++)
 	{
