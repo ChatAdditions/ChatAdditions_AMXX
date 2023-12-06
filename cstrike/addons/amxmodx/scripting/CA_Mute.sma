@@ -7,6 +7,11 @@
 #pragma ctrlchar '\'
 #pragma tabsize 2
 
+#pragma reqlib sqlite
+#if !defined AMXMODX_NOAUTOLOAD
+  #pragma loadlib sqlite
+#endif
+
 new bool: g_playersMute[MAX_PLAYERS + 1][MAX_PLAYERS + 1]
 new bool: g_globalMute[MAX_PLAYERS + 1]
 
