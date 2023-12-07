@@ -254,7 +254,7 @@ Storage_Create() {
   new query[QUERY_LENGTH / 2]
 
   formatex(query, charsmax(query), "CREATE TABLE IF NOT EXISTS " + TABLE_NAME); {
-    strcat(query, "( id INTEGER PRIMARY KEY AUTOINCREMENT,", charsmax(query))
+    strcat(query, " ( id INTEGER PRIMARY KEY AUTOINCREMENT,", charsmax(query))
     strcat(query, "authid VARCHAR NOT NULL,", charsmax(query))
     strcat(query, "authid_target VARCHAR NOT NULL); ", charsmax(query))
     strcat(query, fmt("CREATE UNIQUE INDEX IF NOT EXISTS authid_target_idx1 ON " + TABLE_NAME + " (authid, authid_target)"), charsmax(query))
@@ -284,10 +284,10 @@ Storage_Update(const player, const target) {
   if(target == ITEM_MUTE_ALL) {
     if(g_globalMute[player]) {
       formatex(query, charsmax(query), "INSERT INTO " + TABLE_NAME + " (authid, authid_target)")
-      strcat(query, fmt("VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, "GLOBAL"), charsmax(query))
+      strcat(query, fmt(" VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, "GLOBAL"), charsmax(query))
     } else {
-      formatex(query, charsmax(query), "DELETE FROM " + TABLE_NAME)
-      strcat(query, fmt("WHERE authid='%s' AND authid_target = '%s'", authId, "GLOBAL"), charsmax(query))
+      formatex(query, charsmax(query), "DELETE FROM " + TABLE_NAME + " ")
+      strcat(query, fmt(" WHERE authid='%s' AND authid_target = '%s'", authId, "GLOBAL"), charsmax(query))
     }
 
     SQL_ThreadQuery(g_tuple, "handle_Saved", query)
@@ -299,10 +299,10 @@ Storage_Update(const player, const target) {
 
   if(g_playersMute[player][target]) {
     formatex(query, charsmax(query), "INSERT INTO " + TABLE_NAME + " (authid, authid_target)")
-    strcat(query, fmt("VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, authId_target), charsmax(query))
+    strcat(query, fmt(" VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, authId_target), charsmax(query))
   } else {
     formatex(query, charsmax(query), "DELETE FROM " + TABLE_NAME)
-    strcat(query, fmt("WHERE authid='%s' AND authid_target = '%s'", authId, authId_target), charsmax(query))
+    strcat(query, fmt(" WHERE authid ='%s' AND authid_target = '%s'", authId, authId_target), charsmax(query))
   }
 
   SQL_ThreadQuery(g_tuple, "handle_Saved", query)
@@ -320,7 +320,7 @@ Storage_Load(const player) {
 
   new query[QUERY_LENGTH / 2]
   formatex(query, charsmax(query), "SELECT authid, authid_target FROM " + TABLE_NAME)
-  strcat(query, fmt("WHERE authid='%s' OR authid_target = '%s'", authId, authId), charsmax(query))
+  strcat(query, fmt(" WHERE authid ='%s' OR authid_target = '%s'", authId, authId), charsmax(query))
 
   SQL_ThreadQuery(g_tuple, "handle_LoadedMute", query)
 }
