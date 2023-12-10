@@ -27,7 +27,7 @@ enum {
 }
 
 const QUERY_LENGTH = 4096
-#define TABLE_NAME "ca_players_mute"
+new const g_mute_table[] = "ca_players_mute"
 new Handle: g_tuple = Empty_Handle
 
 public stock const PluginName[] = "CA: Mute"
@@ -245,7 +245,7 @@ Storage_Init() {
     set_fail_state("Can't user 'SQLite'. Check modules.ini")
   }
 
-  g_tuple = SQL_MakeDbTuple("", "", "", TABLE_NAME)
+  g_tuple = SQL_MakeDbTuple("", "", "", g_mute_table)
 
   Storage_Create()
 }
@@ -253,11 +253,11 @@ Storage_Init() {
 Storage_Create() {
   new query[QUERY_LENGTH / 2]
 
-  formatex(query, charsmax(query), "CREATE TABLE IF NOT EXISTS " + TABLE_NAME); {
+  formatex(query, charsmax(query), "CREATE TABLE IF NOT EXISTS %s", g_mute_table); {
     strcat(query, " ( id INTEGER PRIMARY KEY AUTOINCREMENT,", charsmax(query))
     strcat(query, "authid VARCHAR NOT NULL,", charsmax(query))
     strcat(query, "authid_target VARCHAR NOT NULL); ", charsmax(query))
-    strcat(query, fmt("CREATE UNIQUE INDEX IF NOT EXISTS authid_target_idx1 ON " + TABLE_NAME + " (authid, authid_target)"), charsmax(query))
+    strcat(query, fmt("CREATE UNIQUE INDEX IF NOT EXISTS authid_target_idx1 ON %s (authid, authid_target)", g_mute_table), charsmax(query))
   }
 
   SQL_ThreadQuery(g_tuple, "handle_StorageCreated", query)
@@ -268,7 +268,7 @@ public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], 
     return
   }
 
-  CA_Log(logLevel_Debug, "Table '%s' created! (queryTime: '%.3f' sec)", TABLE_NAME, queuetime)
+  CA_Log(logLevel_Debug, "Table '%s' created! (queryTime: '%.3f' sec)", g_mute_table, queuetime)
 }
 
 public client_putinserver(player) {
@@ -283,10 +283,10 @@ Storage_Update(const player, const target) {
 
   if(target == ITEM_MUTE_ALL) {
     if(g_globalMute[player]) {
-      formatex(query, charsmax(query), "INSERT INTO " + TABLE_NAME + " (authid, authid_target)")
+      formatex(query, charsmax(query), "INSERT INTO %s (authid, authid_target)", g_mute_table)
       strcat(query, fmt(" VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, "GLOBAL"), charsmax(query))
     } else {
-      formatex(query, charsmax(query), "DELETE FROM " + TABLE_NAME + " ")
+      formatex(query, charsmax(query), "DELETE FROM %s", g_mute_table)
       strcat(query, fmt(" WHERE authid='%s' AND authid_target = '%s'", authId, "GLOBAL"), charsmax(query))
     }
 
@@ -298,10 +298,10 @@ Storage_Update(const player, const target) {
   get_user_authid(target, authId_target, charsmax(authId_target))
 
   if(g_playersMute[player][target]) {
-    formatex(query, charsmax(query), "INSERT INTO " + TABLE_NAME + " (authid, authid_target)")
+    formatex(query, charsmax(query), "INSERT INTO %s (authid, authid_target)", g_mute_table)
     strcat(query, fmt(" VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, authId_target), charsmax(query))
   } else {
-    formatex(query, charsmax(query), "DELETE FROM " + TABLE_NAME)
+    formatex(query, charsmax(query), "DELETE FROM %s", g_mute_table)
     strcat(query, fmt(" WHERE authid ='%s' AND authid_target = '%s'", authId, authId_target), charsmax(query))
   }
 
@@ -319,7 +319,7 @@ Storage_Load(const player) {
   get_user_authid(player, authId, charsmax(authId))
 
   new query[QUERY_LENGTH / 2]
-  formatex(query, charsmax(query), "SELECT authid, authid_target FROM " + TABLE_NAME)
+  formatex(query, charsmax(query), "SELECT authid, authid_target FROM %s", g_mute_table)
   strcat(query, fmt(" WHERE authid ='%s' OR authid_target = '%s'", authId, authId), charsmax(query))
 
   SQL_ThreadQuery(g_tuple, "handle_LoadedMute", query)
