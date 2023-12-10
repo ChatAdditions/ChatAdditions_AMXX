@@ -175,6 +175,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
   if(userID == ITEM_MUTE_ALL) {
     g_globalMute[id] ^= true
+    Storage_Update(id, ITEM_MUTE_ALL)
 
     client_print_color(0, print_team_default, "%L \3%n\1 %L ", id, "Mute_prefix",
       id, LANG_PLAYER, g_globalMute[id] ? "Mute_PlayerNowMutedAll" : "Mute_PlayerNowUnmutedAll"
@@ -219,7 +220,6 @@ public client_disconnected(id) {
     if (!g_playersMute[i][id])
       continue
 
-    // Storage_Update(i, id)
     g_playersMute[i][id] = false
   }
 }
@@ -253,8 +253,8 @@ Storage_Init() {
 Storage_Create() {
   new query[QUERY_LENGTH / 2]
 
-  formatex(query, charsmax(query), "CREATE TABLE IF NOT EXISTS %s ", g_mute_table); {
-    strcat(query, "( id INTEGER PRIMARY KEY AUTOINCREMENT,", charsmax(query))
+  formatex(query, charsmax(query), "CREATE TABLE IF NOT EXISTS %s", g_mute_table); {
+    strcat(query, " ( id INTEGER PRIMARY KEY AUTOINCREMENT,", charsmax(query))
     strcat(query, "authid VARCHAR NOT NULL,", charsmax(query))
     strcat(query, "authid_target VARCHAR NOT NULL); ", charsmax(query))
     strcat(query, fmt("CREATE UNIQUE INDEX IF NOT EXISTS authid_target_idx1 ON %s (authid, authid_target)", g_mute_table), charsmax(query))
@@ -276,21 +276,33 @@ public client_putinserver(player) {
 }
 
 Storage_Update(const player, const target) {
-  if(!is_user_connected(target))
-    return
-
-  new authId[MAX_AUTHID_LENGTH], authId_target[MAX_AUTHID_LENGTH]
-  get_user_authid(player, authId, charsmax(authId))
-  get_user_authid(target, authId_target, charsmax(authId_target))
-
   new query[QUERY_LENGTH / 2]
+
+  new authId[MAX_AUTHID_LENGTH]
+  get_user_authid(player, authId, charsmax(authId))
+
+  if(target == ITEM_MUTE_ALL) {
+    if(g_globalMute[player]) {
+      formatex(query, charsmax(query), "INSERT INTO %s (authid, authid_target)", g_mute_table)
+      strcat(query, fmt(" VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, "GLOBAL"), charsmax(query))
+    } else {
+      formatex(query, charsmax(query), "DELETE FROM %s", g_mute_table)
+      strcat(query, fmt(" WHERE authid='%s' AND authid_target = '%s'", authId, "GLOBAL"), charsmax(query))
+    }
+
+    SQL_ThreadQuery(g_tuple, "handle_Saved", query)
+    return
+  }
+
+  new authId_target[MAX_AUTHID_LENGTH]
+  get_user_authid(target, authId_target, charsmax(authId_target))
 
   if(g_playersMute[player][target]) {
     formatex(query, charsmax(query), "INSERT INTO %s (authid, authid_target)", g_mute_table)
-    strcat(query, fmt("VALUES ('%s', '%s') ON CONFLICT IGNORE", authId, authId_target), charsmax(query))
+    strcat(query, fmt(" VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, authId_target), charsmax(query))
   } else {
-    formatex(query, charsmax(query), "DELETE FROM %s ", g_mute_table)
-    strcat(query, fmt("WHERE authid='%s' AND authid_target = '%s'", authId, authId_target), charsmax(query))
+    formatex(query, charsmax(query), "DELETE FROM %s", g_mute_table)
+    strcat(query, fmt(" WHERE authid ='%s' AND authid_target = '%s'", authId, authId_target), charsmax(query))
   }
 
   SQL_ThreadQuery(g_tuple, "handle_Saved", query)
@@ -307,8 +319,8 @@ Storage_Load(const player) {
   get_user_authid(player, authId, charsmax(authId))
 
   new query[QUERY_LENGTH / 2]
-  formatex(query, charsmax(query), "SELECT authid, authid_target FROM %s ", g_mute_table)
-  strcat(query, fmt("WHERE authid='%s' OR authid_target = '%s'", authId, authId), charsmax(query))
+  formatex(query, charsmax(query), "SELECT authid, authid_target FROM %s", g_mute_table)
+  strcat(query, fmt(" WHERE authid ='%s' OR authid_target = '%s'", authId, authId), charsmax(query))
 
   SQL_ThreadQuery(g_tuple, "handle_LoadedMute", query)
 }
@@ -327,7 +339,12 @@ public handle_LoadedMute(failstate, Handle: query, error[], errnum, data[], size
     SQL_ReadResult(query, 1, authId_target, charsmax(authId_target))
 
     new player = find_player_ex(FindPlayer_MatchAuthId, authId)
-    if (player == 0) {
+    if(player == 0) {
+      goto next
+    }
+
+    if(strcmp(authId_target, "GLOBAL") == 0) {
+      g_globalMute[player] = true
       goto next
     }
 
