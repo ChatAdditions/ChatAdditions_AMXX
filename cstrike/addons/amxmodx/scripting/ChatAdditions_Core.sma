@@ -1,6 +1,6 @@
 #include <amxmodx>
 #include <amxmisc>
-#include <reapi>
+#include <fakemeta>
 
 #include <grip>
 #include <ChatAdditions>
@@ -65,8 +65,8 @@ public plugin_init() {
   register_clcmd("say",       "ClCmd_Say",      ADMIN_ALL)
   register_clcmd("say_team",  "ClCmd_Say",      ADMIN_ALL)
 
-  RegisterHookChain(RG_CSGameRules_CanPlayerHearPlayer,     "CSGameRules_CanPlayerHearPlayer",    .post = false)
-  RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName,   "CBasePlayer_SetClientUserInfoName",  .post = false)
+  register_forward(FM_Voice_SetClientListening, "Voice_SetClientListening_Pre", ._post = false)
+  register_forward(FM_ClientUserInfoChanged, "ClientUserInfoChanged_Pre", ._post = false)
 
   register_clcmd("VModEnable",  "ClCmd_VModEnable",   ADMIN_ALL, .FlagManager = false)
   register_clcmd("vban",        "ClCmd_vban",         ADMIN_ALL, .FlagManager = false)
@@ -218,32 +218,41 @@ public ClCmd_Say(const id) {
   return (g_retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE
 }
 
-public CSGameRules_CanPlayerHearPlayer(const listener, const sender) {
-  if(listener == sender /* || !g_PlayerModEnable[listener] */) {
-    return HC_CONTINUE
-  }
+public Voice_SetClientListening_Pre(const receiver, const sender, bool: canListen) {
+  if(receiver == sender)
+    return FMRES_IGNORED
 
-  ExecuteForward(g_fwdClientVoice, g_retVal, listener, sender)
+  if(!g_PlayerModEnable[receiver])
+    return FMRES_IGNORED
 
-  if(g_retVal == CA_SUPERCEDE) {
-    SetHookChainReturn(ATYPE_BOOL, false)
+  if (!is_user_connected(receiver) || !is_user_connected(sender))
+    return FMRES_IGNORED
 
-    return HC_BREAK
-  }
+  ExecuteForward(g_fwdClientVoice, g_retVal, receiver, sender)
+  if(g_retVal != CA_SUPERCEDE)
+    return FMRES_IGNORED
 
-  return HC_CONTINUE
+  // Block voice
+  engfunc(EngFunc_SetClientListening, receiver, sender, (canListen = false))
+  return FMRES_SUPERCEDE
 }
 
-public CBasePlayer_SetClientUserInfoName(const id, const infobuffer[], newName[]) {
-  ExecuteForward(g_fwdClientChangeName, g_retVal, id, newName)
+public ClientUserInfoChanged_Pre(const player, const infobuffer) {
+  new currentName[32]
+  get_user_name(player, currentName, charsmax(currentName))
 
-  if(g_retVal == CA_SUPERCEDE) {
-    SetHookChainReturn(ATYPE_BOOL, false)
+  new newName[32]
+  engfunc(EngFunc_InfoKeyValue, infobuffer, "name", newName, charsmax(newName))
 
-    return HC_SUPERCEDE
-  }
+  if(strcmp(currentName, newName) == 0)
+    return
 
-  return HC_CONTINUE
+  ExecuteForward(g_fwdClientChangeName, g_retVal, player, newName)
+  if(g_retVal != CA_SUPERCEDE)
+    return
+
+  // Change back name
+  engfunc(EngFunc_SetClientKeyValue, player, infobuffer, "name", currentName)
 }
 
 public ClCmd_VModEnable(const id) {

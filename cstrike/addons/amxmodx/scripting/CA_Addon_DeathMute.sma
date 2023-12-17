@@ -1,6 +1,6 @@
 #include <amxmodx>
 #include <amxmisc>
-#include <reapi>
+#include <hamsandwich>
 
 #include <ChatAdditions>
 
@@ -43,8 +43,9 @@ public plugin_init() {
 
   AutoExecConfig(true, "CA_Addon_DeathMute", "ChatAdditions")
 
-  RegisterHookChain(RG_CBasePlayer_Killed, "CBasePlayer_Killed", .post = true)
-  RegisterHookChain(RG_CSGameRules_PlayerSpawn, "CBasePlayer_Spawn", .post = true)
+  // RegisterHam(Ham_TFC_Killed, "player", "CBasePlayer_Killed", .Post = true) // Does it need ?!
+  RegisterHam(Ham_Killed, "player", "CBasePlayer_Killed", .Post = true)
+  RegisterHam(Ham_Spawn, "player", "CBasePlayer_Spawn", .Post = true)
 
   g_syncHudOj = CreateHudSyncObj()
 }
@@ -132,6 +133,9 @@ public client_disconnected(id) {
 }
 
 public CBasePlayer_Spawn(const id) {
+  if(!is_user_alive(id))
+    return
+
   g_canSpeakWithAlive[id] = true
 
   remove_task(id)
