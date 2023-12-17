@@ -6,7 +6,6 @@
 #include <CA_GAG_API>
 #include <CA_StorageAPI>
 
-#pragma ctrlchar '\'
 #pragma dynamic 524288
 #pragma tabsize 4
 

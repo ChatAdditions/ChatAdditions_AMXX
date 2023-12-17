@@ -1,7 +1,6 @@
 #include <amxmodx>
 #include <ChatAdditions>
 
-#pragma ctrlchar '\'
 #pragma tabsize 4
 
 new g_OldMessage[MAX_PLAYERS + 1][CA_MAX_MESSAGE_SIZE]

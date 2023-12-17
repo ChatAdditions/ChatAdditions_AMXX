@@ -3,7 +3,6 @@
 
 #include <ChatAdditions>
 
-#pragma ctrlchar '\'
 #pragma tabsize 4
 
 // Natives

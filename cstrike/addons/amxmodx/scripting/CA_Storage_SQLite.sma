@@ -4,7 +4,6 @@
 #include <ChatAdditions>
 #include <CA_StorageAPI_endpoint>
 
-#pragma ctrlchar '\'
 #pragma dynamic 131072
 #pragma tabsize 4
 

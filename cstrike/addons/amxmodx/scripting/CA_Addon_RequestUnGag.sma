@@ -4,7 +4,6 @@
 #include <ChatAdditions>
 #include <CA_GAG_API>
 
-#pragma ctrlchar '\'
 #pragma tabsize 4
 
 new Float: g_userNextRequestTime[MAX_PLAYERS + 1]

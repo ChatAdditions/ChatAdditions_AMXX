@@ -5,7 +5,6 @@
 #include <grip>
 #include <ChatAdditions>
 
-#pragma ctrlchar '\'
 #pragma tabsize 4
 #pragma dynamic (8192 + 4096)
 

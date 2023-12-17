@@ -4,7 +4,6 @@
 
 #include <ChatAdditions>
 
-#pragma ctrlchar '\'
 #pragma tabsize 4
 
 #pragma reqlib sqlite
