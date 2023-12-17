@@ -367,12 +367,12 @@ static stock bool: IsSQLQueryFailed(const failstate, const Handle: query, const 
             return true
         }
         case TQUERY_QUERY_FAILED: {
-            log_amx("SQL: query failed [%i] %s", errNum, error);
+            log_amx("SQL: query failed [%i] %s", errNum, error)
 
             server_print("^n^n ===> Query:")
-            new buffer[1024]; SQL_GetQueryString(query, buffer, charsmax(buffer));
+            new buffer[1024]; SQL_GetQueryString(query, buffer, charsmax(buffer))
             for(new i, len = strlen(buffer); i < len; i+=255) {
-                server_print(fmt("%-255s", buffer[i]));
+                server_print(fmt("%-255s", buffer[i]))
             }
 
             return true

@@ -7,14 +7,14 @@
 #pragma tabsize 4
 
 // Natives
-native aes_get_player_level(const player);
-native ar_get_user_level(const player, rankName[] = "", len = 0);
-native crxranks_get_user_level(const player);
-native cmsranks_get_user_level(player, level[] = "", len = 0);
-native csstats_get_user_stats(const player, const stats[22]);
-native Float:cmsstats_get_user_skill(player, skillname[] = "", namelen = 0, &skill_level = 0);
-native get_user_skill(player, &Float: skill);
-native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS]);
+native aes_get_player_level(const player)
+native ar_get_user_level(const player, rankName[] = "", len = 0)
+native crxranks_get_user_level(const player)
+native cmsranks_get_user_level(player, level[] = "", len = 0)
+native csstats_get_user_stats(const player, const stats[22])
+native Float:cmsstats_get_user_skill(player, skillname[] = "", namelen = 0, &skill_level = 0)
+native get_user_skill(player, &Float: skill)
+native get_user_stats(player, stats[STATSX_MAX_STATS], bodyhits[MAX_BODYHITS])
 //
 
 
