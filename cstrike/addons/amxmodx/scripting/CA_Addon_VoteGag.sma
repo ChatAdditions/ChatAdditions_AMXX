@@ -61,7 +61,7 @@ public plugin_cfg()
 
 public client_disconnected(id)
 {
-    if(g_bPlayerVoted[id])
+    if (g_bPlayerVoted[id])
     {
         g_bPlayerVoted[id] = false;
         g_iPlayersVotedCount--;
@@ -70,13 +70,13 @@ public client_disconnected(id)
 
 public clcmd_VoteGag(id)
 {
-    if(g_iVotingIndex)
+    if (g_iVotingIndex)
     {
         ChatColor(id, 0, MSG_VOTE_EXISTS, PREFIX);
         return PLUGIN_HANDLED;
     }
     new time = g_iVotingLasttime + REPEAT_VOTE_MIN * 60 - get_systime();
-    if(time > 0)
+    if (time > 0)
     {
         ChatColor(id, 0, MSG_VOTE_BLOCK, PREFIX, time % 60);
         return PLUGIN_HANDLED;
@@ -94,7 +94,7 @@ public clcmd_VoteGag(id)
 
     for(new i; i < g_iPnum; i++)
     {
-        if(g_arrPlayers[i] == id)
+        if (g_arrPlayers[i] == id)
             continue;
 
         get_user_name(g_arrPlayers[i], szName, charsmax(szName));
@@ -112,11 +112,11 @@ public players_callback(id, menu, item)
     menu_item_getinfo(menu, item, _access, item_data, charsmax(item_data), .callback = callback);
 
     new index = str_to_num(item_data);
-    if(!is_user_connected(index))
+    if (!is_user_connected(index))
         return ITEM_DISABLED;
-    if(ca_has_user_gag(index))
+    if (ca_has_user_gag(index))
         return ITEM_DISABLED;
-    if(get_user_flags(index) & IMMUNITY_FLAGS)
+    if (get_user_flags(index) & IMMUNITY_FLAGS)
         return ITEM_DISABLED;
 
     return ITEM_ENABLED;
@@ -124,7 +124,7 @@ public players_callback(id, menu, item)
 
 public players_handler(id, menu, item)
 {
-    if(item == MENU_EXIT)
+    if (item == MENU_EXIT)
     {
         menu_destroy(menu);
         return PLUGIN_HANDLED;
@@ -145,10 +145,10 @@ public players_handler(id, menu, item)
 
     for(new i; i < g_iPnum; i++)
     {
-        if(g_arrPlayers[i] == g_iVotingIndex)
+        if (g_arrPlayers[i] == g_iVotingIndex)
             continue;
 
-        if(is_user_connected(g_arrPlayers[i]))
+        if (is_user_connected(g_arrPlayers[i]))
             menu_display(g_arrPlayers[i], g_VotingMenu);
     }
 
@@ -158,13 +158,13 @@ public players_handler(id, menu, item)
 
 public voting_handler(id, menu, item)
 {
-    if(item == MENU_EXIT)
+    if (item == MENU_EXIT)
         return PLUGIN_HANDLED;
 
     new _access, item_data[3], callback;
     menu_item_getinfo(menu, item, _access, item_data, charsmax(item_data), .callback = callback);
 
-    if(str_to_num(item_data))
+    if (str_to_num(item_data))
     {
         g_iPlayersVotedCount++;
         g_bPlayerVoted[id] = true;
@@ -176,15 +176,15 @@ public task__CheckVotes(id)
 {
     for(new i; i < g_iPnum; i++)
     {
-        if(is_user_connected(g_arrPlayers[i]))
+        if (is_user_connected(g_arrPlayers[i]))
             show_menu(g_arrPlayers[i], 0, "^n");
     }
 
     new iVoteCount = floatround(g_iPnum  * PERCENT_VOTE_OK / 100.0);
 
-    if(g_iPlayersVotedCount >= iVoteCount)
+    if (g_iPlayersVotedCount >= iVoteCount)
     {
-        if(is_user_connected(g_iVotingIndex))
+        if (is_user_connected(g_iVotingIndex))
         {
             ca_set_user_gag(g_iVotingIndex, PREFIX, BLOCK_TIME_MIN, (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice));
 
@@ -208,7 +208,7 @@ stock ChatColor(id, id2, const szMessage[], any:...)
     new szMsg[190];
     vformat(szMsg, charsmax(szMsg), szMessage, 4);
 
-    if(id)
+    if (id)
     {
         client_print_color(id, print_team_default, szMsg);
     }
@@ -218,7 +218,7 @@ stock ChatColor(id, id2, const szMessage[], any:...)
         get_players(players, pnum, "c");
         for(new i; i < pnum; ++i)
         {
-            if(players[i] != id2)
+            if (players[i] != id2)
             {
                 client_print_color(players[i], print_team_default, szMsg);
             }

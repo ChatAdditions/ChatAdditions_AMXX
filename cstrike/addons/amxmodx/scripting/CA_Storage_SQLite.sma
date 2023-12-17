@@ -30,7 +30,7 @@ public stock const PluginDescription[] = "SQLite storage provider for ChatAdditi
 public plugin_init() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)
 
-    if(!SQL_SetAffinity("sqlite")) {
+    if (!SQL_SetAffinity("sqlite")) {
         set_fail_state("Can't user 'SQLite'. Check modules.ini")
     }
 
@@ -40,7 +40,7 @@ public plugin_init() {
 }
 
 public plugin_end() {
-    if(g_tuple != Empty_Handle) {
+    if (g_tuple != Empty_Handle) {
         SQL_FreeHandle(g_tuple)
     }
 }
@@ -76,7 +76,7 @@ Storage_Create() {
 }
 
 public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -127,7 +127,7 @@ Storage_Save(const name[], const authID[], const IP[],
 }
 
 public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -174,7 +174,7 @@ Storage_Load(const authID[]) {
 }
 
 public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -185,7 +185,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
 
     new bool: found = (SQL_NumResults(query) != 0)
 
-    if(!found) {
+    if (!found) {
         return
     }
 
@@ -224,7 +224,7 @@ Storage_Remove(const authID[]) {
 }
 
 public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 

@@ -119,21 +119,21 @@ stock show_activity_ex(const actorId, const actorName[], const message[], any: .
     enum { arg_format = 4 }
 
     static _amx_show_activity;
-    if(!_amx_show_activity) {
+    if (!_amx_show_activity) {
         _amx_show_activity = get_cvar_pointer("amx_show_activity");
-        if(!_amx_show_activity) {
+        if (!_amx_show_activity) {
             _amx_show_activity = create_cvar("amx_show_activity", "2");
         }
     }
 
     new prefix[] = "PLAYER";
-    if(is_user_admin(actorId)) {
+    if (is_user_admin(actorId)) {
         copy(prefix, charsmax(prefix), "ADMIN");
     }
 
     static buffer[512];
     for(new i = 1; i <= MaxClients; i++) {
-        if(!is_user_connected(i) && !is_user_bot(i)) {
+        if (!is_user_connected(i) && !is_user_bot(i)) {
             continue;
         }
 
@@ -141,7 +141,7 @@ stock show_activity_ex(const actorId, const actorName[], const message[], any: .
         SetGlobalTransTarget(i);
         vformat(buffer, charsmax(buffer), message, arg_format);
 
-        switch(get_pcvar_num(_amx_show_activity)) {
+        switch (get_pcvar_num(_amx_show_activity)) {
             case 1: { // Hide name for all
                 client_print_color(i, i, "%L %s", i, prefix, buffer);
             }
@@ -152,12 +152,12 @@ stock show_activity_ex(const actorId, const actorName[], const message[], any: .
                 client_print_color(i, i, "%L %s: %s", i, prefix, isAdmin ? actorName : "", buffer);
             }
             case 4: { // show name only to admins, show nothing to normal users
-                if(isAdmin) {
+                if (isAdmin) {
                     client_print_color(i, i, "%L %s: %s", i, prefix, actorName, buffer);
                 }
             }
             case 5: { // show only to admins without actor name
-                if(isAdmin) {
+                if (isAdmin) {
                     client_print_color(i, i, "%L: %s", i, prefix, buffer);
                 }
             }
@@ -166,7 +166,7 @@ stock show_activity_ex(const actorId, const actorName[], const message[], any: .
 }
 
 stock FindPlayerByTarget(const buffer[]) {
-    if(buffer[0] == '#' && buffer[1]) {
+    if (buffer[0] == '#' && buffer[1]) {
         return find_player_ex(FindPlayer_MatchUserId, strtol(buffer[1]));
     }
 
@@ -183,12 +183,12 @@ stock FindPlayerByTarget(const buffer[]) {
 }
 
 stock UTIL_SendAudio(const id, const sample[]) {
-    if(sample[0] == EOS) {
+    if (sample[0] == EOS) {
         return
     }
 
     static msgId_SendAudio
-    if(!msgId_SendAudio) {
+    if (!msgId_SendAudio) {
         msgId_SendAudio = get_user_msgid("SendAudio")
     }
 
@@ -201,7 +201,7 @@ stock UTIL_SendAudio(const id, const sample[]) {
 
 stock UTIL_BarTime(const id, const time) {
     static msgId_BarTime
-    if(!msgId_BarTime) {
+    if (!msgId_BarTime) {
         msgId_BarTime = get_user_msgid("BarTime")
     }
 

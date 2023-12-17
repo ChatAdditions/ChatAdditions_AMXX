@@ -133,7 +133,7 @@ public client_disconnected(id) {
 }
 
 public CBasePlayer_Spawn(const id) {
-    if(!is_user_alive(id))
+    if (!is_user_alive(id))
         return
 
     g_canSpeakWithAlive[id] = true
@@ -142,13 +142,13 @@ public CBasePlayer_Spawn(const id) {
 }
 
 public CBasePlayer_Killed(const id, const attacker) {
-    if(ca_deathmute_time <= 0.0) {
+    if (ca_deathmute_time <= 0.0) {
         return
     }
 
     set_task_ex(ca_deathmute_time, "DisableSpeakWithAlive", .id = id)
 
-    switch(ca_deathmute_notify_type) {
+    switch (ca_deathmute_notify_type) {
         case notify_Disabled: return
 
         case notify_Chat: client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_ChatMessage", ca_deathmute_time)
@@ -173,7 +173,7 @@ public CBasePlayer_Killed(const id, const attacker) {
         }
     }
 
-    if(ca_deathmute_notify_show_progressbar) {
+    if (ca_deathmute_notify_show_progressbar) {
         UTIL_BarTime(id, floatround(ca_deathmute_time))
     }
 }
@@ -181,7 +181,7 @@ public CBasePlayer_Killed(const id, const attacker) {
 public DisableSpeakWithAlive(const id) {
     g_canSpeakWithAlive[id] = false
 
-    switch(ca_deathmute_notify_type) {
+    switch (ca_deathmute_notify_type) {
         case notify_Chat: client_print_color(id, print_team_red, "%L %L", id, "DeathMute_prefix", id, "DeathMute_YouMuted")
 
         case notify_HUD: {
@@ -206,24 +206,24 @@ public DisableSpeakWithAlive(const id) {
 }
 
 public CA_Client_Voice(const listener, const sender) {
-    if(ca_deathmute_time <= 0.0) {
+    if (ca_deathmute_time <= 0.0) {
         return CA_CONTINUE
     }
     
     new bool: listenerHasImmunity = bool: (get_user_flags(listener) & read_flags(ca_deathmute_immunity_flags))
 
-    if(listenerHasImmunity) {
+    if (listenerHasImmunity) {
         return CA_CONTINUE
     }
 
     new bool: listenerAlive = bool: is_user_alive(listener)
     new bool: senderAlive = bool: is_user_alive(sender)
 
-    if(!g_canSpeakWithAlive[sender] && !senderAlive && listenerAlive) {
+    if (!g_canSpeakWithAlive[sender] && !senderAlive && listenerAlive) {
         return CA_SUPERCEDE
     }
 
-    if(!ca_deathmute_dead_hear_alive && !listenerAlive && senderAlive) {
+    if (!ca_deathmute_dead_hear_alive && !listenerAlive && senderAlive) {
         return CA_SUPERCEDE
     }
 

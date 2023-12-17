@@ -9,7 +9,7 @@
 new bool: g_storageInitialized
 
 stock bool: IsSQLQueryFailed(const failstate, const Handle: query, const error[], const errNum) {
-    switch(failstate) {
+    switch (failstate) {
         case TQUERY_CONNECT_FAILED:	{
             log_amx("SQL: connection failed [%i] `%s`", errNum, error)
             return true

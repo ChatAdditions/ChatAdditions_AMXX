@@ -52,17 +52,17 @@ public Create_CVars() {
 
 // TODO: Create `_PRE` hook forward instead this.
 public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
-    if(strcmp(message, ca_requestungag_cmd) != 0)
+    if (strcmp(message, ca_requestungag_cmd) != 0)
         return CA_CONTINUE
 
-    if(!ca_has_user_gag(player)) {
+    if (!ca_has_user_gag(player)) {
         client_print_color(player, print_team_default, "%L", player, "RequestUnGag_NoAccess")
 
         return CA_SUPERCEDE
     }
 
     new Float: gametime = get_gametime()
-    if(g_userNextRequestTime[player] > gametime) {
+    if (g_userNextRequestTime[player] > gametime) {
         new timeLeft = floatround(g_userNextRequestTime[player] - gametime, floatround_ceil)
         client_print_color(player, print_team_default, "%L", player, "RequestUnGag_TimeOut", timeLeft)
 
@@ -80,10 +80,10 @@ public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
     for(new i; i < count; i++) {
         new receiver = players[i]
 
-        if(receiver == player)
+        if (receiver == player)
             continue
 
-        if(!(get_user_flags(receiver) & (accessFlags | accessFlagsHigh)))
+        if (!(get_user_flags(receiver) & (accessFlags | accessFlagsHigh)))
             continue
 
         client_print_color(receiver, print_team_default, "%L",

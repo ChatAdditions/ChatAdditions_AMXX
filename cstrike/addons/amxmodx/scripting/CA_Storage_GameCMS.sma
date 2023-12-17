@@ -45,7 +45,7 @@ public stock const PluginDescription[] = "GameCMS (MySQL) storage provider for C
 public plugin_init() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)
 
-    if(!SQL_SetAffinity("mysql")) {
+    if (!SQL_SetAffinity("mysql")) {
         set_fail_state("Can't user 'MySQL'. Check modules.ini")
     }
 
@@ -68,7 +68,7 @@ public _OnConfigsExecuted() {
 }
 
 public plugin_end() {
-    if(g_tuple != Empty_Handle) {
+    if (g_tuple != Empty_Handle) {
         SQL_FreeHandle(g_tuple)
     }
 
@@ -85,7 +85,7 @@ public plugin_cfg() {
 }
 
 public client_putinserver(id) {
-    if(!g_storageInitialized) {
+    if (!g_storageInitialized) {
         return
     }
 
@@ -162,7 +162,7 @@ Storage_Create() {
 }
 
 public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -175,7 +175,7 @@ Storage_Save(const name[], const authID[], const IP[],
     const reason[], const adminName[], const adminAuthID[],
     const adminIP[], const expireAt, const flags) {
 
-    if(!g_storageInitialized) {
+    if (!g_storageInitialized) {
         new gagData[gagData_s]; {
             copy(gagData[gd_name], charsmax(gagData[gd_name]), name)
             copy(gagData[gd_authID], charsmax(gagData[gd_authID]), authID)
@@ -209,7 +209,7 @@ Storage_Save(const name[], const authID[], const IP[],
 
     new admin_id = 0
     new admin = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), adminAuthID)
-    if(admin) {
+    if (admin) {
         admin_id = g_gamecmsAdminId[admin]
     }
 
@@ -245,7 +245,7 @@ Storage_Save(const name[], const authID[], const IP[],
 }
 
 public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -261,7 +261,7 @@ public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Flo
 }
 
 public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -281,11 +281,11 @@ public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], siz
 
     // HACK: for bad DB struct
     new target = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), authID)
-    if(target)
+    if (target)
         get_user_ip(target, IP, charsmax(IP), true)
 
     new admin = find_player_ex((FindPlayer_MatchName | FindPlayer_ExcludeBots), adminName)
-    if(admin) {
+    if (admin) {
         get_user_authid(admin, adminAuthID, charsmax(adminAuthID))
         get_user_ip(admin, adminIP, charsmax(adminIP), true)
     }
@@ -307,7 +307,7 @@ public handle_SavedResult(failstate, Handle: query, error[], errnum, data[], siz
 }
 
 Storage_Load(const authID[]) {
-    if(!g_storageInitialized) {
+    if (!g_storageInitialized) {
         QueuePushString(g_queueLoad, authID)
 
         return
@@ -324,7 +324,7 @@ Storage_Load(const authID[]) {
 }
 
 public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -335,7 +335,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
 
     new bool: found = (SQL_NumResults(query) != 0)
 
-    if(!found) {
+    if (!found) {
         return
     }
 
@@ -350,11 +350,11 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
 
     // HACK: for bad DB struct
     new target = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), authID)
-    if(target)
+    if (target)
         get_user_ip(target, IP, charsmax(IP), true)
 
     new admin = find_player_ex((FindPlayer_MatchName | FindPlayer_ExcludeBots), adminName)
-    if(admin) {
+    if (admin) {
         get_user_authid(admin, adminAuthID, charsmax(adminAuthID))
         get_user_ip(admin, adminIP, charsmax(adminIP), true)
     }
@@ -376,7 +376,7 @@ public handle_Loaded(failstate, Handle: query, error[], errnum, data[], size, Fl
 }
 
 Storage_Remove(const authID[]) {
-    if(!g_storageInitialized || g_tuple == Empty_Handle) {
+    if (!g_storageInitialized || g_tuple == Empty_Handle) {
         CA_Log(logLevel_Warning, "Storage_Remove(): Storage connection not initialized. Query not executed. (g_storageInitialized=%i, g_tuple=%i)",
             g_storageInitialized, g_tuple
         )
@@ -392,7 +392,7 @@ Storage_Remove(const authID[]) {
 }
 
 public handle_Removed(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -415,13 +415,13 @@ GameCMS_GetServerID() {
 }
 
 public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
     new bool: found = bool: (SQL_NumResults(query) != 0)
 
-    if(!found) {
+    if (!found) {
         set_fail_state("Server `%s` not found on db.", ca_server_address)
 
         return
@@ -443,7 +443,7 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
         ++queueCounter
     }
 
-    if(queueCounter) {
+    if (queueCounter) {
         CA_Log(logLevel_Warning, "Loaded %i queue gags from DB (slow DB connection issue)", queueCounter)
         queueCounter = 0
     }
@@ -460,7 +460,7 @@ public handle_GetServerID(failstate, Handle: query, error[], errnum, data[], siz
         ++queueCounter
     }
 
-    if(queueCounter) {
+    if (queueCounter) {
         CA_Log(logLevel_Warning, "Saved %i queue gags to DB (slow DB connection issue)", queueCounter)
         queueCounter = 0
     }
@@ -481,7 +481,7 @@ enum {
 }
 
 static stock gag_flags_s: GCMS_FlagsTo_CAGAGFlags(const flag) {
-    switch(flag) {
+    switch (flag) {
         case GCMS_FLAG_NONE:    return (gagFlag_Removed)
         case GCMS_FLAG_ALL:     return (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice)
         case GCMS_FLAG_CHAT:    return (gagFlag_Say | gagFlag_SayTeam)
@@ -493,13 +493,13 @@ static stock gag_flags_s: GCMS_FlagsTo_CAGAGFlags(const flag) {
 }
 
 static stock CAGAGFlags_to_GCMS_Flags(const gag_flags_s: flags) {
-    if(flags == gagFlag_Voice) {
+    if (flags == gagFlag_Voice) {
         return GCMS_FLAG_VOICE
     }
-    if(flags == (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice)) {
+    if (flags == (gagFlag_Say | gagFlag_SayTeam | gagFlag_Voice)) {
         return GCMS_FLAG_ALL
     }
-    if(flags & (gagFlag_Say | gagFlag_SayTeam)) {
+    if (flags & (gagFlag_Say | gagFlag_SayTeam)) {
         return GCMS_FLAG_CHAT
     }
 
@@ -525,12 +525,12 @@ GameCMS_GetAdminID(const id) {
 public handle_GetAdminID(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
     enum { col_id }
 
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
     new bool: found = bool: (SQL_NumResults(query) != 0)
-    if(!found) {
+    if (!found) {
         return
     }
 

@@ -26,7 +26,7 @@ public plugin_init() {
 }
 
 public plugin_cfg() {
-    if(find_plugin_byfile("antiflood.amxx") != INVALID_PLUGIN_ID) {
+    if (find_plugin_byfile("antiflood.amxx") != INVALID_PLUGIN_ID) {
         log_amx("Default plugin <antiflood.amxx> was found. It has been stopped.")
         pause("acd", "antiflood.amxx")
     }
@@ -38,7 +38,7 @@ public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
 
 
 CheckMessage(id, const message[]) {
-    if(message[0] == '/') {
+    if (message[0] == '/') {
         return CA_CONTINUE
     }
 
@@ -47,15 +47,15 @@ CheckMessage(id, const message[]) {
 
     new Float:nextSay = get_gametime()
 
-    if(nextMessage[id] > nextSay) {
+    if (nextMessage[id] > nextSay) {
         client_print_color(id, print_team_red, "%L %L", id, "CA_ANTIFLOOD_CHAT_PREFIX", id, "CA_ANTIFLOOD_CHAT_STOP_FLOODING")
         nextMessage[id] = nextSay + ca_anti_flood_time
 
         return CA_SUPERCEDE
     }
 
-    if(strcmp(message, g_OldMessage[id], true) == 0) {
-        if(++equalMessage[id] >= ca_equal_messages) {
+    if (strcmp(message, g_OldMessage[id], true) == 0) {
+        if (++equalMessage[id] >= ca_equal_messages) {
             client_print_color(id, print_team_red, "%L %L", id, "CA_ANTIFLOOD_CHAT_PREFIX", id, "CA_ANTIFLOOD_CHAT_EQUAL_MESSAGE")
 
             return CA_SUPERCEDE

@@ -44,18 +44,18 @@ enum gagData_s {
 stock gag_flags_s: flags_to_bit(const flagsStr[]) {
     new gag_flags_s: bits = gagFlag_Removed;
 
-    if(containi(flagsStr, "a") != -1) bits |= gagFlag_Say;
-    if(containi(flagsStr, "b") != -1) bits |= gagFlag_SayTeam;
-    if(containi(flagsStr, "c") != -1) bits |= gagFlag_Voice;
+    if (containi(flagsStr, "a") != -1) bits |= gagFlag_Say;
+    if (containi(flagsStr, "b") != -1) bits |= gagFlag_SayTeam;
+    if (containi(flagsStr, "c") != -1) bits |= gagFlag_Voice;
 
     return bits;
 }
 
 stock bits_to_flags(const gag_flags_s: bits) {
     new flagsStr[4];
-    if(bits & gagFlag_Say)      add(flagsStr, charsmax(flagsStr), "a");
-    if(bits & gagFlag_SayTeam)  add(flagsStr, charsmax(flagsStr), "b");
-    if(bits & gagFlag_Voice)    add(flagsStr, charsmax(flagsStr), "c");
+    if (bits & gagFlag_Say)      add(flagsStr, charsmax(flagsStr), "a");
+    if (bits & gagFlag_SayTeam)  add(flagsStr, charsmax(flagsStr), "b");
+    if (bits & gagFlag_Voice)    add(flagsStr, charsmax(flagsStr), "c");
 
     return flagsStr;
 }
@@ -97,15 +97,15 @@ stock GagData_Copy(to[gagData_s], const from[gagData_s]) {
 }
 
 stock bool: GagData_IsEqual(const arr1[gagData_s], const arr2[gagData_s]) {
-    if(arr1[gd_reason][r_time] != arr2[gd_reason][r_time]) {
+    if (arr1[gd_reason][r_time] != arr2[gd_reason][r_time]) {
         return false;
     }
 
-    if(arr1[gd_reason][r_flags] != arr2[gd_reason][r_flags]) {
+    if (arr1[gd_reason][r_flags] != arr2[gd_reason][r_flags]) {
         return false;
     }
 
-    if(strcmp(arr1[gd_reason][r_name], arr2[gd_reason][r_name]) != 0) {
+    if (strcmp(arr1[gd_reason][r_name], arr2[gd_reason][r_name]) != 0) {
         return false;
     }
 

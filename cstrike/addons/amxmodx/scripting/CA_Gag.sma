@@ -86,11 +86,11 @@ public plugin_precache() {
 
     LoadConfig()
 
-    if(ca_gag_sound_ok[0] != EOS && file_exists(fmt("sounds/%s", ca_gag_sound_ok))) {
+    if (ca_gag_sound_ok[0] != EOS && file_exists(fmt("sounds/%s", ca_gag_sound_ok))) {
         precache_sound(ca_gag_sound_ok)
     }
 
-    if(ca_gag_sound_error[0] != EOS && file_exists(fmt("sounds/%s", ca_gag_sound_error))) {
+    if (ca_gag_sound_error[0] != EOS && file_exists(fmt("sounds/%s", ca_gag_sound_error))) {
         precache_sound(ca_gag_sound_error)
     }
 }
@@ -232,7 +232,7 @@ Create_CVars() {
 }
 
 public client_putinserver(id) {
-    if(is_user_bot(id) || is_user_hltv(id)) {
+    if (is_user_bot(id) || is_user_hltv(id)) {
         return
     }
 
@@ -259,7 +259,7 @@ public Gags_Thinker() {
         new expireAt = g_currentGags[id][gd_expireAt]
         new bool: hasGag = (expireAt != 0)
 
-        if(hasGag && expireAt < currentTime) {
+        if (hasGag && expireAt < currentTime) {
             Gag_Expired(id)
         }
     }
@@ -276,14 +276,14 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
 
     g_inEditMenu[id] = false
 
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return
     }
 
     new nameLen
     new GetPlayersFlags: flags = (GetPlayers_ExcludeHLTV | GetPlayers_ExcludeBots)
 
-    if(nickname[0] != EOS) {
+    if (nickname[0] != EOS) {
         flags |= (GetPlayers_MatchNameSubstring | GetPlayers_CaseInsensitive)
         nameLen = strlen(nickname)
     }
@@ -291,7 +291,7 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
     new players[MAX_PLAYERS], count
     get_players_ex(players, count, flags, nickname)
 
-    if(count == 0) {
+    if (count == 0) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
         return
@@ -301,24 +301,24 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
 
     static callback
 
-    if(!callback) {
+    if (!callback) {
         callback = menu_makecallback("MenuCallback_PlayersList")
     }
 
     for(new i; i < count; i++) {
         new target = players[i]
 
-        if(target == id) {
+        if (target == id) {
             continue
         }
 
         new name[MAX_NAME_LENGTH + 16]
         get_user_name(target, name, charsmax(name))
 
-        if(nameLen > 0) {
+        if (nameLen > 0) {
             new found = strfind(name, nickname, true)
 
-            if(found != -1) {
+            if (found != -1) {
                 replace_stringex(name, charsmax(name),
                     nickname, fmt("\\r%s\\w", nickname),
                     .caseSensitive = false
@@ -346,13 +346,13 @@ public MenuCallback_PlayersList(const id, const menu, const item) {
 
     new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
 
-    if(target == 0) {
+    if (target == 0) {
         return ITEM_DISABLED
     }
 
     new bool: hasImmunity = IsTargetHasImmunity(id, target)
 
-    if(hasImmunity) {
+    if (hasImmunity) {
         return ITEM_DISABLED
     }
 
@@ -360,7 +360,7 @@ public MenuCallback_PlayersList(const id, const menu, const item) {
 }
 
 public MenuHandler_PlayersList(const id, const menu, const item) {
-    if(item == MENU_EXIT || item < 0) {
+    if (item == MENU_EXIT || item < 0) {
         menu_destroy(menu)
         return PLUGIN_HANDLED
     }
@@ -372,7 +372,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
     new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
 
-    if(target == 0) {
+    if (target == 0) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -381,7 +381,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     }
 
     // Remove already gagged player
-    if(g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed) {
+    if (g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed) {
         GagData_Copy(g_adminTempData[id], g_currentGags[target])
 
         g_adminTempData[id][gd_target] = target
@@ -399,12 +399,12 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
 // Reason choose menu
 static MenuShow_SelectReason(const id) {
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return PLUGIN_HANDLED
     }
 
     new target = g_adminTempData[id][gd_target]
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -420,11 +420,11 @@ static MenuShow_SelectReason(const id) {
 
     new bool: hasReasonsTemplates = bool: (g_gagReasonsTemplates_size != 0)
 
-    if(ca_gag_own_reason_enabled == 1 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason) || !hasReasonsTemplates) {
+    if (ca_gag_own_reason_enabled == 1 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason) || !hasReasonsTemplates) {
         menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
     }
 
-    if(hasReasonsTemplates) {
+    if (hasReasonsTemplates) {
         for(new i; i < g_gagReasonsTemplates_size; i++) {
             new reason[reason_s]
             ArrayGetArray(g_gagReasonsTemplates, i, reason)
@@ -434,30 +434,30 @@ static MenuShow_SelectReason(const id) {
 
             new bool: reasonHasTime, bool: reasonHasFlags
 
-            if(reason[r_time] > 0) {
+            if (reason[r_time] > 0) {
                 reasonHasTime = true
             }
 
-            if(reason[r_flags] != gagFlag_Removed) {
+            if (reason[r_flags] != gagFlag_Removed) {
                 reasonHasFlags = true
             }
 
-            if(reasonHasTime) {
+            if (reasonHasTime) {
                 strcat(buffer, fmt(" (\\y%s", Get_TimeString_seconds(id, reason[r_time])), charsmax(buffer))
             }
 
-            if(reasonHasFlags) {
+            if (reasonHasFlags) {
                 strcat(buffer, fmt("%s%s", reasonHasTime ? ", " : " \\y(", bits_to_flags(reason[r_flags])), charsmax(buffer))
             }
 
-            if(reasonHasTime || reasonHasFlags) {
+            if (reasonHasTime || reasonHasFlags) {
                 strcat(buffer, "\\w)", charsmax(buffer))
             }
 
             menu_additem(menu, buffer,  fmt("%i", i))
         }
 
-        if(ca_gag_own_reason_enabled == 2 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason)) {
+        if (ca_gag_own_reason_enabled == 2 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason)) {
             menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
         }
     } else {
@@ -475,7 +475,7 @@ static MenuShow_SelectReason(const id) {
 }
 
 public MenuHandler_SelectReason(const id, const menu, const item) {
-    if(item == MENU_EXIT || item < 0) {
+    if (item == MENU_EXIT || item < 0) {
         // Return to prev menu
         MenuShow_PlayersList(id)
 
@@ -485,7 +485,7 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -499,7 +499,7 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
 
     new reasonID = strtol(g_itemInfo)
 
-    if(reasonID == ITEM_ENTER_GAG_REASON) {
+    if (reasonID == ITEM_ENTER_GAG_REASON) {
         client_cmd(id, "messagemode enter_GagReason")
         return PLUGIN_HANDLED
     }
@@ -511,17 +511,17 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
     g_adminTempData[id][gd_reason] = reason
 
     // Time not set
-    if(reason[r_time] == 0) {
+    if (reason[r_time] == 0) {
         MenuShow_SelectTime(id)
         return PLUGIN_HANDLED
     }
 
-    if(g_inEditMenu[id]) {
+    if (g_inEditMenu[id]) {
         MenuShow_EditGag(id)
         return PLUGIN_HANDLED
     }
 
-    if(reason[r_flags] == gagFlag_Removed) {
+    if (reason[r_flags] == gagFlag_Removed) {
         MenuShow_SelectFlags(id)
         return PLUGIN_HANDLED
     }
@@ -534,13 +534,13 @@ public MenuHandler_SelectReason(const id, const menu, const item) {
 
 // Time choose menu
 static MenuShow_SelectTime(const id) {
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return PLUGIN_HANDLED
     }
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -554,12 +554,12 @@ static MenuShow_SelectTime(const id) {
     new accessFlagsHigh     = read_flags(ca_gag_access_flags_high)
     new accessFlagsOwnTime  = read_flags(ca_gag_access_flags_own_time)
 
-    if(playerFlags & (accessFlagsHigh | accessFlagsOwnTime)) {
+    if (playerFlags & (accessFlagsHigh | accessFlagsOwnTime)) {
         menu_additem(menu, fmt("%L", id, "Gag_EnterTime"), fmt("%i", ITEM_ENTER_GAG_TIME))
         menu_addblank(menu, .slot = false)
     }
 
-    if(g_gagTimeTemplates_size) {
+    if (g_gagTimeTemplates_size) {
         for(new i; i < g_gagTimeTemplates_size; i++) {
             new time = ArrayGetCell(g_gagTimeTemplates, i)
 
@@ -580,7 +580,7 @@ static MenuShow_SelectTime(const id) {
 }
 
 public MenuHandler_SelectTime(const id, const menu, const item) {
-    if(item == MENU_EXIT || item < 0) {
+    if (item == MENU_EXIT || item < 0) {
         MenuShow_PlayersList(id)
 
         menu_destroy(menu)
@@ -589,7 +589,7 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -603,7 +603,7 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
 
     new timeID = strtol(g_itemInfo)
 
-    if(timeID == ITEM_ENTER_GAG_TIME) {
+    if (timeID == ITEM_ENTER_GAG_TIME) {
         client_cmd(id, "messagemode enter_GagTime")
         return PLUGIN_HANDLED
     }
@@ -611,7 +611,7 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
     new time = ArrayGetCell(g_gagTimeTemplates, timeID)
     g_adminTempData[id][gd_reason][r_time] = time
 
-    if(g_inEditMenu[id]) {
+    if (g_inEditMenu[id]) {
         MenuShow_EditGag(id)
         return PLUGIN_HANDLED
     }
@@ -622,13 +622,13 @@ public MenuHandler_SelectTime(const id, const menu, const item) {
 
 // Select flags menu
 static MenuShow_SelectFlags(const id) {
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return PLUGIN_HANDLED
     }
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -640,7 +640,7 @@ static MenuShow_SelectFlags(const id) {
 
     static callback
 
-    if(!callback) {
+    if (!callback) {
         callback = menu_makecallback("MenuCallback_SelectFlags")
     }
 
@@ -650,7 +650,7 @@ static MenuShow_SelectFlags(const id) {
         (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-"),
         fmt("%i", gagFlag_Say)
     )
-    if(!ca_gag_common_chat_block) {
+    if (!ca_gag_common_chat_block) {
         menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
             (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
             fmt("%i", gagFlag_SayTeam)
@@ -696,12 +696,12 @@ public MenuCallback_SelectFlags(const id, const menu, const item) {
     new bool: alreadyHasGag = (g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed)
     new bool: hasChanges = !GagData_IsEqual(g_currentGags[target], g_adminTempData[id])
 
-    if((itemIndex == ITEM_CONFIRM)) {
-        if(!isReadyToGag) {
+    if ((itemIndex == ITEM_CONFIRM)) {
+        if (!isReadyToGag) {
             return ITEM_DISABLED
         }
 
-        if(alreadyHasGag && !hasChanges) {
+        if (alreadyHasGag && !hasChanges) {
             return ITEM_DISABLED
         }
     }
@@ -710,7 +710,7 @@ public MenuCallback_SelectFlags(const id, const menu, const item) {
 }
 
 public MenuHandler_SelectFlags(const id, const menu, const item) {
-    if(item == MENU_EXIT || item < 0) {
+    if (item == MENU_EXIT || item < 0) {
         MenuShow_PlayersList(id)
 
         menu_destroy(menu)
@@ -719,7 +719,7 @@ public MenuHandler_SelectFlags(const id, const menu, const item) {
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -733,7 +733,7 @@ public MenuHandler_SelectFlags(const id, const menu, const item) {
 
     new itemIndex = strtol(g_itemInfo)
 
-    switch(itemIndex) {
+    switch (itemIndex) {
         case gagFlag_Say: {
             g_adminTempData[id][gd_reason][r_flags] ^= (!ca_gag_common_chat_block ? gagFlag_Say : (gagFlag_Say | gagFlag_SayTeam))
         }
@@ -758,7 +758,7 @@ public MenuHandler_SelectFlags(const id, const menu, const item) {
 
 // Show gag menu
 static MenuShow_ShowGag(const id) {
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return
     }
 
@@ -766,7 +766,7 @@ static MenuShow_ShowGag(const id) {
 
     static callback
 
-    if(!callback) {
+    if (!callback) {
         callback = menu_makecallback("MenuCallback_ShowGag")
     }
 
@@ -792,7 +792,7 @@ static MenuShow_ShowGag(const id) {
     )
 
     new hoursLeft = (g_adminTempData[id][gd_expireAt] - get_systime()) / SECONDS_IN_HOUR
-    if(hoursLeft > 5) {
+    if (hoursLeft > 5) {
         new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_adminTempData[id][gd_expireAt])
         menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Expire",
                 timeStr
@@ -819,13 +819,13 @@ static MenuShow_ShowGag(const id) {
 }
 
 public MenuCallback_ShowGag(const id, const menu, const item) {
-    if(!ca_gag_remove_only_own_gag) {
+    if (!ca_gag_remove_only_own_gag) {
         return ITEM_ENABLED
     }
 
     new flags = get_user_flags(id)
 
-    if(flags & read_flags(ca_gag_access_flags_high)) {
+    if (flags & read_flags(ca_gag_access_flags_high)) {
         return ITEM_ENABLED
     }
 
@@ -834,7 +834,7 @@ public MenuCallback_ShowGag(const id, const menu, const item) {
     new authID[MAX_AUTHID_LENGTH]; get_user_authid(id, authID, charsmax(authID))
     new bool: isOwnGag = (strcmp(authID, g_itemInfo) == 0)
 
-    if(isOwnGag) {
+    if (isOwnGag) {
         return ITEM_ENABLED
     }
 
@@ -846,14 +846,14 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
 
     menu_destroy(menu)
 
-    if(item == MENU_EXIT || item < 0) {
+    if (item == MENU_EXIT || item < 0) {
         MenuShow_PlayersList(id)
         return PLUGIN_HANDLED
     }
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -862,7 +862,7 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
     }
 
     // Remove player gag and exit from menu
-    if(item == menu_ComfirmRemove) {
+    if (item == menu_ComfirmRemove) {
         Gag_Remove(id, target)
 
         MenuShow_PlayersList(id)
@@ -870,7 +870,7 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
     }
 
     // Edit player gag properties
-    if(item == menu_EditGagProperties) {
+    if (item == menu_EditGagProperties) {
         new gagData[gagData_s]; {
             // Copy already used gag data
             GagData_Copy(gagData, g_currentGags[target])
@@ -893,13 +893,13 @@ public MenuHandler_ShowGag(const id, const menu, const item) {
 
 // Edit gag menu
 static MenuShow_EditGag(const id) {
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return
     }
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -911,7 +911,7 @@ static MenuShow_EditGag(const id) {
 
     static callback
 
-    if(!callback) {
+    if (!callback) {
         callback = menu_makecallback("MenuCallback_EditGag")
     }
 
@@ -923,7 +923,7 @@ static MenuShow_EditGag(const id) {
         fmt("%i", gagFlag_Say)
     )
 
-    if(!ca_gag_common_chat_block) {
+    if (!ca_gag_common_chat_block) {
         menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
                 (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"
             ),
@@ -956,7 +956,7 @@ static MenuShow_EditGag(const id) {
     menu_addblank2(menu)
     menu_addblank2(menu)
 
-    if(ca_gag_common_chat_block) {
+    if (ca_gag_common_chat_block) {
         menu_addblank2(menu)
     }
 
@@ -976,20 +976,20 @@ public MenuCallback_EditGag(const id, const menu, const item) {
 
     new itemIndex = strtol(g_itemInfo)
 
-    if(itemIndex != ITEM_CONFIRM) {
+    if (itemIndex != ITEM_CONFIRM) {
         return ITEM_ENABLED
     }
 
     new bool: isReadyToGag = (g_adminTempData[id][gd_reason][r_flags] != gagFlag_Removed)
 
-    if(!isReadyToGag) {
+    if (!isReadyToGag) {
         return ITEM_DISABLED
     }
 
     new target = g_adminTempData[id][gd_target]
     new bool: hasChanges = !GagData_IsEqual(g_currentGags[target], g_adminTempData[id])
 
-    if(!hasChanges) {
+    if (!hasChanges) {
         return ITEM_DISABLED
     }
 
@@ -997,7 +997,7 @@ public MenuCallback_EditGag(const id, const menu, const item) {
 }
 
 public MenuHandler_EditGag(const id, const menu, const item) {
-    if(item == MENU_EXIT || item < 0) {
+    if (item == MENU_EXIT || item < 0) {
         MenuShow_PlayersList(id)
 
         menu_destroy(menu)
@@ -1005,7 +1005,7 @@ public MenuHandler_EditGag(const id, const menu, const item) {
     }
 
     new target = g_adminTempData[id][gd_target]
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -1019,7 +1019,7 @@ public MenuHandler_EditGag(const id, const menu, const item) {
 
     new itemIndex = strtol(g_itemInfo)
 
-    switch(itemIndex) {
+    switch (itemIndex) {
         case gagFlag_Say:      g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Say
         case gagFlag_SayTeam:  g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_SayTeam
         case gagFlag_Voice:    g_adminTempData[id][gd_reason][r_flags] ^= gagFlag_Voice
@@ -1064,11 +1064,11 @@ public MenuHandler_EditGag(const id, const menu, const item) {
  * @section user cmds handling
  */
 public ClCmd_Gag(const id, const level, const cid) {
-    if(!cmd_access(id, level, cid, 1)) {
+    if (!cmd_access(id, level, cid, 1)) {
         return PLUGIN_HANDLED
     }
 
-    if(get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
+    if (get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_default, "%L %L", id, "Gag_prefix", id, "Gag_NotEnoughPlayers")
         return PLUGIN_HANDLED
@@ -1079,13 +1079,13 @@ public ClCmd_Gag(const id, const level, const cid) {
 }
 
 public ClCmd_EnterGagReason(const id, const level, const cid) {
-    if(!cmd_access(id, level, cid, 1)) {
+    if (!cmd_access(id, level, cid, 1)) {
         return PLUGIN_HANDLED
     }
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -1096,7 +1096,7 @@ public ClCmd_EnterGagReason(const id, const level, const cid) {
     static customReasonName[128]
     read_argv(1, customReasonName, charsmax(customReasonName))
 
-    if(!customReasonName[0]) {
+    if (!customReasonName[0]) {
         MenuShow_SelectReason(id)
         return PLUGIN_HANDLED
     }
@@ -1110,17 +1110,17 @@ public ClCmd_EnterGagReason(const id, const level, const cid) {
 }
 
 public ClCmd_EnterGagTime(const id, const level, const cid) {
-    if(!cmd_access(id, level, cid, 1)) {
+    if (!cmd_access(id, level, cid, 1)) {
         return PLUGIN_HANDLED
     }
 
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return PLUGIN_HANDLED
     }
 
     new target = g_adminTempData[id][gd_target]
 
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_red, "%L %L", id, "Gag_prefix", id, "Gag_PlayerNotConnected")
 
@@ -1133,7 +1133,7 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
 
     new time = strtol(timeStr) * SECONDS_IN_MINUTE
 
-    if(time <= 0) {
+    if (time <= 0) {
         client_print_color(id, print_team_red, "%L %L (%s)!", id, "Gag_prefix", id, "Gag_NotValidTimeEntered", timeStr)
 
         MenuShow_SelectTime(id)
@@ -1144,7 +1144,7 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
 
     g_adminTempData[id][gd_reason][r_time] = time
 
-    if(g_inEditMenu[id]) {
+    if (g_inEditMenu[id]) {
         MenuShow_EditGag(id)
 
         return PLUGIN_HANDLED
@@ -1157,13 +1157,13 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
 public ConCmd_amx_gag(const id, const level, const cid) {
     enum amx_gag_s { /* arg_cmd, */ arg_player = 1, arg_reason, arg_time, arg_flags }
 
-    if(!cmd_access(id, level, cid, 1)) {
+    if (!cmd_access(id, level, cid, 1)) {
         return PLUGIN_HANDLED
     }
 
     new argc = read_argc()
 
-    if(argc == 1) {
+    if (argc == 1) {
         console_print(id, "\t Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>\n")
 
         return PLUGIN_HANDLED
@@ -1176,13 +1176,13 @@ public ConCmd_amx_gag(const id, const level, const cid) {
 
     new target = FindPlayerByTarget(args[arg_player])
 
-    if(!target || target == id) {
+    if (!target || target == id) {
         console_print(id, "Can't find player by arg=`%s`", args[arg_player])
 
         return PLUGIN_HANDLED
     }
 
-    if(g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed) {
+    if (g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed) {
         console_print(id, "Player '%n' has already gagged.", target)
 
         return PLUGIN_HANDLED
@@ -1198,19 +1198,19 @@ public ConCmd_amx_gag(const id, const level, const cid) {
 
     copy(g_adminTempData[id][gd_reason][r_name], charsmax(g_adminTempData[][r_name]), "Not set")
 
-    if(args[arg_reason][0] != EOS) {
+    if (args[arg_reason][0] != EOS) {
         copy(g_adminTempData[id][gd_reason][r_name], charsmax(g_adminTempData[][r_name]), args[arg_reason])
     }
 
-    if(args[arg_time][0] != EOS) {
+    if (args[arg_time][0] != EOS) {
         new seconds = strtol(args[arg_time]) * SECONDS_IN_MINUTE
 
-        if(seconds > 0) {
+        if (seconds > 0) {
             g_adminTempData[id][gd_reason][r_time] = seconds
         }
     }
 
-    if(args[arg_flags][0] != EOS) {
+    if (args[arg_flags][0] != EOS) {
         g_adminTempData[id][gd_reason][r_flags] = flags_to_bit(args[arg_flags][0])
     }
 
@@ -1222,7 +1222,7 @@ public SrvCmd_AddReason() {
     enum any: args_s { arg_cmd, arg_reason, arg_flags, arg_time }
 
     new argCount = read_argc()
-    if(argCount < 2 || argCount > 4) {
+    if (argCount < 2 || argCount > 4) {
         server_print("\tUsage: ca_gag_add_reason <reason> [flags] [time]")
         return
     }
@@ -1255,7 +1255,7 @@ public SrvCmd_AddWhitelistCmd() {
     enum { arg_chat_cmd = 1 }
 
     new argCount = read_argc()
-    if(argCount != 2) {
+    if (argCount != 2) {
         server_print("\tUsage: ca_gag_add_chat_whitelist_cmd <cmd>")
         return
     }
@@ -1270,7 +1270,7 @@ public SrvCmd_AddWhitelistCmd() {
 }
 
 public SrvCmd_ShowTemplates() {
-    if(!g_gagReasonsTemplates_size) {
+    if (!g_gagReasonsTemplates_size) {
         CA_Log(logLevel_Warning, "\t NO REASONS FOUNDED!")
         return PLUGIN_HANDLED
     }
@@ -1299,7 +1299,7 @@ static Message_ChatBlocked(const target) {
     new secondsLeft = g_currentGags[target][gd_expireAt] - get_systime()
     new hoursLeft = secondsLeft / SECONDS_IN_HOUR
 
-    if(hoursLeft > 5) {
+    if (hoursLeft > 5) {
         new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_currentGags[target][gd_expireAt])
         client_print_color(target, print_team_red, "%L %L %L %s", target, "Gag_prefix", target, "Gag_NotifyPlayer_BlockedChat", target, "Gag_MenuItem_Expire", timeStr)
     } else {
@@ -1314,7 +1314,7 @@ static bool: IsWhitelistCmd(const message[]) {
     for(new i; i < g_chatWhitelistCmds_size; i++) {
         ArrayGetArray(g_chatWhitelistCmds, i, whitelistCmd)
 
-        if(strcmp(message, whitelistCmd) == 0) {
+        if (strcmp(message, whitelistCmd) == 0) {
             return true
         }
     }
@@ -1332,7 +1332,7 @@ static bool: IsWhitelistCmd(const message[]) {
 public CA_Client_Voice(const listener, const sender) {
     new bool: hasBlock = (g_currentGags[sender][gd_reason][r_flags] & gagFlag_Voice)
 
-    if(!hasBlock) {
+    if (!hasBlock) {
         return CA_CONTINUE
     }
 
@@ -1342,21 +1342,21 @@ public CA_Client_Voice(const listener, const sender) {
 }
 
 public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
-    if(CmdRouter(id, message))
+    if (CmdRouter(id, message))
         return CA_CONTINUE
 
     new bool: hasBlock
-    if(isTeamMessage) {
+    if (isTeamMessage) {
         hasBlock = bool: (g_currentGags[id][gd_reason][r_flags] & (ca_gag_common_chat_block ? gagFlag_Say : gagFlag_SayTeam))
     } else {
         hasBlock = bool: (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
     }
 
-    if(!hasBlock) {
+    if (!hasBlock) {
         return CA_CONTINUE
     }
 
-    if(IsWhitelistCmd(message)) {
+    if (IsWhitelistCmd(message)) {
         return CA_CONTINUE
     }
 
@@ -1367,13 +1367,13 @@ public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
 }
 
 public CA_Client_ChangeName(const id, const newName[]) {
-    if(!ca_gag_block_nickname_change) {
+    if (!ca_gag_block_nickname_change) {
         return CA_CONTINUE
     }
 
     new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
 
-    if(!hasBlock) {
+    if (!hasBlock) {
         return CA_CONTINUE
     }
 
@@ -1383,7 +1383,7 @@ public CA_Client_ChangeName(const id, const newName[]) {
 public ClCmd_adminSay(const id) {
     new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
 
-    if(!hasBlock || !ca_gag_block_admin_chat) {
+    if (!hasBlock || !ca_gag_block_admin_chat) {
         return CA_CONTINUE
     }
 
@@ -1412,7 +1412,7 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
 
     new admin = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), adminAuthID)
 
-    if(is_user_connected(admin)) {
+    if (is_user_connected(admin)) {
         UTIL_SendAudio(admin, ca_gag_sound_ok)
     }
 
@@ -1435,7 +1435,7 @@ public CA_Storage_Loaded(const name[], const authID[], const IP[], const reason[
 
     new target = find_player_ex((FindPlayer_MatchAuthId | FindPlayer_ExcludeBots), authID)
 
-    if(!target) {
+    if (!target) {
         return
     }
 
@@ -1467,12 +1467,12 @@ public CA_Storage_Removed( ) {
 
 
 static LoadConfig() {
-    if(ArraySize(g_gagReasonsTemplates) > 0) {
+    if (ArraySize(g_gagReasonsTemplates) > 0) {
         ArrayClear(g_gagReasonsTemplates)
         g_gagReasonsTemplates_size = 0
     }
 
-    if(ArraySize(g_chatWhitelistCmds) > 0) {
+    if (ArraySize(g_chatWhitelistCmds) > 0) {
         ArrayClear(g_chatWhitelistCmds)
         g_chatWhitelistCmds_size = 0
     }
@@ -1493,14 +1493,14 @@ static LoadConfig() {
 static ParseTimes() {
     new buffer[128]; get_cvar_string("ca_gag_times", buffer, charsmax(buffer))
 
-    if(strlen(buffer) > 0) {
+    if (strlen(buffer) > 0) {
         const MAX_TIMES_COUNT = 10
 
         new times[MAX_TIMES_COUNT][16]
 
         new count = explode_string(buffer, ",", times, sizeof(times), charsmax(times[]))
 
-        if(g_gagTimeTemplates_size) {
+        if (g_gagTimeTemplates_size) {
             ArrayClear(g_gagTimeTemplates)
         }
 
@@ -1525,7 +1525,7 @@ static Get_TimeString_seconds(const id, const seconds) {
     new timeStr[32]
     get_time_length(id, seconds, timeunit_seconds, timeStr, charsmax(timeStr))
 
-    if(timeStr[0] == EOS) {
+    if (timeStr[0] == EOS) {
         formatex(timeStr, charsmax(timeStr), "%L", id, "Gag_NotSet")
     }
 
@@ -1535,13 +1535,13 @@ static Get_TimeString_seconds(const id, const seconds) {
 static Get_GagString_reason(const id, const target) {
     new buffer[MAX_REASON_LEN]
 
-    if(id != LANG_PLAYER) {
+    if (id != LANG_PLAYER) {
         copy(buffer, charsmax(buffer), g_adminTempData[id][gd_reason][r_name])
     } else {
         copy(buffer, charsmax(buffer), g_currentGags[target][gd_reason][r_name])
     }
 
-    if(buffer[0] == EOS) {
+    if (buffer[0] == EOS) {
         formatex(buffer, charsmax(buffer), "%L", id, "Gag_NotSet")
     }
 
@@ -1551,9 +1551,9 @@ static Get_GagString_reason(const id, const target) {
 static Get_PlayerPostfix(const id, const target, const hasImmunity) {
     new postfix[32]
 
-    if(hasImmunity) {
+    if (hasImmunity) {
         formatex(postfix, charsmax(postfix), " [\\r%L\\d]", id, "Gag_Immunity")
-    } else if(g_currentGags[target][gd_reason][r_flags]) {
+    } else if (g_currentGags[target][gd_reason][r_flags]) {
         formatex(postfix, charsmax(postfix), " [\\y%L\\w]", id, "Gag_Gagged")
     }
 
@@ -1569,17 +1569,17 @@ static bool: IsTargetHasImmunity(const id, const target) {
     new targetFlags           = get_user_flags(target)
 
     // main admin can gag everyone
-    if(userFlags & accessFlagsHigh) {
+    if (userFlags & accessFlagsHigh) {
         return false
     }
 
     // main admin can't be gagged by admins
-    if(targetFlags & accessFlagsHigh) {
+    if (targetFlags & accessFlagsHigh) {
         return true
     }
 
     // target has immunity or admin flags
-    if(targetFlags & (accessFlags|accessFlagsImmunity)) {
+    if (targetFlags & (accessFlags|accessFlagsImmunity)) {
         return true
     }
 
@@ -1594,16 +1594,16 @@ static Get_GagFlags_Names(gag_flags_s: flags) {
         "Chat", "Team chat", "Voice"
     }
 
-    if(ca_gag_common_chat_block && (flags & gagFlag_SayTeam))
+    if (ca_gag_common_chat_block && (flags & gagFlag_SayTeam))
         flags ^= gagFlag_SayTeam
 
     for(new i; i < sizeof(GAG_FLAGS_STR); i++) {
-        if(flags & gag_flags_s: (1 << i)) {
+        if (flags & gag_flags_s: (1 << i)) {
             strcat(buffer, fmt("%s + ", GAG_FLAGS_STR[i]), charsmax(buffer))
         }
     }
 
-    if(buffer[0] != EOS) {
+    if (buffer[0] != EOS) {
         buffer[strlen(buffer) - 3] = EOS
     }
 
@@ -1641,7 +1641,7 @@ static bool: Gag_Save(const id, const target, const time, const flags, const exp
         gag[gd_expireAt]
     )
 
-    if(g_ret == CA_SUPERCEDE) {
+    if (g_ret == CA_SUPERCEDE) {
         return false
     }
 
@@ -1659,7 +1659,7 @@ static bool: Gag_Save(const id, const target, const time, const flags, const exp
 }
 
 static bool: Gag_Remove(const id, const target) {
-    if(g_adminTempData[id][gd_reason][r_flags] != gagFlag_Removed) {
+    if (g_adminTempData[id][gd_reason][r_flags] != gagFlag_Removed) {
         ExecuteForward(g_fwd_gag_removed, g_ret,
             target,
             g_currentGags[target][gd_reason][r_name],
@@ -1667,7 +1667,7 @@ static bool: Gag_Remove(const id, const target) {
             g_currentGags[target][gd_reason][r_flags]
         )
 
-        if(g_ret == CA_SUPERCEDE) {
+        if (g_ret == CA_SUPERCEDE) {
             return false
         }
 
@@ -1693,20 +1693,20 @@ static Gag_Expired(const id) {
 }
 
 static bool: CmdRouter(const player, const message[]) {
-    if(!(get_user_flags(player) & (read_flags(ca_gag_access_flags) | read_flags(ca_gag_access_flags_high))))
+    if (!(get_user_flags(player) & (read_flags(ca_gag_access_flags) | read_flags(ca_gag_access_flags_high))))
         return false
 
     new cmd[32], token[32]
     strtok2(message[1], cmd, charsmax(cmd), token, charsmax(token), .trim = true)
 
-    if(strncmp(cmd, g_gagCmd, charsmax(g_gagCmd), true) == 0) {
+    if (strncmp(cmd, g_gagCmd, charsmax(g_gagCmd), true) == 0) {
         MenuShow_PlayersList(player, token)
         return true
     }
 
-    if(strncmp(cmd, g_unGagCmd, charsmax(g_unGagCmd), true) == 0) {
+    if (strncmp(cmd, g_unGagCmd, charsmax(g_unGagCmd), true) == 0) {
         new targetUserID = strtol(token)
-        if(targetUserID == 0)
+        if (targetUserID == 0)
             return false
 
         UnGag_ByUserID(player, targetUserID)
@@ -1718,13 +1718,13 @@ static bool: CmdRouter(const player, const message[]) {
 
 static UnGag_ByUserID(const admin, const targetUserID) {
     new target = find_player_ex(FindPlayer_MatchUserId | FindPlayer_ExcludeBots, targetUserID)
-    if(!is_user_connected(target)) {
+    if (!is_user_connected(target)) {
             client_print_color(admin, print_team_red, "%L %L", admin, "Gag_prefix", admin, "Gag_PlayerNotConnected")
             return
         }
 
     new bool: hasBlock = g_currentGags[target][gd_reason][r_flags] != gagFlag_Removed
-    if(!hasBlock) {
+    if (!hasBlock) {
         client_print_color(admin, print_team_red, "%L %L", admin, "Gag_prefix", admin, "Gag_PlayerExpiredGag", target)
         return
     }
@@ -1776,7 +1776,7 @@ public bool: native_ca_get_user_gag(const plugin_id, const argc) {
     new target = get_param(arg_index)
     new gag_flags_s: flags = g_currentGags[target][gd_reason][r_flags]
 
-    if(!flags) {
+    if (!flags) {
         return false
     }
 
@@ -1802,7 +1802,7 @@ public bool: native_ca_remove_user_gag(const plugin_id, const argc) {
     new target = get_param(arg_target)
     new gag_flags_s: flags = g_currentGags[target][gd_reason][r_flags]
 
-    if(flags == gagFlag_Removed) {
+    if (flags == gagFlag_Removed) {
         return false
     }
 

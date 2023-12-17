@@ -93,8 +93,8 @@ public _OnConfigsExecuted() {
 }
 
 CheckAutoDelete() {
-    if(ca_log_autodelete_time > 0) {
-        if(dir_exists(g_logsPath)) {
+    if (ca_log_autodelete_time > 0) {
+        if (dir_exists(g_logsPath)) {
             new logFile[PLATFORM_MAX_PATH]
             new dirHandle
             new subDirectory[PLATFORM_MAX_PATH]
@@ -104,12 +104,12 @@ CheckAutoDelete() {
 
             dirHandle = open_dir(g_logsPath, logFile, charsmax(logFile))
 
-            if(dirHandle) {
-                while(next_file(dirHandle, logFile, charsmax(logFile))) {
-                    if(logFile[0] == '.')
+            if (dirHandle) {
+                while (next_file(dirHandle, logFile, charsmax(logFile))) {
+                    if (logFile[0] == '.')
                         continue
 
-                    if(containi(logFile, ".log") == -1) {
+                    if (containi(logFile, ".log") == -1) {
                         formatex(subDirectory, charsmax(subDirectory), "%s/%s", g_logsPath, logFile)
 
                         ReadFolder(deleteTime, subDirectory)
@@ -128,23 +128,23 @@ ReadFolder(deleteTime, logPath[]) {
     new dirHandle = open_dir(logPath, logFile, charsmax(logFile))
     new fileTime
 
-    if(dirHandle) {
+    if (dirHandle) {
         do 
         {
-            if(logFile[0] == '.') {
+            if (logFile[0] == '.') {
                 continue
             }
 
-            if(containi(logFile, ".log") != -1) {
+            if (containi(logFile, ".log") != -1) {
                 fileTime = 0
                 format(logFile, charsmax(logFile), "%s/%s", logPath, logFile)
 
                 fileTime = GetFileTime(logFile, FileTime_Created)
-                if(fileTime < deleteTime) {
+                if (fileTime < deleteTime) {
                     unlink(logFile)
                 }
             }
-        } while(next_file(dirHandle, logFile, charsmax(logFile)))
+        } while (next_file(dirHandle, logFile, charsmax(logFile)))
     }
     close_dir(dirHandle)
 }
@@ -219,17 +219,17 @@ public ClCmd_Say(const id) {
 }
 
 public Voice_SetClientListening_Pre(const receiver, const sender, bool: canListen) {
-    if(receiver == sender)
+    if (receiver == sender)
         return FMRES_IGNORED
 
-    if(!g_PlayerModEnable[receiver])
+    if (!g_PlayerModEnable[receiver])
         return FMRES_IGNORED
 
     if (!is_user_connected(receiver) || !is_user_connected(sender))
         return FMRES_IGNORED
 
     ExecuteForward(g_fwdClientVoice, g_retVal, receiver, sender)
-    if(g_retVal != CA_SUPERCEDE)
+    if (g_retVal != CA_SUPERCEDE)
         return FMRES_IGNORED
 
     // Block voice
@@ -244,11 +244,11 @@ public ClientUserInfoChanged_Pre(const player, const infobuffer) {
     new newName[32]
     engfunc(EngFunc_InfoKeyValue, infobuffer, "name", newName, charsmax(newName))
 
-    if(strcmp(currentName, newName) == 0)
+    if (strcmp(currentName, newName) == 0)
         return
 
     ExecuteForward(g_fwdClientChangeName, g_retVal, player, newName)
-    if(g_retVal != CA_SUPERCEDE)
+    if (g_retVal != CA_SUPERCEDE)
         return
 
     // Change back name
@@ -256,7 +256,7 @@ public ClientUserInfoChanged_Pre(const player, const infobuffer) {
 }
 
 public ClCmd_VModEnable(const id) {
-    if(read_argc() < 2) {
+    if (read_argc() < 2) {
         return
     }
 
@@ -265,7 +265,7 @@ public ClCmd_VModEnable(const id) {
 }
 
 public ClCmd_vban(const id) {
-    if(read_argc() < 2) {
+    if (read_argc() < 2) {
         return
     }
 
@@ -278,7 +278,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
 
     new logLevel_s: level = logLevel_s: get_param(arg_level)
 
-    if(ca_log_level < level) {
+    if (ca_log_level < level) {
         return false
     }
 
@@ -287,7 +287,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
 
     new logsFile[PLATFORM_MAX_PATH]
 
-    if(ca_log_type > _Default)
+    if (ca_log_type > _Default)
     {
         new pluginName[32]
         get_plugin(plugin_id, pluginName, charsmax(pluginName))
@@ -297,7 +297,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
         new logsPath[PLATFORM_MAX_PATH]
         formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
 
-        if(!dir_exists(logsPath)) {
+        if (!dir_exists(logsPath)) {
             mkdir(logsPath)
         }
 
@@ -307,7 +307,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
         formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
     }
 
-    switch(ca_log_type) {
+    switch (ca_log_type) {
         case _LogToDir:         log_to_file(logsFile, msg)
         case _Default:          log_amx(msg)
         case _LogToDirSilent:   log_to_file_ex(logsFile, msg)
@@ -322,7 +322,7 @@ public bool: native_CA_PlayerHasBlockedPlayer(const plugin_id, const argc) {
     new receiver  = get_param(arg_receiver)
     new sender    = get_param(arg_sender)
 
-    if(CVoiceGameMgr__PlayerHasBlockedPlayer(receiver, sender)) {
+    if (CVoiceGameMgr__PlayerHasBlockedPlayer(receiver, sender)) {
         return true
     }
 
@@ -333,7 +333,7 @@ static GetLogsFilePath(buffer[], len = PLATFORM_MAX_PATH, const dir[] = "ChatAdd
     get_localinfo("amxx_logs", buffer, len)
     strcat(buffer, fmt("/%s", dir), len)
 
-    if(!dir_exists(buffer) && mkdir(buffer) == -1) {
+    if (!dir_exists(buffer) && mkdir(buffer) == -1) {
         set_fail_state("[Core API] Can't create folder! (%s)", buffer)
     }
 }
@@ -341,7 +341,7 @@ static GetLogsFilePath(buffer[], len = PLATFORM_MAX_PATH, const dir[] = "ChatAdd
 static bool: CVoiceGameMgr__PlayerHasBlockedPlayer(const receiver, const sender) {
     #define CanPlayerHearPlayer(%0,%1)  ( ~g_BanMasks[%0] & ( 1 << (%1 - 1) ) )
 
-    if(receiver <= 0 || receiver > MaxClients || sender <= 0 || sender > MaxClients) {
+    if (receiver <= 0 || receiver > MaxClients || sender <= 0 || sender > MaxClients) {
         return false
     }
 
@@ -349,13 +349,13 @@ static bool: CVoiceGameMgr__PlayerHasBlockedPlayer(const receiver, const sender)
 }
 
 static CheckUpdate() {
-    if(!ca_update_notify)
+    if (!ca_update_notify)
         return
 
-    if(strcmp(CA_VERSION, "CA_VERSION") == 0 || contain(CA_VERSION, ".") == -1) // ignore custom builds
+    if (strcmp(CA_VERSION, "CA_VERSION") == 0 || contain(CA_VERSION, ".") == -1) // ignore custom builds
         return
 
-    if(is_module_loaded("grip") == -1) {
+    if (is_module_loaded("grip") == -1) {
         CA_Log(logLevel_Warning, "The `GRip` module is not loaded! The new version cannot be verified.")
         CA_Log(logLevel_Warning, "Please install GRip: `https://github.com/In-line/grip` or disable update checks (`ca_update_notify `0`).")
 
@@ -385,7 +385,7 @@ static RequestNewVersion(const link[]) {
     new response[8192]
     grip_get_response_body_string(response, charsmax(response))
 
-    if(contain(response, "tag_name") == -1) {
+    if (contain(response, "tag_name") == -1) {
         CA_Log(logLevel_Warning, " > Wrong response! (don't contain `tag_name`). res=`%s`", response)
         return
     }
@@ -393,7 +393,7 @@ static RequestNewVersion(const link[]) {
     static errorBuffer[1024]
     new GripJSONValue: json = grip_json_parse_string(response, errorBuffer, charsmax(errorBuffer))
 
-    if(json == Invalid_GripJSONValue) {
+    if (json == Invalid_GripJSONValue) {
         CA_Log(logLevel_Warning, " > Can't parse response JSON! (error=`%s`)", errorBuffer)
         goto END
     }
@@ -401,7 +401,7 @@ static RequestNewVersion(const link[]) {
     new tag_name[32]
     grip_json_object_get_string(json, "tag_name", tag_name, charsmax(tag_name))
 
-    if(CmpVersions(CA_VERSION, tag_name) >= 0)
+    if (CmpVersions(CA_VERSION, tag_name) >= 0)
         goto END
 
     new html_url[256]
@@ -437,7 +437,7 @@ static stock CmpVersions(const a[], const b[]) {
 
     for(new i, l = min(countA, countB); i < l; i++) {
         new diff = strtol(segmentsA[i]) - strtol(segmentsB[i])
-        if(diff)
+        if (diff)
             return diff
     }
 
@@ -452,25 +452,25 @@ stock log_to_file_ex(const filePath[], message[]) {
     format_time(date, charsmax(date), "%m/%d/%Y - %H:%M:%S")
     static modName[15], amxVersion[15]
 
-    if(!modName[0]) {
+    if (!modName[0]) {
         get_modname(modName, charsmax(modName))
     }
 
-    if(!amxVersion[0]) {
+    if (!amxVersion[0]) {
         get_amxx_verstring(amxVersion, charsmax(amxVersion))
     }
 
-    if((file = fopen(filePath, "r"))) {
+    if ((file = fopen(filePath, "r"))) {
         firstTime = false
         fclose(file)
     }
 
-    if(!(file = fopen(filePath, "at"))) {
+    if (!(file = fopen(filePath, "at"))) {
         log_error(AMX_ERR_GENERAL, "Can't open \"%s\" file for writing.", filePath)
         return PLUGIN_CONTINUE
     }
 
-    if(firstTime) {
+    if (firstTime) {
         fprintf(file, "L %s: Log file started (file \"%s\") (game \"%s\") (amx \"%s\")\n", date, filePath, modName, amxVersion)
     }
 

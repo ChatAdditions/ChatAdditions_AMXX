@@ -65,11 +65,11 @@ public plugin_init() {
 
 
 public ClCmd_Mute(const id) {
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return PLUGIN_CONTINUE
     }
 
-    if(get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
+    if (get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
         client_print_color(id, print_team_default, "%L %L", id, "Mute_prefix", id, "Mute_NotEnoughPlayers")
         return PLUGIN_HANDLED
     }
@@ -80,7 +80,7 @@ public ClCmd_Mute(const id) {
 }
 
 static MenuShow_PlayersList(const id) {
-    if(!is_user_connected(id)) {
+    if (!is_user_connected(id)) {
         return
     }
 
@@ -88,14 +88,14 @@ static MenuShow_PlayersList(const id) {
 
     static callback
 
-    if(!callback) {
+    if (!callback) {
         callback = menu_makecallback("MenuCallback_PlayersList")
     }
 
     new players[MAX_PLAYERS], count
     get_players_ex(players, count, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV))
 
-    if(count < 2) {
+    if (count < 2) {
         menu_additem(menu, fmt("\\r %L", id, "Mute_NotEnoughPlayers"), fmt("%i", ITEM_NOT_ENOUTH_PLAYERS), .callback = callback)
     } else {
         menu_additem(menu, fmt("\\y %L %s\n", id, "Mute_MuteAll", g_globalMute[id] ? "\\w[ \\r+\\w ]" : ""), fmt("%i", ITEM_MUTE_ALL))
@@ -104,17 +104,17 @@ static MenuShow_PlayersList(const id) {
         for(new i; i < count; i++) {
             new target = players[i]
 
-            if(target == id) {
+            if (target == id) {
                 continue
             }
 
             get_user_name(target, name, charsmax(name))
 
-            if(g_playersMute[id][target] || CA_PlayerHasBlockedPlayer(id, target)) {
+            if (g_playersMute[id][target] || CA_PlayerHasBlockedPlayer(id, target)) {
                 strcat(name, " \\d[ \\r+\\d ]", charsmax(name))
             }
 
-            if(g_globalMute[target] || g_playersMute[target][id] || CA_PlayerHasBlockedPlayer(target, id)) {
+            if (g_globalMute[target] || g_playersMute[target][id] || CA_PlayerHasBlockedPlayer(target, id)) {
                 strcat(name, fmt(" \\d(\\y%L\\d)", id, "Mute_PlayerMutedYou"), charsmax(name))
             }
 
@@ -134,18 +134,18 @@ public MenuCallback_PlayersList(const id, const menu, const item) {
 
     new userID = strtol(g_itemInfo)
 
-    if(userID == ITEM_NOT_ENOUTH_PLAYERS) {
+    if (userID == ITEM_NOT_ENOUTH_PLAYERS) {
         return ITEM_DISABLED
     }
 
     // Disable all players in menu when local user muted all
-    if(userID != ITEM_MUTE_ALL && g_globalMute[id]) {
+    if (userID != ITEM_MUTE_ALL && g_globalMute[id]) {
         return ITEM_DISABLED
     }
 
     new target = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
 
-    if(CA_PlayerHasBlockedPlayer(id, target)) {
+    if (CA_PlayerHasBlockedPlayer(id, target)) {
         return ITEM_DISABLED
     }
 
@@ -153,7 +153,7 @@ public MenuCallback_PlayersList(const id, const menu, const item) {
 }
 
 public MenuHandler_PlayersList(const id, const menu, const item) {
-    if(item == MENU_EXIT || item < 0) {
+    if (item == MENU_EXIT || item < 0) {
         menu_destroy(menu)
         return PLUGIN_HANDLED
     }
@@ -163,7 +163,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
     new Float: gametime = get_gametime()
 
-    if(g_nextUse[id] > gametime) {
+    if (g_nextUse[id] > gametime) {
         client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_UseTooOften")
         MenuShow_PlayersList(id)
         return PLUGIN_HANDLED
@@ -173,7 +173,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
     new userID = strtol(g_itemInfo)
 
-    if(userID == ITEM_MUTE_ALL) {
+    if (userID == ITEM_MUTE_ALL) {
         g_globalMute[id] ^= true
         Storage_Update(id, ITEM_MUTE_ALL)
 
@@ -188,7 +188,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
 
     new player = find_player_ex((FindPlayer_MatchUserId | FindPlayer_ExcludeBots), userID)
 
-    if(player == 0) {
+    if (player == 0) {
         client_print_color(id, print_team_red, "%L %L", id, "Mute_prefix", id, "Mute_PlayerNotConnected")
         MenuShow_PlayersList(id)
         return PLUGIN_HANDLED
@@ -225,15 +225,15 @@ public client_disconnected(id) {
 }
 
 public CA_Client_Voice(const listener, const sender) {
-    if(g_globalMute[listener]) {
+    if (g_globalMute[listener]) {
         return CA_SUPERCEDE
     }
 
-    if(g_globalMute[sender]) {
+    if (g_globalMute[sender]) {
         return CA_SUPERCEDE
     }
 
-    if(g_playersMute[listener][sender] == true) {
+    if (g_playersMute[listener][sender] == true) {
         return CA_SUPERCEDE
     }
 
@@ -241,7 +241,7 @@ public CA_Client_Voice(const listener, const sender) {
 }
 
 Storage_Init() {
-    if(!SQL_SetAffinity("sqlite")) {
+    if (!SQL_SetAffinity("sqlite")) {
         set_fail_state("Can't user 'SQLite'. Check modules.ini")
     }
 
@@ -264,7 +264,7 @@ Storage_Create() {
 }
 
 public handle_StorageCreated(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
@@ -281,8 +281,8 @@ Storage_Update(const player, const target) {
     new authId[MAX_AUTHID_LENGTH]
     get_user_authid(player, authId, charsmax(authId))
 
-    if(target == ITEM_MUTE_ALL) {
-        if(g_globalMute[player]) {
+    if (target == ITEM_MUTE_ALL) {
+        if (g_globalMute[player]) {
             formatex(query, charsmax(query), "INSERT INTO %s (authid, authid_target)", g_mute_table)
             strcat(query, fmt(" VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, "GLOBAL"), charsmax(query))
         } else {
@@ -297,7 +297,7 @@ Storage_Update(const player, const target) {
     new authId_target[MAX_AUTHID_LENGTH]
     get_user_authid(target, authId_target, charsmax(authId_target))
 
-    if(g_playersMute[player][target]) {
+    if (g_playersMute[player][target]) {
         formatex(query, charsmax(query), "INSERT INTO %s (authid, authid_target)", g_mute_table)
         strcat(query, fmt(" VALUES ('%s', '%s') ON CONFLICT DO NOTHING", authId, authId_target), charsmax(query))
     } else {
@@ -309,7 +309,7 @@ Storage_Update(const player, const target) {
 }
 
 public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 }
@@ -326,24 +326,24 @@ Storage_Load(const player) {
 }
 
 public handle_LoadedMute(failstate, Handle: query, error[], errnum, data[], size, Float: queuetime) {
-    if(IsSQLQueryFailed(failstate, query, error, errnum)) {
+    if (IsSQLQueryFailed(failstate, query, error, errnum)) {
         return
     }
 
-    if(!SQL_NumResults(query))
+    if (!SQL_NumResults(query))
         return
     
-    while(SQL_MoreResults(query)) {
+    while (SQL_MoreResults(query)) {
         new authId[MAX_AUTHID_LENGTH], authId_target[MAX_AUTHID_LENGTH]
         SQL_ReadResult(query, 0, authId, charsmax(authId))
         SQL_ReadResult(query, 1, authId_target, charsmax(authId_target))
 
         new player = find_player_ex(FindPlayer_MatchAuthId, authId)
-        if(player == 0) {
+        if (player == 0) {
             goto next
         }
 
-        if(strcmp(authId_target, "GLOBAL") == 0) {
+        if (strcmp(authId_target, "GLOBAL") == 0) {
             g_globalMute[player] = true
             goto next
         }
@@ -361,7 +361,7 @@ public handle_LoadedMute(failstate, Handle: query, error[], errnum, data[], size
 }
 
 static stock bool: IsSQLQueryFailed(const failstate, const Handle: query, const error[], const errNum) {
-    switch(failstate) {
+    switch (failstate) {
         case TQUERY_CONNECT_FAILED:	{
             log_amx("SQL: connection failed [%i] `%s`", errNum, error)
             return true

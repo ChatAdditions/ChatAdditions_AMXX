@@ -59,31 +59,31 @@ public plugin_natives() {
 }
 
 public native_filter(const name[], index, trap) {
-    if(strcmp(name, "aes_get_player_level")) {
+    if (strcmp(name, "aes_get_player_level")) {
         return PLUGIN_HANDLED
     }
 
-    if(strcmp(name, "ar_get_user_level")) {
+    if (strcmp(name, "ar_get_user_level")) {
         return PLUGIN_HANDLED
     }
 
-    if(strcmp(name, "crxranks_get_user_level")) {
+    if (strcmp(name, "crxranks_get_user_level")) {
         return PLUGIN_HANDLED
     }
 
-    if(strcmp(name, "csstats_get_user_stats")) {
+    if (strcmp(name, "csstats_get_user_stats")) {
         return PLUGIN_HANDLED
     }
 
-    if(strcmp(name, "cmsranks_get_user_level")) {
+    if (strcmp(name, "cmsranks_get_user_level")) {
         return PLUGIN_HANDLED
     }
 
-    if(strcmp(name, "cmsstats_get_user_skill")) {
+    if (strcmp(name, "cmsstats_get_user_skill")) {
         return PLUGIN_HANDLED
     }
 
-    if(strcmp(name, "get_user_stats")) {
+    if (strcmp(name, "get_user_stats")) {
         return PLUGIN_HANDLED
     }
 
@@ -163,7 +163,7 @@ Create_CVars() {
 }
 
 public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
-    if(!CanCommunicate(player, true, text_chat)) {
+    if (!CanCommunicate(player, true, text_chat)) {
         return CA_SUPERCEDE
     }
 
@@ -171,7 +171,7 @@ public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
 }
 
 public CA_Client_Voice(const listener, const sender) {
-    if(!CanCommunicate(sender, false, voice_chat)) {
+    if (!CanCommunicate(sender, false, voice_chat)) {
         // need chat notification?
         return CA_SUPERCEDE
     }
@@ -180,23 +180,23 @@ public CA_Client_Voice(const listener, const sender) {
 }
 
 bool: CanCommunicate(const player, const bool: print, chatType) {
-    if(ca_rankrestrictions_type <= rr_type_none) {
+    if (ca_rankrestrictions_type <= rr_type_none) {
         return true
     }
 
     // check is gagged?
-    if(get_user_flags(player) & read_flags(ca_rankrestrictions_immunity_flag)) {
+    if (get_user_flags(player) & read_flags(ca_rankrestrictions_immunity_flag)) {
         return true
     }
 
-    if(ca_rankrestrictions_steam_immunity && _is_user_steam(player)) {
+    if (ca_rankrestrictions_steam_immunity && _is_user_steam(player)) {
         return true
     }
 
-    switch(chatType) {
+    switch (chatType) {
         case voice_chat: {
-            if(ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level_voice_chat) {
-                if(print) {
+            if (ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level_voice_chat) {
+                if (print) {
                     client_print_color(player, print_team_red, "%L",
                         player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level_voice_chat
                     )
@@ -205,8 +205,8 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
                 return false
             }
 
-            if(ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills_voice_chat) {
-                if(print) {
+            if (ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills_voice_chat) {
+                if (print) {
                     client_print_color(player, print_team_red, "%L",
                         player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills_voice_chat
                     )
@@ -217,8 +217,8 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
         }
 
         case text_chat: {
-            if(ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level_text_chat) {
-                if(print) {
+            if (ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level_text_chat) {
+                if (print) {
                     client_print_color(player, print_team_red, "%L",
                         player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level_text_chat
                     )
@@ -227,8 +227,8 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
                 return false
             }
 
-            if(ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills_text_chat) {
-                if(print) {
+            if (ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills_text_chat) {
+                if (print) {
                     client_print_color(player, print_team_red, "%L",
                         player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills_text_chat
                     )
@@ -243,7 +243,7 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
 }
 
 GetUserLevel(const player) {
-    switch(ca_rankrestrictions_type_level) {
+    switch (ca_rankrestrictions_type_level) {
         case 0: return aes_get_player_level(player)
         case 1: return ar_get_user_level(player)
         case 2: return crxranks_get_user_level(player)
@@ -271,7 +271,7 @@ GetUserLevel(const player) {
 GetUserFragsFromStats(const player) {
     enum { stats_Frags/* , stats_Deaths, stats_Rounds = 16 */ }
 
-    switch(ca_rankrestrictions_type_kills) {
+    switch (ca_rankrestrictions_type_kills) {
         case 0: {
             new stats[22]
             csstats_get_user_stats(player, stats)
@@ -289,7 +289,7 @@ GetUserFragsFromStats(const player) {
 
 static stock bool: _is_user_steam(const player) {
     #if (defined _reapi_reunion_included)
-    if(has_reunion())
+    if (has_reunion())
         return (REU_GetAuthtype(player) == CA_TYPE_STEAM)
     #endif
 
@@ -299,7 +299,7 @@ static stock bool: _is_user_steam(const player) {
         server_exec()
 
         #define DP_AUTH_STEAM 2
-        if(get_pcvar_num(dp_r_id_provider) == DP_AUTH_STEAM)
+        if (get_pcvar_num(dp_r_id_provider) == DP_AUTH_STEAM)
             return true
 
         return false
