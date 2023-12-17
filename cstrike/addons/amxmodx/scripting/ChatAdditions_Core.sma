@@ -465,12 +465,12 @@ stock log_to_file_ex(const filePath[], message[]) {
     }
 
     if (!(file = fopen(filePath, "at"))) {
-        log_error(AMX_ERR_GENERAL, "Can't open \"%s\" file for writing.", filePath)
+        log_error(AMX_ERR_GENERAL, "Can't open ^"%s^" file for writing.", filePath)
         return PLUGIN_CONTINUE
     }
 
     if (firstTime) {
-        fprintf(file, "L %s: Log file started (file \"%s\") (game \"%s\") (amx \"%s\")\n", date, filePath, modName, amxVersion)
+        fprintf(file, "L %s: Log file started (file ^"%s^") (game ^"%s^") (amx ^"%s^")\n", date, filePath, modName, amxVersion)
     }
 
     fprintf(file, "L %s: %s\n", date, message)

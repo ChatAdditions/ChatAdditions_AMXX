@@ -1036,7 +1036,7 @@ public MenuHandler_EditGag(const id, const menu, const item) {
 
             new gagTimeStr[32]; copy(gagTimeStr, charsmax(gagTimeStr), Get_TimeString_seconds(LANG_PLAYER, time))
 
-            CA_Log(logLevel_Info, "Gag: \"%s\" edit gag for \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+            CA_Log(logLevel_Info, "Gag: ^"%s^" edit gag for ^"%s^" (type:^"%s^") (time:^"%s^") (reason:^"%s^")", \
                 g_adminTempData[id][gd_adminName], g_adminTempData[id][gd_name], \
                 bits_to_flags(gag_flags_s: g_adminTempData[id][gd_reason][r_flags]), \
                 gagTimeStr, g_adminTempData[id][gd_reason][r_name] \
@@ -1423,7 +1423,7 @@ public CA_Storage_Saved(const name[], const authID[], const IP[], const reason[]
         Get_GagFlags_Names(gag_flags_s: flags)
     )
 
-    CA_Log(logLevel_Info, "Gag: \"%s\" add gag to \"%s\" (type:\"%s\") (time:\"%s\") (reason:\"%s\")", \
+    CA_Log(logLevel_Info, "Gag: ^"%s^" add gag to ^"%s^" (type:^"%s^") (time:^"%s^") (reason:^"%s^")", \
         adminName, name, bits_to_flags(gag_flags_s: flags), gagTimeStr, reason \
     )
 }

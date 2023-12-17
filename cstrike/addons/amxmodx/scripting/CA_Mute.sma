@@ -180,7 +180,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
             id, LANG_PLAYER, g_globalMute[id] ? "Mute_PlayerNowMutedAll" : "Mute_PlayerNowUnmutedAll"
         )
 
-        CA_Log(logLevel_Info, "Mute: \"%N\" %sMuted everyone", id, g_globalMute[id] ? "" : "Un")
+        CA_Log(logLevel_Info, "Mute: ^"%N^" %sMuted everyone", id, g_globalMute[id] ? "" : "Un")
         MenuShow_PlayersList(id)
         return PLUGIN_HANDLED
     }
