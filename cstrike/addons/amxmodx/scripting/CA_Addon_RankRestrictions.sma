@@ -1,5 +1,5 @@
 #include <amxmodx>
-#tryinclude <reapi_reunion>
+#tryinclude <reapi>
 
 #include <ChatAdditions>
 
@@ -189,7 +189,7 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
     return true
   }
 
-  if(ca_rankrestrictions_steam_immunity && is_user_steam(player)) {
+  if(ca_rankrestrictions_steam_immunity && _is_user_steam(player)) {
     return true
   }
 
@@ -287,11 +287,15 @@ GetUserFragsFromStats(const player) {
 	return 0
 }
 
-#if !defined _reapi_reunion_included
-static stock bool: is_user_steam(const id) {
+static stock bool: _is_user_steam(const player) {
+  #if (defined _reapi_reunion_included)
+  if(has_reunion())
+    return (REU_GetAuthtype(player) == CA_TYPE_STEAM)
+  #endif
+
   static dp_r_id_provider
   if (dp_r_id_provider || (dp_r_id_provider = get_cvar_pointer("dp_r_id_provider"))) {
-    server_cmd("dp_clientinfo %i", id)
+    server_cmd("dp_clientinfo %i", player)
     server_exec()
 
     #define DP_AUTH_STEAM 2
@@ -303,4 +307,3 @@ static stock bool: is_user_steam(const id) {
 
   return false
 }
-#endif
