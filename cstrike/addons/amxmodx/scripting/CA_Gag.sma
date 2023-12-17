@@ -117,7 +117,7 @@ public plugin_init() {
   register_clcmd("amx_gagmenu", "ClCmd_Gag", (accessFlags | accessFlagsHigh), .FlagManager = false)
 
   for(new i; i < sizeof g_adminChatCmds; i++)
-    register_clcmd(g_adminChatCmds[i], "ClCmd_adminSay", ADMIN_CHAT)
+    register_clcmd(g_adminChatCmds[i], "ClCmd_adminSay", ADMIN_CHAT, .FlagManager = false)
 
   CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 
