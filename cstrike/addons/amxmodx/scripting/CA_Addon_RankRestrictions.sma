@@ -1,5 +1,5 @@
 #include <amxmodx>
-#include <reapi_reunion>
+#tryinclude <reapi_reunion>
 
 #include <ChatAdditions>
 
@@ -286,3 +286,21 @@ GetUserFragsFromStats(const player) {
 
 	return 0
 }
+
+#if !defined _reapi_reunion_included
+static stock bool: is_user_steam(const id) {
+  static dp_r_id_provider
+  if (dp_r_id_provider || (dp_r_id_provider = get_cvar_pointer("dp_r_id_provider"))) {
+    server_cmd("dp_clientinfo %i", id)
+    server_exec()
+
+    #define DP_AUTH_STEAM 2
+    if(get_pcvar_num(dp_r_id_provider) == DP_AUTH_STEAM)
+      return true
+
+    return false
+  }
+
+  return false
+}
+#endif
