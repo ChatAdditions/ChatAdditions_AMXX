@@ -163,7 +163,7 @@ public client_putinserver(player) {
     Stats_Update(player)
 }
 
-public client_disconnected(player) {
+public client_remove(player) {
     Stats_Update(player)
 }
 
