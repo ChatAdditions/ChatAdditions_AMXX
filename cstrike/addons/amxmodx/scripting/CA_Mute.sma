@@ -16,7 +16,8 @@ new bool: g_globalMute[MAX_PLAYERS + 1]
 
 new Float: g_nextUse[MAX_PLAYERS + 1]
 
-new Float: ca_mute_use_delay
+new Float: ca_mute_use_delay,
+    bool: ca_mute_use_storage
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 
@@ -41,13 +42,7 @@ public plugin_init() {
     register_dictionary("CA_Mute.txt")
     register_dictionary("common.txt")
 
-    bind_pcvar_float(create_cvar("ca_mute_use_delay", "3",
-            .description = "How often players can use menu. (in seconds)",
-            .has_min = true, .min_val = 0.0,
-            .has_max = true, .max_val = 120.0
-        ),
-        ca_mute_use_delay
-    )
+    Create_CVars()
 
     new const CMDS_Mute[][] = { "mute" }
 
@@ -62,6 +57,23 @@ public plugin_init() {
     CA_Log(logLevel_Debug, "[CA]: Mute initialized!")
 }
 
+Create_CVars() {
+    bind_pcvar_float(create_cvar("ca_mute_use_delay", "3",
+            .description = "How often players can use menu. (in seconds)",
+            .has_min = true, .min_val = 0.0,
+            .has_max = true, .max_val = 120.0
+        ),
+        ca_mute_use_delay
+    )
+
+    bind_pcvar_num(create_cvar("ca_mute_use_storage", "1",
+            .description = "Save the player's individual preferences in the vault.",
+            .has_min = true, .min_val = 0.0,
+            .has_max = true, .max_val = 1.0
+        ),
+        ca_mute_use_storage
+    )
+}
 
 public ClCmd_Mute(const id) {
     if (!is_user_connected(id)) {
@@ -275,6 +287,9 @@ public client_putinserver(player) {
 }
 
 Storage_Update(const player, const target) {
+    if (!ca_mute_use_storage)
+        return
+
     new query[QUERY_LENGTH / 2]
 
     new authId[MAX_AUTHID_LENGTH]
@@ -314,6 +329,9 @@ public handle_Saved(failstate, Handle: query, error[], errnum, data[], size, Flo
 }
 
 Storage_Load(const player) {
+    if (!ca_mute_use_storage)
+        return
+
     new authId[MAX_AUTHID_LENGTH]
     get_user_authid(player, authId, charsmax(authId))
 
