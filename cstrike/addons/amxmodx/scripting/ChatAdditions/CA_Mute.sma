@@ -57,6 +57,11 @@ public plugin_init() {
     CA_Log(logLevel_Debug, "[CA]: Mute initialized!")
 }
 
+public plugin_end() {
+    if (g_tuple != Empty_Handle)
+        SQL_FreeHandle(g_tuple)
+}
+
 Create_CVars() {
     bind_pcvar_float(create_cvar("ca_mute_use_delay", "3",
             .description = "How often players can use menu. (in seconds)",
