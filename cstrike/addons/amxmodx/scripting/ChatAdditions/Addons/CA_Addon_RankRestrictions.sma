@@ -1,4 +1,5 @@
 #include <amxmodx>
+#include <amxmisc>
 #tryinclude <reapi>
 
 #include <ChatAdditions>
@@ -27,6 +28,16 @@ enum any: eRankRestrictionsType {
     rr_type_level,
     rr_type_frags
 }
+
+const Float: STATS_THINKER_FREQ = 30.0
+
+enum Stats_s {
+    Stats_Level,
+    Stats_Kills,
+    Float: Stats_NextUpdate,
+}
+
+new g_playersStats[MAX_PLAYERS + 1][Stats_s]
 
 new ca_rankrestrictions_type,
     ca_rankrestrictions_type_kills,
@@ -148,6 +159,14 @@ Create_CVars() {
     )
 }
 
+public client_putinserver(player) {
+    Stats_Update(player)
+}
+
+public client_disconnected(player) {
+    Stats_Update(player)
+}
+
 public CA_Client_Say(player, const bool: isTeamMessage, const message[]) {
     if (!CanCommunicate(player, true, text_chat)) {
         return CA_SUPERCEDE
@@ -181,7 +200,7 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
 
     switch (chatType) {
         case voice_chat: {
-            if (ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level_voice_chat) {
+            if (ca_rankrestrictions_type == rr_type_level && g_playersStats[player][Stats_Level] < ca_rankrestrictions_min_level_voice_chat) {
                 if (print) {
                     client_print_color(player, print_team_red, "%L",
                         player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level_voice_chat
@@ -191,7 +210,7 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
                 return false
             }
 
-            if (ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills_voice_chat) {
+            if (ca_rankrestrictions_type == rr_type_frags && g_playersStats[player][Stats_Kills] < ca_rankrestrictions_min_kills_voice_chat) {
                 if (print) {
                     client_print_color(player, print_team_red, "%L",
                         player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills_voice_chat
@@ -203,7 +222,7 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
         }
 
         case text_chat: {
-            if (ca_rankrestrictions_type == rr_type_level && GetUserLevel(player) < ca_rankrestrictions_min_level_text_chat) {
+            if (ca_rankrestrictions_type == rr_type_level && g_playersStats[player][Stats_Level] < ca_rankrestrictions_min_level_text_chat) {
                 if (print) {
                     client_print_color(player, print_team_red, "%L",
                         player, "RankRestrictions_Warning_MinLevel", ca_rankrestrictions_min_level_text_chat
@@ -213,7 +232,7 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
                 return false
             }
 
-            if (ca_rankrestrictions_type == rr_type_frags && GetUserFragsFromStats(player) < ca_rankrestrictions_min_kills_text_chat) {
+            if (ca_rankrestrictions_type == rr_type_frags && g_playersStats[player][Stats_Kills] < ca_rankrestrictions_min_kills_text_chat) {
                 if (print) {
                     client_print_color(player, print_team_red, "%L",
                         player, "RankRestrictions_Warning_MinKills", ca_rankrestrictions_min_kills_text_chat
@@ -228,7 +247,7 @@ bool: CanCommunicate(const player, const bool: print, chatType) {
     return true
 }
 
-GetUserLevel(const player) {
+Stats_ReadUserLevel(const player) {
     switch (ca_rankrestrictions_type_level) {
         case 0: return aes_get_player_level(player)
         case 1: return ar_get_user_level(player)
@@ -254,7 +273,7 @@ GetUserLevel(const player) {
     return 0
 }
 
-GetUserFragsFromStats(const player) {
+Stats_ReadUserFrags(const player) {
     enum { stats_Frags/* , stats_Deaths, stats_Rounds = 16 */ }
 
     switch (ca_rankrestrictions_type_kills) {
@@ -271,6 +290,28 @@ GetUserFragsFromStats(const player) {
     }
 
     return 0
+}
+
+public Stats_Update(player) {
+    if (!is_user_connected(player) || is_user_bot(player)) {
+        g_playersStats[player][Stats_Level] = 0
+        g_playersStats[player][Stats_Kills] = 0
+        g_playersStats[player][Stats_NextUpdate] = 0.0
+
+        remove_task(player)
+        return
+    }
+
+    if (!task_exists(player))
+        set_task_ex(STATS_THINKER_FREQ, "Stats_Update", .id = player, .flags = SetTask_Repeat)
+
+    new Float: gametime = get_gametime()
+    if (g_playersStats[player][Stats_NextUpdate] > gametime)
+        return
+
+    g_playersStats[player][Stats_Level] = Stats_ReadUserLevel(player)
+    g_playersStats[player][Stats_Kills] = Stats_ReadUserFrags(player)
+    g_playersStats[player][Stats_NextUpdate] = gametime + STATS_THINKER_FREQ
 }
 
 static stock bool: _is_user_steam(const player) {
