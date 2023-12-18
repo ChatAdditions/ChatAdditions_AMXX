@@ -95,9 +95,9 @@ static MenuShow_PlayersList(const id) {
     get_players_ex(players, count, .flags = (GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV))
 
     if (count < 2) {
-        menu_additem(menu, fmt("\\r %L", id, "Mute_NotEnoughPlayers"), fmt("%i", ITEM_NOT_ENOUTH_PLAYERS), .callback = callback)
+        menu_additem(menu, fmt("\r %L", id, "Mute_NotEnoughPlayers"), fmt("%i", ITEM_NOT_ENOUTH_PLAYERS), .callback = callback)
     } else {
-        menu_additem(menu, fmt("\\y %L %s\n", id, "Mute_MuteAll", g_globalMute[id] ? "\\w[ \\r+\\w ]" : ""), fmt("%i", ITEM_MUTE_ALL))
+        menu_additem(menu, fmt("\y %L %s^n", id, "Mute_MuteAll", g_globalMute[id] ? "\w[ \r+\w ]" : ""), fmt("%i", ITEM_MUTE_ALL))
 
         new name[128]
         for(new i; i < count; i++) {
@@ -110,11 +110,11 @@ static MenuShow_PlayersList(const id) {
             get_user_name(target, name, charsmax(name))
 
             if (g_playersMute[id][target] || CA_PlayerHasBlockedPlayer(id, target)) {
-                strcat(name, " \\d[ \\r+\\d ]", charsmax(name))
+                strcat(name, " \d[ \r+\d ]", charsmax(name))
             }
 
             if (g_globalMute[target] || g_playersMute[target][id] || CA_PlayerHasBlockedPlayer(target, id)) {
-                strcat(name, fmt(" \\d(\\y%L\\d)", id, "Mute_PlayerMutedYou"), charsmax(name))
+                strcat(name, fmt(" \d(\y%L\d)", id, "Mute_PlayerMutedYou"), charsmax(name))
             }
 
             menu_additem(menu, name, fmt("%i", get_user_userid(target)), .callback = callback)
@@ -176,7 +176,7 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
         g_globalMute[id] ^= true
         Storage_Update(id, ITEM_MUTE_ALL)
 
-        client_print_color(0, print_team_default, "%L \3%n\1 %L ", id, "Mute_prefix",
+        client_print_color(0, print_team_default, "%L ^3%n^1 %L ", id, "Mute_prefix",
             id, LANG_PLAYER, g_globalMute[id] ? "Mute_PlayerNowMutedAll" : "Mute_PlayerNowUnmutedAll"
         )
 
@@ -196,11 +196,11 @@ public MenuHandler_PlayersList(const id, const menu, const item) {
     g_playersMute[id][player] ^= true
     Storage_Update(id, player)
 
-    client_print_color(id, print_team_default, "%L %L \3%n\1", id, "Mute_prefix",
+    client_print_color(id, print_team_default, "%L %L ^3%n^1", id, "Mute_prefix",
         id, g_playersMute[id][player] ? "Mute_YouMutePlayer" : "Mute_YouUnmutePlayer", player
     )
 
-    client_print_color(player, print_team_default, "%L \3%n\1 %L ", id, "Mute_prefix",
+    client_print_color(player, print_team_default, "%L ^3%n^1 %L ", id, "Mute_prefix",
         id, player, g_playersMute[id][player] ? "Mute_PlayerNowMutedYou" : "Mute_PlayerNowUnmutedYou"
     )
 

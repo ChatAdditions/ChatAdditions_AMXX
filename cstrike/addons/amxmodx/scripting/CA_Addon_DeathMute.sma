@@ -51,7 +51,7 @@ public plugin_init() {
 
 Create_CVars() {
     bind_pcvar_float(create_cvar("ca_deathmute_time", "5.0",
-            .description = "Time (in seconds) for killed players, during which they can report information to living players.\n\
+            .description = "Time (in seconds) for killed players, during which they can report information to living players.^n\
                 0 - disabled functionality",
             .has_min = true, .min_val = 0.0,
             .has_max = true, .max_val = 240.0
@@ -59,8 +59,8 @@ Create_CVars() {
     )
 
     bind_pcvar_num(create_cvar("ca_deathmute_dead_hear_alive", "1",
-            .description = "Death mute mode\n\
-                0 - alive hear only alive, dead hear all\n\
+            .description = "Death mute mode^n\
+                0 - alive hear only alive, dead hear all^n\
                 1 - alive hear only alive, dead hear only dead",
             .has_min = true, .min_val = 0.0,
             .has_max = true, .max_val = 1.0
@@ -68,21 +68,21 @@ Create_CVars() {
     )
 
     bind_pcvar_num(create_cvar("ca_deathmute_notify_type", "1",
-            .description = "Notification type for dead players \n\
-                0 - disabled functionality\n\
-                1 - chat message\n\
+            .description = "Notification type for dead players ^n\
+                0 - disabled functionality^n\
+                1 - chat message^n\
                 2 - HUD message"
         ), ca_deathmute_notify_type
     )
 
     bind_pcvar_num(create_cvar("ca_deathmute_notify_show_progressbar", "1",
-            .description = "Show progressbar \n\
+            .description = "Show progressbar ^n\
                 0 - disabled functionality"
         ), ca_deathmute_notify_show_progressbar
     )
 
     bind_pcvar_float(create_cvar("ca_deathmute_notify_hud_x", "-1.0",
-            .description = "X position for HUD message\n\
+            .description = "X position for HUD message^n\
                 -1.0 - center",
             .has_min = true, .min_val = -1.0,
             .has_max = true, .max_val = 1.0
@@ -90,7 +90,7 @@ Create_CVars() {
     )
 
     bind_pcvar_float(create_cvar("ca_deathmute_notify_hud_y", "0.15",
-            .description = "Y position for HUD message\n\
+            .description = "Y position for HUD message^n\
                 -1.0 - center",
             .has_min = true, .min_val = -1.0,
             .has_max = true, .max_val = 1.0
@@ -231,7 +231,7 @@ public CA_Client_Voice(const listener, const sender) {
 
 stock ReplaceColors(text[], len)
 {
-    replace_string(text, len, "\1", "")
-    replace_string(text, len, "\3", "")
-    replace_string(text, len, "\4", "")
+    replace_string(text, len, "^1", "")
+    replace_string(text, len, "^3", "")
+    replace_string(text, len, "^4", "")
 }

@@ -151,9 +151,9 @@ ReadFolder(deleteTime, logPath[]) {
 Create_CVars() {
 
     bind_pcvar_num(create_cvar("ca_log_type", "1",
-            .description = fmt("Log file type\n \
-                0 = log to common amxx log file (logs/L*.log)\n \
-                1 = log to plugins folder (logs/%s/[plugin name]/L*.log)\n \
+            .description = fmt("Log file type^n \
+                0 = log to common amxx log file (logs/L*.log)^n \
+                1 = log to plugins folder (logs/%s/[plugin name]/L*.log)^n \
                 2 = silent log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER, LOG_FOLDER),
             .has_min = true, .min_val = 0.0,
             .has_max = true, .max_val = float(_LogToDirSilent)
@@ -162,7 +162,7 @@ Create_CVars() {
     )
 
     bind_pcvar_num(create_cvar("ca_log_level", "1",
-            .description = "Log level\n 0 = disable logs\n 1 = add info messages logs\n 2 = add warinigs info\n 3 = add debug messages",
+            .description = "Log level^n 0 = disable logs^n 1 = add info messages logs^n 2 = add warinigs info^n 3 = add debug messages",
             .has_min = true, .min_val = 0.0,
             .has_max = true, .max_val = float(logLevel_Debug)
         ),
@@ -170,7 +170,7 @@ Create_CVars() {
     )
 
     bind_pcvar_num(create_cvar("ca_update_notify", "1",
-            .description = "Enable update check?\n 0 = disable update checks",
+            .description = "Enable update check?^n 0 = disable update checks",
             .has_min = true, .min_val = 0.0,
             .has_max = true, .max_val = 1.0
         ),
@@ -178,8 +178,8 @@ Create_CVars() {
     )
 
     bind_pcvar_num(create_cvar("ca_log_autodelete_time", "7",
-            .description = "The time in days after which the log files should be deleted.\n \
-            0 - The logs won't be deleted.\n \
+            .description = "The time in days after which the log files should be deleted.^n \
+            0 - The logs won't be deleted.^n \
             > 0 - The logs will be deleted at the time inserted.",
             .has_min = true, .min_val = 0.0
             ), 
@@ -413,7 +413,7 @@ static RequestNewVersion(const link[]) {
 }
 
 static NotifyUpdate(const newVersion[], const URL[]) {
-    CA_Log(logLevel_Info, "\n\t ChatAdditions (%s) has update! New version `%s`.\n\
+    CA_Log(logLevel_Info, "^n^t ChatAdditions (%s) has update! New version `%s`.^n\
         Download link: `%s`", CA_VERSION, newVersion, URL
     )
 }
@@ -470,10 +470,10 @@ stock log_to_file_ex(const filePath[], message[]) {
     }
 
     if (firstTime) {
-        fprintf(file, "L %s: Log file started (file ^"%s^") (game ^"%s^") (amx ^"%s^")\n", date, filePath, modName, amxVersion)
+        fprintf(file, "L %s: Log file started (file ^"%s^") (game ^"%s^") (amx ^"%s^")^n", date, filePath, modName, amxVersion)
     }
 
-    fprintf(file, "L %s: %s\n", date, message)
+    fprintf(file, "L %s: %s^n", date, message)
 
     fclose(file)
 

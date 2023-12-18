@@ -79,7 +79,7 @@ Create_CVars() {
         create_cvar(
             .name = "ca_anti_flood_time",
             .string = "0.75",
-            .description = "Time between messages\n 0.0 - no limit",
+            .description = "Time between messages^n 0.0 - no limit",
             .has_min = true,
             .min_val = 0.0
         ),
@@ -91,7 +91,7 @@ Create_CVars() {
         create_cvar(
             .name = "ca_equal_messages",
             .string = "2",
-            .description = "How many identical messages can be written in a row\n 0 - no limit",
+            .description = "How many identical messages can be written in a row^n 0 - no limit",
             .has_min = true,
             .min_val = 0.0
         ),

@@ -130,100 +130,100 @@ public plugin_end() {
 
 Create_CVars() {
     bind_pcvar_string(create_cvar("ca_gag_times", "1i, 5i, 10i, 30i, 1h, 1d, 1w, 1m",
-            .description = "Gag time values for choose\n \
-                format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week, 1m = 1 month, 1y = 1 year\n \
+            .description = "Gag time values for choose^n \
+                format: 1 = 1 second, 1i = 1 minute, 1h = 1 hour, 1d = 1 day, 1w = 1 week, 1m = 1 month, 1y = 1 year^n \
                 NOTE: Changes will be applied only after reloading the map (or command `ca_gag_reload_config`)"
         ),
         ca_gag_times, charsmax(ca_gag_times)
     )
 
     bind_pcvar_string(create_cvar("ca_gag_immunity_flags", "a",
-            .description = "User immunity flag\n users with this flag can't be gagged\n \
+            .description = "User immunity flag^n users with this flag can't be gagged^n \
                 NOTE: `ca_gag_access_flags_high` can gag this users"
         ),
         ca_gag_immunity_flags, charsmax(ca_gag_immunity_flags)
     )
 
     bind_pcvar_string(create_cvar("ca_gag_access_flags", "c",
-            .description = "Admin flag\n \
-                users with this flag can gag users with flag `z`, but can't with flag `ca_gag_immunity_flags`\n \
-                users with this flag can't be gagged by same flags users (immunity)\n \
+            .description = "Admin flag^n \
+                users with this flag can gag users with flag `z`, but can't with flag `ca_gag_immunity_flags`^n \
+                users with this flag can't be gagged by same flags users (immunity)^n \
                 NOTE: `ca_gag_access_flags_high` can gag this users"
         ),
         ca_gag_access_flags, charsmax(ca_gag_access_flags)
     )
 
     bind_pcvar_string(create_cvar("ca_gag_access_flags_own_reason", "d",
-            .description = "Admin flag\n \
+            .description = "Admin flag^n \
                 users with this flag can enter their own gag reason"
         ),
         ca_gag_access_flags_own_reason, charsmax(ca_gag_access_flags_own_reason)
     )
 
     bind_pcvar_string(create_cvar("ca_gag_access_flags_own_time", "e",
-            .description = "Admin flag\n \
+            .description = "Admin flag^n \
                 users with this flag can enter their own gag time"
         ),
         ca_gag_access_flags_own_time, charsmax(ca_gag_access_flags_own_time)
     )
 
     bind_pcvar_string(create_cvar("ca_gag_access_flags_high", "l",
-            .description = "High admin flag\n \
-                users with this flag can everyone\n \
-                users with this flag can't be gagged\n \
+            .description = "High admin flag^n \
+                users with this flag can everyone^n \
+                users with this flag can't be gagged^n \
                 NOTE: `ca_gag_access_flags_high` can gag this users"
         ),
         ca_gag_access_flags_high, charsmax(ca_gag_access_flags_high)
     )
 
     bind_pcvar_num(create_cvar("ca_gag_remove_only_own_gag", "1",
-            .description = "Remove gag access control\n \
-                1 = remove only own gags\n \
-                0 = no restrictions\n \
+            .description = "Remove gag access control^n \
+                1 = remove only own gags^n \
+                0 = no restrictions^n \
                 NOTE: `ca_gag_access_flags_high` can remove every gag"
         ),
         ca_gag_remove_only_own_gag
     )
 
     get_pcvar_string(create_cvar("ca_gag_sound_ok", "buttons/blip2.wav",
-            .description = "Sound for success action\n \
+            .description = "Sound for success action^n \
                 NOTE: Changes will be applied only after reloading the map"
         ),
         ca_gag_sound_ok, charsmax(ca_gag_sound_ok)
     )
 
     get_pcvar_string(create_cvar("ca_gag_sound_error", "buttons/button2.wav",
-            .description = "Sound for error action\n \
+            .description = "Sound for error action^n \
                 NOTE: Changes will be applied only after reloading the map"
         ),
         ca_gag_sound_error, charsmax(ca_gag_sound_error)
     )
 
     bind_pcvar_num(create_cvar("ca_gag_block_nickname_change", "1",
-            .description = "Block nickname change for gagged player\n \
+            .description = "Block nickname change for gagged player^n \
                 0 = no restrictions"
         ),
         ca_gag_block_nickname_change
     )
 
     bind_pcvar_num(create_cvar("ca_gag_block_admin_chat", "1",
-            .description = "Also block adminchat if admin gagged\n \
+            .description = "Also block adminchat if admin gagged^n \
                 0 = no restrictions"
         ),
         ca_gag_block_admin_chat
     )
 
     bind_pcvar_num(create_cvar("ca_gag_common_chat_block", "1",
-            .description = "Don't separate `say` & `say_team` chats\n \
+            .description = "Don't separate `say` & `say_team` chats^n \
                 0 = disabled"
         ),
         ca_gag_common_chat_block
     )
 
     bind_pcvar_num(create_cvar("ca_gag_own_reason_enabled", "1",
-            .description = "Enable own gag reason\n \
-                0 = disabled (excluding when there are no reasons)\n \
-                1 = enabled, at first position in reasons list\n \
+            .description = "Enable own gag reason^n \
+                0 = disabled (excluding when there are no reasons)^n \
+                1 = enabled, at first position in reasons list^n \
                 2 = enabled, at last position in reasons list"
         ),
         ca_gag_own_reason_enabled
@@ -296,7 +296,7 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
         return
     }
 
-    new menu = menu_create(fmt("%L \\r%s\\y", id, "Gag_MenuTitle_PlayersList", nickname), "MenuHandler_PlayersList")
+    new menu = menu_create(fmt("%L \r%s\y", id, "Gag_MenuTitle_PlayersList", nickname), "MenuHandler_PlayersList")
 
     static callback
 
@@ -319,7 +319,7 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
 
             if (found != -1) {
                 replace_stringex(name, charsmax(name),
-                    nickname, fmt("\\r%s\\w", nickname),
+                    nickname, fmt("\r%s\w", nickname),
                     .caseSensitive = false
                 )
             }
@@ -411,7 +411,7 @@ static MenuShow_SelectReason(const id) {
         return PLUGIN_HANDLED
     }
 
-    new menu = menu_create(fmt("%L [\\r%s\\y]", id, "Gag_MenuTitle_SelectReason", g_adminTempData[id][gd_name]), "MenuHandler_SelectReason")
+    new menu = menu_create(fmt("%L [\r%s\y]", id, "Gag_MenuTitle_SelectReason", g_adminTempData[id][gd_name]), "MenuHandler_SelectReason")
 
     new playerFlags           = get_user_flags(id)
     new accessFlagsHigh       = read_flags(ca_gag_access_flags_high)
@@ -420,7 +420,7 @@ static MenuShow_SelectReason(const id) {
     new bool: hasReasonsTemplates = bool: (g_gagReasonsTemplates_size != 0)
 
     if (ca_gag_own_reason_enabled == 1 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason) || !hasReasonsTemplates) {
-        menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
+        menu_additem(menu, fmt("%L^n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
     }
 
     if (hasReasonsTemplates) {
@@ -442,25 +442,25 @@ static MenuShow_SelectReason(const id) {
             }
 
             if (reasonHasTime) {
-                strcat(buffer, fmt(" (\\y%s", Get_TimeString_seconds(id, reason[r_time])), charsmax(buffer))
+                strcat(buffer, fmt(" (\y%s", Get_TimeString_seconds(id, reason[r_time])), charsmax(buffer))
             }
 
             if (reasonHasFlags) {
-                strcat(buffer, fmt("%s%s", reasonHasTime ? ", " : " \\y(", bits_to_flags(reason[r_flags])), charsmax(buffer))
+                strcat(buffer, fmt("%s%s", reasonHasTime ? ", " : " \y(", bits_to_flags(reason[r_flags])), charsmax(buffer))
             }
 
             if (reasonHasTime || reasonHasFlags) {
-                strcat(buffer, "\\w)", charsmax(buffer))
+                strcat(buffer, "\w)", charsmax(buffer))
             }
 
             menu_additem(menu, buffer,  fmt("%i", i))
         }
 
         if (ca_gag_own_reason_enabled == 2 && playerFlags & (accessFlagsHigh | accessFlagsOwnReason)) {
-            menu_additem(menu, fmt("%L\n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
+            menu_additem(menu, fmt("%L^n", id, "Gag_EnterReason"), fmt("%i", ITEM_ENTER_GAG_REASON))
         }
     } else {
-        menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
+        menu_addtext(menu, fmt("\d		%L", id, "Gag_NoTemplatesAvailable_Reasons"), .slot = false)
     }
 
     menu_setprop(menu, MPROP_SHOWPAGE, false)
@@ -565,7 +565,7 @@ static MenuShow_SelectTime(const id) {
             menu_additem(menu, fmt("%s", Get_TimeString_seconds(id, time)), fmt("%i", i))
         }
     } else {
-        menu_addtext(menu, fmt("\\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
+        menu_addtext(menu, fmt("\d		%L", id, "Gag_NoTemplatesAvailable_Times"), .slot = false)
     }
 
     menu_setprop(menu, MPROP_SHOWPAGE, false)
@@ -646,17 +646,17 @@ static MenuShow_SelectFlags(const id) {
     new gag_flags_s: gagFlags = g_adminTempData[id][gd_reason][r_flags]
 
     menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSay",
-        (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-"),
+        (gagFlags & gagFlag_Say) ? " \r+\w " : "-"),
         fmt("%i", gagFlag_Say)
     )
     if (!ca_gag_common_chat_block) {
         menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
-            (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"),
+            (gagFlags & gagFlag_SayTeam) ? " \r+\w " : "-"),
             fmt("%i", gagFlag_SayTeam)
         )
     }
     menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
-        (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"),
+        (gagFlags & gagFlag_Voice) ? " \r+\w " : "-"),
         fmt("%i", gagFlag_Voice)
     )
 
@@ -664,7 +664,7 @@ static MenuShow_SelectFlags(const id) {
 
     menu_additem(menu, fmt("%L", id, "Gag_MenuItem_Confirm"), fmt("%i", ITEM_CONFIRM), .callback = callback)
 
-    menu_addtext(menu, fmt("\n%L", id, "Gag_MenuItem_Resolution",
+    menu_addtext(menu, fmt("^n%L", id, "Gag_MenuItem_Resolution",
         Get_TimeString_seconds(id, g_adminTempData[id][gd_reason][r_time]),
         Get_GagString_reason(id, target)), false
     )
@@ -772,20 +772,20 @@ static MenuShow_ShowGag(const id) {
     menu_additem(menu, fmt("%L", id, "Gag_MenuItem_RemoveGag"), .info = g_adminTempData[id][gd_adminAuthID], .callback = callback)
     menu_additem(menu, fmt("%L", id, "Gag_MenuItem_EditGag"), .info = g_adminTempData[id][gd_adminAuthID], .callback = callback)
 
-    menu_addtext(menu, fmt("\n  \\d%L \\w%s", id, "Gag_MenuItem_Admin",
+    menu_addtext(menu, fmt("^n  \d%L \w%s", id, "Gag_MenuItem_Admin",
             g_adminTempData[id][gd_adminName]
         )
     )
-    menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Reason",
+    menu_addtext(menu, fmt("  \d%L \w%s", id, "Gag_MenuItem_Reason",
             Get_GagString_reason(id, g_adminTempData[id][gd_target])
         )
     )
-    menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Type",
+    menu_addtext(menu, fmt("  \d%L \w%s", id, "Gag_MenuItem_Type",
             Get_GagFlags_Names(gag_flags_s: g_adminTempData[id][gd_reason][r_flags])
         )
     )
 
-    menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Length",
+    menu_addtext(menu, fmt("  \d%L \w%s", id, "Gag_MenuItem_Length",
             Get_TimeString_seconds(id, g_adminTempData[id][gd_reason][r_time])
         )
     )
@@ -793,7 +793,7 @@ static MenuShow_ShowGag(const id) {
     new hoursLeft = (g_adminTempData[id][gd_expireAt] - get_systime()) / SECONDS_IN_HOUR
     if (hoursLeft > 5) {
         new timeStr[32]; format_time(timeStr, charsmax(timeStr), "%d/%m/%Y (%H:%M)", g_adminTempData[id][gd_expireAt])
-        menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Expire",
+        menu_addtext(menu, fmt("  \d%L \w%s", id, "Gag_MenuItem_Expire",
                 timeStr
             )
         )
@@ -801,7 +801,7 @@ static MenuShow_ShowGag(const id) {
         new expireLeft = g_adminTempData[id][gd_expireAt] - get_systime()
         new expireLeftStr[128]; get_time_length(id, expireLeft, timeunit_seconds, expireLeftStr, charsmax(expireLeftStr))
 
-        menu_addtext(menu, fmt("  \\d%L \\w%s", id, "Gag_MenuItem_Left",
+        menu_addtext(menu, fmt("  \d%L \w%s", id, "Gag_MenuItem_Left",
                 expireLeftStr
             )
         )
@@ -906,7 +906,7 @@ static MenuShow_EditGag(const id) {
         return
     }
 
-    new menu = menu_create(fmt("%L [\\r%s\\y]", id, "Gag_MenuItem_EditGag", g_adminTempData[id][gd_name]), "MenuHandler_EditGag")
+    new menu = menu_create(fmt("%L [\r%s\y]", id, "Gag_MenuItem_EditGag", g_adminTempData[id][gd_name]), "MenuHandler_EditGag")
 
     static callback
 
@@ -917,33 +917,33 @@ static MenuShow_EditGag(const id) {
     new gag_flags_s: gagFlags = g_adminTempData[id][gd_reason][r_flags]
 
     menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSay",
-            (gagFlags & gagFlag_Say) ? " \\r+\\w " : "-"
+            (gagFlags & gagFlag_Say) ? " \r+\w " : "-"
         ),
         fmt("%i", gagFlag_Say)
     )
 
     if (!ca_gag_common_chat_block) {
         menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropSayTeam",
-                (gagFlags & gagFlag_SayTeam) ? " \\r+\\w " : "-"
+                (gagFlags & gagFlag_SayTeam) ? " \r+\w " : "-"
             ),
             fmt("%i", gagFlag_SayTeam)
         )
     }
 
     menu_additem(menu, fmt("%L [ %s ]", id, "Gag_MenuItem_PropVoice",
-            (gagFlags & gagFlag_Voice) ? " \\r+\\w " : "-"
+            (gagFlags & gagFlag_Voice) ? " \r+\w " : "-"
         ),
         fmt("%i", gagFlag_Voice)
     )
 
     menu_addblank(menu, .slot = false)
 
-    menu_additem(menu, fmt("%L [ \\r%s\\w ]", id, "Gag_MenuItem_Reason",
+    menu_additem(menu, fmt("%L [ \r%s\w ]", id, "Gag_MenuItem_Reason",
             Get_GagString_reason(id, target)
         ),
         fmt("%i", ITEM_REASON)
     )
-    menu_addtext(menu, fmt("      %L [ \\r%s\\w ]", id, "Gag_MenuItem_Time",
+    menu_addtext(menu, fmt("      %L [ \r%s\w ]", id, "Gag_MenuItem_Time",
             Get_TimeString_seconds(id, g_adminTempData[id][gd_reason][r_time])
         ), .slot = false
     )
@@ -1163,7 +1163,7 @@ public ConCmd_amx_gag(const id, const level, const cid) {
     new argc = read_argc()
 
     if (argc == 1) {
-        console_print(id, "\t Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>\n")
+        console_print(id, "^t Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>^n")
 
         return PLUGIN_HANDLED
     }
@@ -1222,7 +1222,7 @@ public SrvCmd_AddReason() {
 
     new argCount = read_argc()
     if (argCount < 2 || argCount > 4) {
-        server_print("\tUsage: ca_gag_add_reason <reason> [flags] [time]")
+        server_print("^tUsage: ca_gag_add_reason <reason> [flags] [time]")
         return
     }
 
@@ -1255,7 +1255,7 @@ public SrvCmd_AddWhitelistCmd() {
 
     new argCount = read_argc()
     if (argCount != 2) {
-        server_print("\tUsage: ca_gag_add_chat_whitelist_cmd <cmd>")
+        server_print("^tUsage: ca_gag_add_chat_whitelist_cmd <cmd>")
         return
     }
 
@@ -1270,7 +1270,7 @@ public SrvCmd_AddWhitelistCmd() {
 
 public SrvCmd_ShowTemplates() {
     if (!g_gagReasonsTemplates_size) {
-        CA_Log(logLevel_Warning, "\t NO REASONS FOUNDED!")
+        CA_Log(logLevel_Warning, "^t NO REASONS FOUNDED!")
         return PLUGIN_HANDLED
     }
 
@@ -1280,7 +1280,7 @@ public SrvCmd_ShowTemplates() {
 
         new timeStr[32]; get_time_length(LANG_SERVER, reason[r_time], timeunit_seconds, timeStr, charsmax(timeStr))
 
-        server_print("\t Reason[#%i]: '%s' (Flags:'%s', Time:'%s')",\
+        server_print("^t Reason[#%i]: '%s' (Flags:'%s', Time:'%s')",\
             i + 1, reason[r_name], bits_to_flags(reason[r_flags]), timeStr\
         )
     }
@@ -1551,9 +1551,9 @@ static Get_PlayerPostfix(const id, const target, const hasImmunity) {
     new postfix[32]
 
     if (hasImmunity) {
-        formatex(postfix, charsmax(postfix), " [\\r%L\\d]", id, "Gag_Immunity")
+        formatex(postfix, charsmax(postfix), " [\r%L\d]", id, "Gag_Immunity")
     } else if (g_currentGags[target][gd_reason][r_flags]) {
-        formatex(postfix, charsmax(postfix), " [\\y%L\\w]", id, "Gag_Gagged")
+        formatex(postfix, charsmax(postfix), " [\y%L\w]", id, "Gag_Gagged")
     }
 
     return postfix

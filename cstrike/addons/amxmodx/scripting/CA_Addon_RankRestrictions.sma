@@ -91,9 +91,9 @@ public native_filter(const name[], index, trap) {
 
 Create_CVars() {
     bind_pcvar_num(create_cvar("ca_rankrestrictions_type", "1", 
-        .description = "Restrictions Type\n\
-            0 - Disable restrictions\n\
-            1 - Level restrictions\n\
+        .description = "Restrictions Type^n\
+            0 - Disable restrictions^n\
+            1 - Level restrictions^n\
             2 - Kills count restrictions",
         .has_min = true, .min_val = 0.0,
         .has_max = true, .max_val = 2.0
@@ -101,8 +101,8 @@ Create_CVars() {
     )
 
     bind_pcvar_num(create_cvar("ca_rankrestrictions_type_kills", "1",
-        .description = "Kill System Types\n\
-        0 - CSStats MySQL\n\
+        .description = "Kill System Types^n\
+        0 - CSStats MySQL^n\
         1 - CSX Module",
         .has_min = true, .min_val = 0.0,
         .has_max = true, .max_val = 1.0
@@ -122,13 +122,13 @@ Create_CVars() {
     )
 
     bind_pcvar_num(create_cvar("ca_rankrestrictions_type_level", "1",
-        .description = "Level System Types\n\
-            0 - Advanced Experience System\n\
-            1 - Army Ranks Ultimate\n\
-            2 - OciXCrom's Rank System\n\
-            3 - CMSStats Ranks\n\
-            4 - CMSStats MySQL\n\
-            5 - CSstatsX SQL\n\
+        .description = "Level System Types^n\
+            0 - Advanced Experience System^n\
+            1 - Army Ranks Ultimate^n\
+            2 - OciXCrom's Rank System^n\
+            3 - CMSStats Ranks^n\
+            4 - CMSStats MySQL^n\
+            5 - CSstatsX SQL^n\
             6 - CSX Module",
         .has_min = true, .min_val = 0.0,
         .has_max = true, .max_val = 6.0
