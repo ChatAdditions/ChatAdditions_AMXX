@@ -58,32 +58,19 @@ public plugin_natives() {
 }
 
 public native_filter(const name[], index, trap) {
-    if (strcmp(name, "aes_get_player_level")) {
-        return PLUGIN_HANDLED
+    new const na[][] = {
+        "aes_get_player_level",
+        "ar_get_user_level",
+        "crxranks_get_user_level",
+        "csstats_get_user_stats",
+        "cmsranks_get_user_level",
+        "cmsstats_get_user_skill",
+        "get_user_stats"
     }
 
-    if (strcmp(name, "ar_get_user_level")) {
-        return PLUGIN_HANDLED
-    }
-
-    if (strcmp(name, "crxranks_get_user_level")) {
-        return PLUGIN_HANDLED
-    }
-
-    if (strcmp(name, "csstats_get_user_stats")) {
-        return PLUGIN_HANDLED
-    }
-
-    if (strcmp(name, "cmsranks_get_user_level")) {
-        return PLUGIN_HANDLED
-    }
-
-    if (strcmp(name, "cmsstats_get_user_skill")) {
-        return PLUGIN_HANDLED
-    }
-
-    if (strcmp(name, "get_user_stats")) {
-        return PLUGIN_HANDLED
+    for (new i; i < sizeof(na); i++) {
+        if (strcmp(na[i], name) != 0)
+            return PLUGIN_HANDLED
     }
 
     return PLUGIN_CONTINUE
