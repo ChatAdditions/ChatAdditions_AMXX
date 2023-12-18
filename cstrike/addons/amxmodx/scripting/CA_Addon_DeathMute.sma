@@ -27,11 +27,11 @@ new bool: g_canSpeakWithAlive[MAX_PLAYERS + 1]
 
 new g_syncHudOj
 
-public stock const PluginName[] = "CA Addon: Death mute"
-public stock const PluginVersion[] = CA_VERSION
-public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "Alive players don't hear dead players after 5 secs"
+public stock const PluginName[]         = "CA Addon: Death mute"
+public stock const PluginVersion[]      = CA_VERSION
+public stock const PluginAuthor[]       = "Sergey Shorokhov"
+public stock const PluginURL[]          = "https://github.com/ChatAdditions/"
+public stock const PluginDescription[]  = "Alive players don't hear dead players after 5 secs"
 
 public plugin_init() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)

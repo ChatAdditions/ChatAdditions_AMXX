@@ -29,11 +29,11 @@ const QUERY_LENGTH = 4096
 new const g_mute_table[] = "ca_players_mute"
 new Handle: g_tuple = Empty_Handle
 
-public stock const PluginName[] = "CA: Mute"
-public stock const PluginVersion[] = CA_VERSION
-public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "Players can choose who they can hear."
+public stock const PluginName[]         = "CA: Mute"
+public stock const PluginVersion[]      = CA_VERSION
+public stock const PluginAuthor[]       = "Sergey Shorokhov"
+public stock const PluginURL[]          = "https://github.com/ChatAdditions/"
+public stock const PluginDescription[]  = "Players can choose who they can hear."
 
 public plugin_init() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)

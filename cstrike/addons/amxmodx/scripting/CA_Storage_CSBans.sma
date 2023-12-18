@@ -31,11 +31,11 @@ new ca_storage_host[64],
     ca_storage_pass[128],
     ca_storage_dbname[128]
 
-public stock const PluginName[] = "ChatAdditions: CSBans storage"
-public stock const PluginVersion[] = CA_VERSION
-public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "CSBans (MySQL) storage provider for ChatAdditions"
+public stock const PluginName[]         = "ChatAdditions: CSBans storage"
+public stock const PluginVersion[]      = CA_VERSION
+public stock const PluginAuthor[]       = "Sergey Shorokhov"
+public stock const PluginURL[]          = "https://github.com/ChatAdditions/"
+public stock const PluginDescription[]  = "CSBans (MySQL) storage provider for ChatAdditions"
 
 public plugin_init() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)

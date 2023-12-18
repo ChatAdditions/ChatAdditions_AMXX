@@ -42,11 +42,11 @@ new const g_versionLink[] = "https://api.github.com/repos/"
     + "ChatAdditions/ChatAdditions_AMXX"
     + "/releases/latest"
 
-public stock const PluginName[] = "ChatAdditions: Core"
-public stock const PluginVersion[] = CA_VERSION
-public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "A core plugin for control different types of chat."
+public stock const PluginName[]         = "ChatAdditions: Core"
+public stock const PluginVersion[]      = CA_VERSION
+public stock const PluginAuthor[]       = "Sergey Shorokhov"
+public stock const PluginURL[]          = "https://github.com/ChatAdditions/"
+public stock const PluginDescription[]  = "A core plugin for control different types of chat."
 
 public plugin_precache() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)

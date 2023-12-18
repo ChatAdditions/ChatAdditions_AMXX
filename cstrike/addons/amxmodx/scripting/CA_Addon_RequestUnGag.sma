@@ -13,11 +13,11 @@ new ca_requestungag_cmd[32],
     ca_gag_access_flags_high[32],
     ca_gag_access_flags[32]
 
-public stock const PluginName[] = "CA Addon: Request UnGAG"
-public stock const PluginVersion[] = CA_VERSION
-public stock const PluginAuthor[] = "steelzzz"
-public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "A player can apologize to the administration"
+public stock const PluginName[]         = "CA Addon: Request UnGAG"
+public stock const PluginVersion[]      = CA_VERSION
+public stock const PluginAuthor[]       = "steelzzz"
+public stock const PluginURL[]          = "https://github.com/ChatAdditions/"
+public stock const PluginDescription[]  = "A player can apologize to the administration"
 
 public plugin_init() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)

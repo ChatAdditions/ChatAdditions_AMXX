@@ -8,11 +8,11 @@ new g_OldMessage[MAX_PLAYERS + 1][CA_MAX_MESSAGE_SIZE]
 new Float: ca_anti_flood_time,
     ca_equal_messages
 
-public stock const PluginName[] = "CA: Anti Flood"
-public stock const PluginVersion[] = CA_VERSION
-public stock const PluginAuthor[] = "Nordic Warrior"
-public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "Antiflood for text chat"
+public stock const PluginName[]         = "CA: Anti Flood"
+public stock const PluginVersion[]      = CA_VERSION
+public stock const PluginAuthor[]       = "Nordic Warrior"
+public stock const PluginURL[]          = "https://github.com/ChatAdditions/"
+public stock const PluginDescription[]  = "Antiflood for text chat"
 
 public plugin_init() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)
@@ -59,8 +59,7 @@ CheckMessage(id, const message[]) {
 
             return CA_SUPERCEDE
         }
-    }
-    else {
+    } else {
         equalMessage[id] = 0
     }
 

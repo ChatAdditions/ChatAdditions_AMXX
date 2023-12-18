@@ -59,11 +59,11 @@ new const g_adminChatCmds[][] = {
 new const g_gagCmd[] = "gag"
 new const g_unGagCmd[] = "ungag"
 
-public stock const PluginName[] = "CA: Gag"
-public stock const PluginVersion[] = CA_VERSION
-public stock const PluginAuthor[] = "Sergey Shorokhov"
-public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "Manage player chats for the admin."
+public stock const PluginName[]         = "CA: Gag"
+public stock const PluginVersion[]      = CA_VERSION
+public stock const PluginAuthor[]       = "Sergey Shorokhov"
+public stock const PluginURL[]          = "https://github.com/ChatAdditions/"
+public stock const PluginDescription[]  = "Manage player chats for the admin."
 
 public plugin_precache() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)

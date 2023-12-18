@@ -38,11 +38,11 @@ new ca_rankrestrictions_type,
     ca_rankrestrictions_immunity_flag[16],
     ca_rankrestrictions_steam_immunity
 
-public stock const PluginName[] = "CA Addon: Rank restrictions"
-public stock const PluginVersion[] = CA_VERSION
-public stock const PluginAuthor[] = "steelzzz"
-public stock const PluginURL[] = "https://github.com/ChatAdditions/"
-public stock const PluginDescription[] = "Restrict chat until you reach the rank of a statistic"
+public stock const PluginName[]         = "CA Addon: Rank restrictions"
+public stock const PluginVersion[]      = CA_VERSION
+public stock const PluginAuthor[]       = "steelzzz"
+public stock const PluginURL[]          = "https://github.com/ChatAdditions/"
+public stock const PluginDescription[]  = "Restrict chat until you reach the rank of a statistic"
 
 public plugin_init() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)
