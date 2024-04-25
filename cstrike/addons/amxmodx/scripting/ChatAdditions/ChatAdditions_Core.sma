@@ -2,7 +2,7 @@
 #include <amxmisc>
 #include <fakemeta>
 
-#include <grip>
+#include <easy_http>
 #include <ChatAdditions>
 
 #pragma tabsize 4
@@ -128,7 +128,7 @@ ReadFolder(deleteTime, logPath[]) {
     new fileTime
 
     if (dirHandle) {
-        do 
+        do
         {
             if (logFile[0] == '.') {
                 continue
@@ -182,7 +182,7 @@ Create_CVars() {
             0 - The logs won't be deleted.^n \
             > 0 - The logs will be deleted at the time inserted.",
             .has_min = true, .min_val = 0.0
-            ), 
+            ),
         ca_log_autodelete_time
     )
 }
@@ -198,11 +198,17 @@ public plugin_natives() {
 }
 
 public ModuleFilter(const library[], LibType: type) {
-    return strcmp("grip", library) == 0 ? PLUGIN_HANDLED : PLUGIN_CONTINUE
+    return strcmp("easy_http", library) == 0 ? PLUGIN_HANDLED : PLUGIN_CONTINUE
 }
 
 public NativeFilter(const nativeName[], index, trap) {
-    return strncmp(nativeName, "grip_", 5) == 0 ? PLUGIN_HANDLED : PLUGIN_CONTINUE
+    if (strncmp(nativeName, "ezhttp_", 7) == 0)
+        return PLUGIN_HANDLED
+
+    if (strncmp(nativeName, "ezjson_", 7) == 0)
+        return PLUGIN_HANDLED
+
+    return PLUGIN_CONTINUE
 }
 
 public ClCmd_Say(const id) {
@@ -354,9 +360,9 @@ static CheckUpdate() {
     if (strcmp(CA_VERSION, "CA_VERSION") == 0 || contain(CA_VERSION, ".") == -1) // ignore custom builds
         return
 
-    if (is_module_loaded("grip") == -1) {
-        CA_Log(logLevel_Warning, "The `GRip` module is not loaded! The new version cannot be verified.")
-        CA_Log(logLevel_Warning, "Please install GRip: `https://github.com/In-line/grip` or disable update checks (`ca_update_notify `0`).")
+    if (is_module_loaded("easy_http") == -1) {
+        CA_Log(logLevel_Warning, "The `AmxxEasyHttp` module is not loaded! The new version cannot be verified.")
+        CA_Log(logLevel_Warning, "Please install AmxxEasyHttp: `https://github.com/Next21Team/AmxxEasyHttp` or disable update checks (`ca_update_notify `0`).")
 
         return
     }
@@ -365,51 +371,45 @@ static CheckUpdate() {
 }
 
 static RequestNewVersion(const link[]) {
-    new GripRequestOptions: options = grip_create_default_options()
-    new GripBody: body = grip_body_from_string("")
-
-    grip_request(
-        link,
-        body,
-        GripRequestTypeGet,
-        "@RequestHandler",
-        options
-    )
-
-    grip_destroy_body(body)
-    grip_destroy_options(options)
+    ezhttp_get(link, "@RequestHandler")
 }
 
-@RequestHandler() {
+@RequestHandler(EzHttpRequest: request_id) {
+    if (ezhttp_get_error_code(request_id) != EZH_OK) {
+        new error[64]
+        ezhttp_get_error_message(request_id, error, charsmax(error))
+        server_print("Response error: %s", error)
+        return
+    }
+
+
     new response[8192]
-    grip_get_response_body_string(response, charsmax(response))
+    ezhttp_get_data(request_id, response, charsmax(response))
 
     if (contain(response, "tag_name") == -1) {
         CA_Log(logLevel_Warning, " > Wrong response! (don't contain `tag_name`). res=`%s`", response)
         return
     }
 
-    static errorBuffer[1024]
-    new GripJSONValue: json = grip_json_parse_string(response, errorBuffer, charsmax(errorBuffer))
-
-    if (json == Invalid_GripJSONValue) {
-        CA_Log(logLevel_Warning, " > Can't parse response JSON! (error=`%s`)", errorBuffer)
+    new EzJSON: json = ezjson_parse(response)
+    if (json == EzInvalid_JSON) {
+        CA_Log(logLevel_Warning, " > Can't parse response JSON!")
         goto END
     }
 
     new tag_name[32]
-    grip_json_object_get_string(json, "tag_name", tag_name, charsmax(tag_name))
+    ezjson_object_get_string(json, "tag_name", tag_name, charsmax(tag_name))
 
     if (CmpVersions(CA_VERSION, tag_name) >= 0)
         goto END
 
     new html_url[256]
-    grip_json_object_get_string(json, "html_url", html_url, charsmax(html_url))
+    ezjson_object_get_string(json, "html_url", html_url, charsmax(html_url))
 
     NotifyUpdate(tag_name, html_url)
 
     END:
-    grip_destroy_json_value(json)
+    ezjson_free(json)
 }
 
 static NotifyUpdate(const newVersion[], const URL[]) {
