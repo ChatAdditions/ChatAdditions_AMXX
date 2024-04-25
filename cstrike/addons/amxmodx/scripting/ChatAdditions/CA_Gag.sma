@@ -1162,14 +1162,15 @@ public ConCmd_amx_gag(const id, const level, const cid) {
 
     new argc = read_argc()
 
-    if (argc == 1) {
-        console_print(id, "^t Usage: amx_gag [nickname | STEAM_ID | userID | IP] <reason> <time> <flags>^n")
+    if (argc == 1 || argc >= amx_gag_s) {
+        console_print(id, "^t Wrong arguments count: `%i`", argc)
+        console_print(id, "^t Usage: amx_gag ^"[nickname | STEAM_ID | userID | IP]^" ^"<reason>^" <time> <flags>^n")
 
         return PLUGIN_HANDLED
     }
 
     new args[amx_gag_s][255]
-    for(new i; i < argc; i++) {
+    for (new i; i < argc; i++) {
         read_argv(i, args[amx_gag_s: i], charsmax(args[]))
     }
 
