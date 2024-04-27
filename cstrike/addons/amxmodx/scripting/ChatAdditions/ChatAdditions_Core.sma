@@ -360,7 +360,7 @@ static CheckUpdate() {
     if (strcmp(CA_VERSION, "CA_VERSION") == 0 || contain(CA_VERSION, ".") == -1) // ignore custom builds
         return
 
-    if (is_module_loaded("easy_http") == -1) {
+    if (is_module_loaded("Amxx Easy Http") == -1) {
         CA_Log(logLevel_Warning, "The `AmxxEasyHttp` module is not loaded! The new version cannot be verified.")
         CA_Log(logLevel_Warning, "Please install AmxxEasyHttp: `https://github.com/Next21Team/AmxxEasyHttp` or disable update checks (`ca_update_notify `0`).")
 
