@@ -50,6 +50,7 @@ Rich API capabilities allow the system to connect any functionality (work with p
 - [ReGameDLL](https://github.com/s1lentq/ReGameDLL_CS) installed;
 - Installed AMXModX ([`v1.9`](https://www.amxmodx.org/downloads-new.php) or [`v1.10`](https://www.amxmodx.org/downloads-new.php?branch=master));
     - Installed [ReAPI](https://github.com/s1lentq/reapi) module (optional, but not required);
+    - Installed [AmxxEasyHttp](https://github.com/Next21Team/AmxxEasyHttp) module (optional, but not required);
       
 ## Installation
 - [Download the latest](https://github.com/ChatAdditions/ChatAdditions_AMXX/releases/latest) stable version from the release section.
