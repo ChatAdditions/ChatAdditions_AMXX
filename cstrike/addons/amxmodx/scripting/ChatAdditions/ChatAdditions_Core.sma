@@ -51,7 +51,7 @@ public stock const PluginDescription[]  = "A core plugin for control different t
 public plugin_precache() {
     register_plugin(PluginName, PluginVersion, PluginAuthor)
 
-    create_cvar("ChatAdditions_version", PluginVersion, (FCVAR_SERVER | FCVAR_SPONLY | FCVAR_UNLOGGED))
+    create_cvar("ChatAdditions_version", PluginVersion, FCVAR_SERVER)
 
     GetLogsFilePath(g_logsPath, .dir = LOG_FOLDER)
 
