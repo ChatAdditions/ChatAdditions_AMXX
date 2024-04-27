@@ -17,7 +17,6 @@ enum logType_s {
 
 new logType_s: ca_log_type,
     logLevel_s: ca_log_level = logLevel_Debug,
-    g_logsPath[PLATFORM_MAX_PATH],
     bool: ca_update_notify,
     ca_log_autodelete_time
 
@@ -53,11 +52,8 @@ public plugin_precache() {
 
     create_cvar("ChatAdditions_version", PluginVersion, FCVAR_SERVER)
 
-    GetLogsFilePath(g_logsPath, .dir = LOG_FOLDER)
-
     Create_CVars()
-
-    AutoExecConfig(true, "ChatAdditions_core", "ChatAdditions")
+    CheckUpdate()
 }
 
 public plugin_init() {
@@ -77,8 +73,6 @@ public plugin_init() {
     CheckAutoDelete()
 
     CA_Log(logLevel_Debug, "Chat Additions: Core initialized!")
-
-    set_task_ex(6.274, "_OnConfigsExecuted")
 }
 
 public plugin_end() {
@@ -87,39 +81,40 @@ public plugin_end() {
     DestroyForward(g_fwdClientChangeName)
 }
 
-public _OnConfigsExecuted() {
-    CheckUpdate()
-}
-
 CheckAutoDelete() {
-    if (ca_log_autodelete_time > 0) {
-        if (dir_exists(g_logsPath)) {
-            new logFile[PLATFORM_MAX_PATH]
-            new dirHandle
-            new subDirectory[PLATFORM_MAX_PATH]
-            new deleteTime
+    if (ca_log_autodelete_time <= 0)
+        return
 
-            deleteTime = get_systime() - (ca_log_autodelete_time * 60 * 60 * 24)
+    new logsPath[PLATFORM_MAX_PATH]
+    GetLogsFilePath(logsPath, .dir = LOG_FOLDER)
 
-            dirHandle = open_dir(g_logsPath, logFile, charsmax(logFile))
+    if (!dir_exists(logsPath))
+        return
 
-            if (dirHandle) {
-                while (next_file(dirHandle, logFile, charsmax(logFile))) {
-                    if (logFile[0] == '.')
-                        continue
+    new logFile[PLATFORM_MAX_PATH]
+    new dirHandle
+    dirHandle = open_dir(logsPath, logFile, charsmax(logFile))
+    if (!dirHandle)
+        return
 
-                    if (containi(logFile, ".log") == -1) {
-                        formatex(subDirectory, charsmax(subDirectory), "%s/%s", g_logsPath, logFile)
+    new subDirectory[PLATFORM_MAX_PATH]
+    new deleteTime = get_systime() - (ca_log_autodelete_time * (60 * 60 * 24))
 
-                        ReadFolder(deleteTime, subDirectory)
+    while (next_file(dirHandle, logFile, charsmax(logFile))) {
+        if (logFile[0] == '.')
+            continue
 
-                        continue
-                    }
-                }
-                close_dir(dirHandle)
-            }
+        if (containi(logFile, ".log") == -1) {
+            formatex(subDirectory, charsmax(subDirectory), "%s/%s", logsPath, logFile)
+
+            // TODO: refactor this
+            ReadFolder(deleteTime, subDirectory)
+
+            continue
         }
     }
+
+    close_dir(dirHandle)
 }
 
 ReadFolder(deleteTime, logPath[]) {
@@ -185,6 +180,14 @@ Create_CVars() {
             ),
         ca_log_autodelete_time
     )
+
+    AutoExecConfig(true, "ChatAdditions_core", LOG_FOLDER)
+
+    new configsDir[PLATFORM_MAX_PATH]
+    get_configsdir(configsDir, charsmax(configsDir))
+
+    server_cmd("exec %s/plugins/%s/ChatAdditions_core.cfg", configsDir, LOG_FOLDER)
+    server_exec()
 }
 
 public plugin_natives() {
@@ -283,38 +286,41 @@ public bool: native_CA_Log(const plugin_id, const argc) {
 
     new logLevel_s: level = logLevel_s: get_param(arg_level)
 
-    if (ca_log_level < level) {
+    if (ca_log_level < level)
         return false
-    }
 
     new msg[2048]
     vdformat(msg, charsmax(msg), arg_msg, arg_format)
 
     new logsFile[PLATFORM_MAX_PATH]
 
-    if (ca_log_type > _Default)
-    {
-        new pluginName[32]
+    if (ca_log_type > _Default) {
+        new logsPath[PLATFORM_MAX_PATH]
+        get_localinfo("amxx_logs", logsPath, charsmax(logsPath))
+
+        new pluginName[PLATFORM_MAX_PATH]
         get_plugin(plugin_id, pluginName, charsmax(pluginName))
 
         replace(pluginName, charsmax(pluginName), ".amxx", "")
 
-        new logsPath[PLATFORM_MAX_PATH]
-        formatex(logsPath, charsmax(logsPath), "%s/%s", g_logsPath, pluginName)
+        formatex(logsPath, charsmax(logsPath), "%s/%s", logsPath, pluginName)
 
-        if (!dir_exists(logsPath)) {
+        if (!dir_exists(logsPath))
             mkdir(logsPath)
-        }
 
         new year, month, day
         date(year, month, day)
 
-        formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log", logsPath, pluginName, year, month, day)
+        formatex(logsFile, charsmax(logsFile), "%s/%s__%i-%02i-%02i.log",
+            logsPath,
+            pluginName[sizeof(LOG_FOLDER)],
+            year, month, day
+        )
     }
 
     switch (ca_log_type) {
-        case _LogToDir:         log_to_file(logsFile, msg)
         case _Default:          log_amx(msg)
+        case _LogToDir:         log_to_file(logsFile, msg)
         case _LogToDirSilent:   log_to_file_ex(logsFile, msg)
     }
 
