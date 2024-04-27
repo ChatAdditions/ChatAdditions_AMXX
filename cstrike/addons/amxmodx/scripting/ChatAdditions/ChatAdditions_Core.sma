@@ -12,7 +12,8 @@
 enum logType_s {
     _Default,
     _LogToDir,
-    _LogToDirSilent
+    _LogToDirSilent,
+    _LogToAlertMessage,
 }
 
 new logType_s: ca_log_type,
@@ -147,19 +148,26 @@ Create_CVars() {
 
     bind_pcvar_num(create_cvar("ca_log_type", "1",
             .description = fmt("Log file type^n \
-                0 = log to common amxx log file (logs/L*.log)^n \
-                1 = log to plugins folder (logs/%s/[plugin name]/L*.log)^n \
-                2 = silent log to plugins folder (logs/%s/[plugin name]/L*.log)", LOG_FOLDER, LOG_FOLDER),
+                    0 = log to common amxx log file (logs/L*.log)^n \
+                    1 = log to plugins folder (logs/%s/[plugin name]/L*.log)^n \
+                    2 = silent log to plugins folder (logs/%s/[plugin name]/L*.log)^n \
+                    3 = use elog_message) \
+                ",
+                LOG_FOLDER, LOG_FOLDER),
             .has_min = true, .min_val = 0.0,
-            .has_max = true, .max_val = float(_LogToDirSilent)
+            .has_max = true, .max_val = float(logType_s) - 1.0
         ),
         ca_log_type
     )
 
     bind_pcvar_num(create_cvar("ca_log_level", "1",
-            .description = "Log level^n 0 = disable logs^n 1 = add info messages logs^n 2 = add warinigs info^n 3 = add debug messages",
+            .description = "Log level^n \
+                0 = disable logs^n \
+                1 = add info messages logs^n \
+                2 = add warinigs info^n \
+                3 = add debug messages",
             .has_min = true, .min_val = 0.0,
-            .has_max = true, .max_val = float(logLevel_Debug)
+            .has_max = true, .max_val = float(logLevel_s) - 1.0
         ),
         ca_log_level
     )
@@ -294,7 +302,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
 
     new logsFile[PLATFORM_MAX_PATH]
 
-    if (ca_log_type > _Default) {
+    if (ca_log_type == _LogToDir || ca_log_type == _LogToDirSilent) {
         new logsPath[PLATFORM_MAX_PATH]
         get_localinfo("amxx_logs", logsPath, charsmax(logsPath))
 
@@ -322,6 +330,7 @@ public bool: native_CA_Log(const plugin_id, const argc) {
         case _Default:          log_amx(msg)
         case _LogToDir:         log_to_file(logsFile, msg)
         case _LogToDirSilent:   log_to_file_ex(logsFile, msg)
+        case _LogToAlertMessage: elog_message(msg)
     }
 
     return true
