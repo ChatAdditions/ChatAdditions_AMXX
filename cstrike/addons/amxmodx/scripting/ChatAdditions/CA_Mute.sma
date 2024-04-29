@@ -17,7 +17,8 @@ new bool: g_globalMute[MAX_PLAYERS + 1]
 new Float: g_nextUse[MAX_PLAYERS + 1]
 
 new Float: ca_mute_use_delay,
-    bool: ca_mute_use_storage
+    bool: ca_mute_use_storage,
+    ca_mute_mode[4]
 
 new g_dummy, g_itemInfo[64], g_itemName[128]
 
@@ -77,6 +78,12 @@ Create_CVars() {
             .has_max = true, .max_val = 1.0
         ),
         ca_mute_use_storage
+    )
+
+    bind_pcvar_string(create_cvar("ca_mute_mode", "abcd",
+            .description = "Mute mode"
+        ),
+        ca_mute_mode, charsmax(ca_mute_mode)
     )
 }
 
