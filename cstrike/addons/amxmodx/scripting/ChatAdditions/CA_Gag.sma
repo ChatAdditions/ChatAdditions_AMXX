@@ -1162,7 +1162,7 @@ public ConCmd_amx_gag(const id, const level, const cid) {
 
     new argc = read_argc()
 
-    if (argc == 1 || argc >= amx_gag_s) {
+    if (argc == 1 || argc >= _: amx_gag_s) {
         console_print(id, "^t Wrong arguments count: `%i`", argc)
         console_print(id, "^t Usage: amx_gag ^"[nickname | STEAM_ID | userID | IP]^" ^"<reason>^" <time> <flags>^n")
 
