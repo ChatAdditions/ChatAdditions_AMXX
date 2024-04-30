@@ -16,6 +16,11 @@ new bool: g_globalMute[MAX_PLAYERS + 1]
 
 new Float: g_nextUse[MAX_PLAYERS + 1]
 
+enum (<<=1) {
+    MuteFlag_Voice = (1 << 0),
+    MuteFlag_Chat,
+}
+
 new Float: ca_mute_use_delay,
     bool: ca_mute_use_storage,
     ca_mute_mode[4]
@@ -55,6 +60,9 @@ public plugin_init() {
 
     Storage_Init()
 
+    // TODO: make it into API
+    register_message(get_user_msgid("SayText"), "UserMsg_SayText")
+
     CA_Log(logLevel_Debug, "[CA]: Mute initialized!")
 }
 
@@ -80,7 +88,7 @@ Create_CVars() {
         ca_mute_use_storage
     )
 
-    bind_pcvar_string(create_cvar("ca_mute_mode", "abcd",
+    bind_pcvar_string(create_cvar("ca_mute_mode", "ab",
             .description = "Mute mode"
         ),
         ca_mute_mode, charsmax(ca_mute_mode)
@@ -248,6 +256,10 @@ public client_disconnected(id) {
 }
 
 public CA_Client_Voice(const listener, const sender) {
+    new flags = read_flags(ca_mute_mode)
+    if (flags && !(read_flags(ca_mute_mode) & MuteFlag_Voice))
+        return PLUGIN_CONTINUE
+
     if (g_globalMute[listener]) {
         return CA_SUPERCEDE
     }
@@ -261,6 +273,28 @@ public CA_Client_Voice(const listener, const sender) {
     }
 
     return CA_CONTINUE
+}
+
+public UserMsg_SayText(msgid, dest, receiver) {
+    if (get_msg_args() < 4)
+        return PLUGIN_CONTINUE
+
+    new flags = read_flags(ca_mute_mode)
+    if (flags && !(read_flags(ca_mute_mode) & MuteFlag_Chat))
+        return PLUGIN_CONTINUE
+
+    new sender = get_msg_arg_int(1)
+
+    if (g_globalMute[receiver])
+        return PLUGIN_HANDLED
+
+    if (g_globalMute[sender])
+        return PLUGIN_HANDLED
+
+    if (g_playersMute[receiver][sender] == true)
+        return PLUGIN_HANDLED
+
+    return PLUGIN_CONTINUE
 }
 
 Storage_Init() {
