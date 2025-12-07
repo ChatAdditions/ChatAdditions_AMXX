@@ -1154,7 +1154,8 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
 }
 
 public ConCmd_amx_gag(const id, const level, const cid) {
-    enum amx_gag_s { /* arg_cmd, */ arg_player = 1, arg_reason, arg_time, arg_flags }
+    enum amx_gag_s { arg_cmd, arg_player, arg_reason, arg_time, arg_flags }
+    #pragma unused arg_cmd
 
     if (!cmd_access(id, level, cid, 1)) {
         return PLUGIN_HANDLED
@@ -1162,7 +1163,7 @@ public ConCmd_amx_gag(const id, const level, const cid) {
 
     new argc = read_argc()
 
-    if (argc == 1 || argc >= _: amx_gag_s) {
+    if (argc == 1 || argc > _: amx_gag_s) {
         console_print(id, "^t Wrong arguments count: `%i`", argc)
         console_print(id, "^t Usage: amx_gag ^"[nickname | STEAM_ID | userID | IP]^" ^"<reason>^" <time> <flags>^n")
 
