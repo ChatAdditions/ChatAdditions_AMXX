@@ -1154,7 +1154,9 @@ public ClCmd_EnterGagTime(const id, const level, const cid) {
 }
 
 public ConCmd_amx_gag(const id, const level, const cid) {
-    enum amx_gag_s { /* arg_cmd, */ arg_player = 1, arg_reason, arg_time, arg_flags }
+    const AMX_GAG_ARG_COUNT = 5
+    enum { arg_cmd, arg_player, arg_reason, arg_time, arg_flags }
+    #pragma unused arg_cmd
 
     if (!cmd_access(id, level, cid, 1)) {
         return PLUGIN_HANDLED
@@ -1162,16 +1164,16 @@ public ConCmd_amx_gag(const id, const level, const cid) {
 
     new argc = read_argc()
 
-    if (argc == 1 || argc >= _: amx_gag_s) {
+    if (argc < 2 || argc > AMX_GAG_ARG_COUNT) {
         console_print(id, "^t Wrong arguments count: `%i`", argc)
         console_print(id, "^t Usage: amx_gag ^"[nickname | STEAM_ID | userID | IP]^" ^"<reason>^" <time> <flags>^n")
 
         return PLUGIN_HANDLED
     }
 
-    new args[amx_gag_s][255]
+    new args[AMX_GAG_ARG_COUNT][255]
     for (new i; i < argc; i++) {
-        read_argv(i, args[amx_gag_s: i], charsmax(args[]))
+        read_argv(i, args[i], charsmax(args[]))
     }
 
     new target = FindPlayerByTarget(args[arg_player])
@@ -1219,17 +1221,18 @@ public ConCmd_amx_gag(const id, const level, const cid) {
 }
 
 public SrvCmd_AddReason() {
-    enum any: args_s { arg_cmd, arg_reason, arg_flags, arg_time }
+    const ARGS_COUNT = 4
+    enum { arg_cmd, arg_reason, arg_flags, arg_time }
 
     new argCount = read_argc()
-    if (argCount < 2 || argCount > 4) {
+    if (argCount < 2 || argCount > ARGS_COUNT) {
         server_print("^tUsage: ca_gag_add_reason <reason> [flags] [time]")
         return
     }
 
-    new args[args_s][256]
+    new args[ARGS_COUNT][256]
 
-    for(new arg = arg_cmd; arg < sizeof(args); arg++) {
+    for(new arg = arg_cmd; arg < ARGS_COUNT; arg++) {
         read_argv(arg, args[arg], charsmax(args[]))
     }
 
@@ -1252,10 +1255,11 @@ public SrvCmd_AddReason() {
 }
 
 public SrvCmd_AddWhitelistCmd() {
+    const ARGS_COUNT = 2
     enum { arg_chat_cmd = 1 }
 
     new argCount = read_argc()
-    if (argCount != 2) {
+    if (argCount != ARGS_COUNT) {
         server_print("^tUsage: ca_gag_add_chat_whitelist_cmd <cmd>")
         return
     }
