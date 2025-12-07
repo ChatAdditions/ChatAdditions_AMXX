@@ -47,7 +47,7 @@ jobs:
 
       - name: Setup latest ReAPI includes
         env:
-          REPO: "s1lentq/reapi"
+          REPO: "rehlds/reapi"
         run: |
           mkdir -p dep/reapi
           cd dep/reapi
