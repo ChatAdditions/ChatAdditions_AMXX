@@ -1677,6 +1677,12 @@ static bool: Gag_Remove(const id, const target) {
 
         show_activity_ex(id, fmt("%n", id), "%l", "Gag_AdminUngagPlayer", g_currentGags[target][gd_name])
 
+        CA_Log(logLevel_Info, "Gag: ^"%n^" remove gag from ^"%n^" (type:^"%s^") (time:^"%s^") (reason:^"%s^")", \
+            id, target, bits_to_flags(gag_flags_s: g_currentGags[target][gd_reason][r_flags]), \
+            Get_TimeString_seconds(LANG_PLAYER, g_currentGags[target][gd_reason][r_time]), \
+            g_currentGags[target][gd_reason][r_name] \
+        )
+
         GagData_Reset(g_adminTempData[id])
         GagData_Reset(g_currentGags[target])
 
