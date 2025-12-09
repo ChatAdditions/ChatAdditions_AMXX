@@ -12,7 +12,12 @@
 
     /* ----- START SETTINGS ----- */
 const Float: GAG_THINKER_FREQ = 3.0
+// #define DEBUG
     /* ----- END OF SETTINGS ----- */
+
+#if defined DEBUG
+    #pragma showstackusageinfo
+#endif
 
 static g_currentGags[MAX_PLAYERS + 1][gagData_s]
 static g_adminTempData[MAX_PLAYERS + 1][gagData_s]
@@ -307,9 +312,11 @@ static MenuShow_PlayersList(const id, const nickname[] = "") {
     for(new i; i < count; i++) {
         new target = players[i]
 
+        #if !defined DEBUG
         if (target == id) {
             continue
         }
+        #endif
 
         new name[MAX_NAME_LENGTH + 16]
         get_user_name(target, name, charsmax(name))
@@ -1067,11 +1074,13 @@ public ClCmd_Gag(const id, const level, const cid) {
         return PLUGIN_HANDLED
     }
 
+    #if !defined DEBUG
     if (get_playersnum_ex(GetPlayers_ExcludeBots | GetPlayers_ExcludeHLTV) < 2) {
         UTIL_SendAudio(id, ca_gag_sound_error)
         client_print_color(id, print_team_default, "%L %L", id, "Gag_prefix", id, "Gag_NotEnoughPlayers")
         return PLUGIN_HANDLED
     }
+    #endif
 
     MenuShow_PlayersList(id)
     return PLUGIN_HANDLED
