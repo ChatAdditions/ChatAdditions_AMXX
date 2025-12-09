@@ -247,6 +247,18 @@ native bool: CA_PlayerHasBlockedPlayer(const receiver, const sender)
  */
 forward CA_Client_Say(index, const bool: isTeamMessage, const message[])
 
+/**
+ * Called when server send message from player to other players chat.
+ *
+ * @param index          Client index.
+ * @param receiver          Receiver index.
+ * @param message        Client message.
+ *
+ * @return      CA_CONTINUE to allow send message
+ *              CA_SUPERCEDE or higher to prevent message
+ */
+forward CA_Client_SendToClient(const index, const receiver, const message[])
+
 
 /**
  * Called when player begins to speak.
