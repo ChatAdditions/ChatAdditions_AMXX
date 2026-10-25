@@ -1,6 +1,7 @@
 #include <amxmodx>
 #include <amxmisc>
 #include <time>
+#include <fakemeta>
 
 #include <ChatAdditions>
 #include <CA_GAG_API>
@@ -22,6 +23,7 @@ const Float: GAG_THINKER_FREQ = 3.0
 static g_currentGags[MAX_PLAYERS + 1][gagData_s]
 static g_adminTempData[MAX_PLAYERS + 1][gagData_s]
 static bool: g_inEditMenu[MAX_PLAYERS + 1] // HACK: need for transmit data per menus
+static bool: g_connectedWithGag[MAX_PLAYERS + 1]
 
 static Array: g_gagReasonsTemplates, g_gagReasonsTemplates_size
 static Array: g_gagTimeTemplates, g_gagTimeTemplates_size
@@ -126,6 +128,8 @@ public plugin_init() {
     CA_Log(logLevel_Debug, "[CA]: Gag initialized!")
 
     Register_Forwards()
+
+    register_forward(FM_ClientUserInfoChanged, "ClientUserInfoChanged_Pre", ._post = false)
 }
 
 public plugin_end() {
@@ -1379,7 +1383,36 @@ public CA_Client_Say(id, const bool: isTeamMessage, const message[]) {
     return CA_SUPERCEDE
 }
 
-public CA_Client_ChangeName(const id, const newName[]) {
+public ClientUserInfoChanged_Pre(const player, const infobuffer) {
+    if (!ca_gag_block_nickname_change) {
+        return FMRES_IGNORED
+    }
+
+    new currentName[32]
+    get_user_name(player, currentName, charsmax(currentName))
+
+    new newName[32]
+    engfunc(EngFunc_InfoKeyValue, infobuffer, "name", newName, charsmax(newName))
+
+    if (strcmp(currentName, newName) == 0)
+        return FMRES_IGNORED
+
+    new bool: hasBlock = (g_currentGags[player][gd_reason][r_flags] & gagFlag_Say)
+
+    if (hasBlock) {
+        if (g_connectedWithGag[player]) {
+            g_connectedWithGag[player] = false
+            return FMRES_SUPERCEDE
+        } else {
+            // Change back name
+            engfunc(EngFunc_SetClientKeyValue, player, infobuffer, "name", currentName)
+        }
+    }
+
+    return FMRES_IGNORED
+}
+
+/*public CA_Client_ChangeName(const id, const newName[]) {
     if (!ca_gag_block_nickname_change) {
         return CA_CONTINUE
     }
@@ -1391,7 +1424,7 @@ public CA_Client_ChangeName(const id, const newName[]) {
     }
 
     return CA_SUPERCEDE
-}
+}*/
 
 public ClCmd_adminSay(const id) {
     new bool: hasBlock = (g_currentGags[id][gd_reason][r_flags] & gagFlag_Say)
@@ -1454,8 +1487,8 @@ public CA_Storage_Loaded(const name[], const authID[], const IP[], const reason[
 
     copy(g_currentGags[target][gd_name], charsmax(g_currentGags[][gd_name]), name)
 
-    // FIXME: Nickname can't change on DEAD player.
-    // set_user_info(target, "name", name)
+    g_connectedWithGag[target] = true
+    set_user_info(target, "name", name)
 
     copy(g_currentGags[target][gd_authID], charsmax(g_currentGags[][gd_authID]), authID)
     copy(g_currentGags[target][gd_IP], charsmax(g_currentGags[][gd_IP]), IP)
