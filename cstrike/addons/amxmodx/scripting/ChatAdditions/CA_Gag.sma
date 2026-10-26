@@ -60,7 +60,7 @@ new const g_adminChatCmds[][] = {
     "amx_say", "amx_asay", "amx_chat", "amx_psay",
     "amx_teamsay", "amx_bsay", "amx_bsay2", "amx_csay",
     "amx_csay2", "amx_rsay", "amx_rsay2", "amx_tsay",
-    "amx_tsay2"
+    "amx_tsay2", "amx_rawsay", "amx_centersay", "amx_speak"
 }
 
 new const g_gagCmd[] = "gag"
