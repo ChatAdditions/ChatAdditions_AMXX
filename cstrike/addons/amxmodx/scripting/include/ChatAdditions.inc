@@ -127,11 +127,9 @@ stock parseTime(const value[]) {
  * @return          Parsed value (may be negative for values above 2^31-1)
  */
 stock ca_strtoul(const string[], const base = 10) {
-    new value
+    new value, digit
 
     for (new i; string[i] != EOS; i++) {
-        new digit
-
         switch (string[i]) {
             case '0'..'9': digit = string[i] - '0'
             case 'a'..'z': digit = string[i] - 'a' + 10
