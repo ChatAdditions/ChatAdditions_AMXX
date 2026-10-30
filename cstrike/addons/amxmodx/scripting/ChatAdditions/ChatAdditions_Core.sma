@@ -286,7 +286,7 @@ public ClCmd_vban(const id) {
     }
 
     new arg[32]; read_argv(1, arg, charsmax(arg))
-    g_BanMasks[id] = strtol(arg, .base = 16)
+    g_BanMasks[id] = ca_strtoul(arg, 16)
 }
 
 public bool: native_CA_Log(const plugin_id, const argc) {
