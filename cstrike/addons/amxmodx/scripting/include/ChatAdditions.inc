@@ -115,6 +115,38 @@ stock parseTime(const value[]) {
     return k + t
 }
 
+/**
+ * Parses an integer the way strtoul() does, but never clamps on overflow:
+ * anything above the cell size is dropped instead, so for hex input the result
+ * keeps the original bit pattern. Treat the returned value as a set of bits
+ * rather than as a signed number.
+ *
+ * @param string    String to parse
+ * @param base      Numeric base, 2..36
+ *
+ * @return          Parsed value (may be negative for values above 2^31-1)
+ */
+stock ca_strtoul(const string[], const base = 10) {
+    new value, digit
+
+    for (new i; string[i] != EOS; i++) {
+        switch (string[i]) {
+            case '0'..'9': digit = string[i] - '0'
+            case 'a'..'z': digit = string[i] - 'a' + 10
+            case 'A'..'Z': digit = string[i] - 'A' + 10
+            default: return value
+        }
+
+        if (digit >= base) {
+            break
+        }
+
+        value = (value * base) + digit
+    }
+
+    return value
+}
+
 stock show_activity_ex(const actorId, const actorName[], const message[], any: ...) {
     enum { arg_format = 4 }
 
