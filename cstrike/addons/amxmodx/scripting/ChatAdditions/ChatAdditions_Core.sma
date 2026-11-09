@@ -24,6 +24,7 @@ new logType_s: ca_log_type,
 new const LOG_FOLDER[] = "ChatAdditions"
 
 new g_fwdClientSay,
+    g_fwdClientSendToClient,
     g_fwdClientVoice,
     g_fwdClientChangeName,
     g_retVal
@@ -61,6 +62,8 @@ public plugin_init() {
     register_clcmd("say",       "ClCmd_Say",      ADMIN_ALL)
     register_clcmd("say_team",  "ClCmd_Say",      ADMIN_ALL)
 
+    register_message(get_user_msgid("SayText"), "UserMsg_SayText")
+
     register_forward(FM_Voice_SetClientListening, "Voice_SetClientListening_Pre", ._post = false)
     register_forward(FM_ClientUserInfoChanged, "ClientUserInfoChanged_Pre", ._post = false)
 
@@ -68,6 +71,7 @@ public plugin_init() {
     register_clcmd("vban",        "ClCmd_vban",         ADMIN_ALL, .FlagManager = false)
 
     g_fwdClientSay          = CreateMultiForward("CA_Client_Say", ET_STOP, FP_CELL, FP_CELL, FP_STRING)
+    g_fwdClientSendToClient = CreateMultiForward("CA_Client_SendToClient", ET_STOP, FP_CELL, FP_CELL, FP_STRING)
     g_fwdClientVoice        = CreateMultiForward("CA_Client_Voice", ET_STOP, FP_CELL, FP_CELL)
     g_fwdClientChangeName   = CreateMultiForward("CA_Client_ChangeName", ET_STOP, FP_CELL, FP_STRING)
 
@@ -78,6 +82,7 @@ public plugin_init() {
 
 public plugin_end() {
     DestroyForward(g_fwdClientSay)
+    DestroyForward(g_fwdClientSendToClient)
     DestroyForward(g_fwdClientVoice)
     DestroyForward(g_fwdClientChangeName)
 }
@@ -230,6 +235,21 @@ public ClCmd_Say(const id) {
     remove_quotes(message)
 
     ExecuteForward(g_fwdClientSay, g_retVal, id, isTeamMessage, message)
+
+    return (g_retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE
+}
+
+public UserMsg_SayText(msgid, dest, receiver) {
+    if (dest != MSG_ONE)
+        return PLUGIN_CONTINUE
+
+    new sender = get_msg_arg_int(1)
+
+    // TODO: check other args
+    static message[256]
+    get_msg_arg_string(3, message, charsmax(message))
+
+    ExecuteForward(g_fwdClientSendToClient, g_retVal, sender, receiver, message)
 
     return (g_retVal == CA_SUPERCEDE) ? PLUGIN_HANDLED : PLUGIN_CONTINUE
 }
