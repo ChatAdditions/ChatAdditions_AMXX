@@ -17,9 +17,6 @@
     <a href="https://www.amxmodx.org/downloads-new.php">
     <img src="https://img.shields.io/badge/AMXModX-%3E%3D1.9.0-blue?style=flat-square"
          alt="AMXModX dependency">
-    <a href="https://t.me/ChatAdditions_group">
-    <img src="https://img.shields.io/badge/discussions-on%20Telegram%20group-informational?style=flat-square&logo=googlechat"
-         alt="Telegram">
 </p>
       
 <p align="center">
@@ -94,9 +91,6 @@ I would like to thank the creators of AMXModX and ReAPI and everyone who helps m
 Reach out to me at one of the following places:
 - Github issues;
 - Github discussions;
-- [Telegram](https://t.me/ShorokhovSergey);
-- [Telegram group](https://t.me/ChatAdditions_group);
-- E-Mail;
 
 ## License
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
